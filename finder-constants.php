@@ -9,13 +9,6 @@ return \StubsGenerator\Finder::create()
     ) )
     ->append(
         \StubsGenerator\Finder::create()
-            ->in(['source/'])
-            ->files()
-            ->depth('< 1')
-            ->path('bootstrap.php')
-    )
-    ->append(
-        \StubsGenerator\Finder::create()
             ->in(['source/vendor/freemius/wordpress-sdk'])
             ->files()
             ->depth('< 1')

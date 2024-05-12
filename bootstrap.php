@@ -70,3 +70,5 @@ define('WP_DEFAULT_THEME', 'twentytwentythree');
 
 // Freemius SDK constants.
 define('WP_FS__SDK_VERSION', '1.0.0');
+define('WP_FS__SCRIPT_START_TIME', time());
+define( 'FS_SDK__HAS_CURL', false );

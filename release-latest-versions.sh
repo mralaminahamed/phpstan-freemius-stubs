@@ -4,8 +4,7 @@
 #
 
 # Watch current release on Packagist.
-wget -qO- https://packagist.org/packages/freemius/wordpress-sdk.json \
-| jq '.package.versions[] | select(.version_normalized=="4.4.0.0")'
+wget -qO- https://packagist.org/packages/freemius/wordpress-sdk.json | jq '.package.versions[] | select(.version_normalized=="4.4.0.0")'
 
 set -e
 

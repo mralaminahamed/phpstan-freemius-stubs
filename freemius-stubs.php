@@ -6,84 +6,6 @@
  */
 
 /**
- * Mock 'Debug Bar' panel class.
- *
- * @package query-monitor
- */
-abstract class Debug_Bar_Panel
-{
-    /**
-     * @var string
-     */
-    public $_title = '';
-    /**
-     * @var bool
-     */
-    public $_visible = \true;
-    /**
-     * @param string $title
-     */
-    public function __construct($title = '')
-    {
-    }
-    /**
-     * Initializes the panel.
-     *
-     * @return false|void
-     */
-    public function init()
-    {
-    }
-    /**
-     * @return void
-     */
-    public function prerender()
-    {
-    }
-    /**
-     * Renders the panel.
-     *
-     * @return void
-     */
-    public function render()
-    {
-    }
-    /**
-     * @return bool
-     */
-    public function is_visible()
-    {
-    }
-    /**
-     * @param bool $visible
-     * @return void
-     */
-    public function set_visible($visible)
-    {
-    }
-    /**
-     * @param string|null $title
-     * @return string|void
-     */
-    public function title($title = \null)
-    {
-    }
-    /**
-     * @param array<int, string> $classes
-     * @return array<int, string>
-     */
-    public function debug_bar_classes($classes)
-    {
-    }
-    /**
-     * @param string $title
-     * @return void
-     */
-    public function Debug_Bar_Panel($title = '')
-    {
-    }
-}
-/**
  * - Each instance of Freemius class represents a single plugin
  * install by a single user (the installer of the plugin).
  *
@@ -3358,7 +3280,6 @@ class Freemius extends \Freemius_Abstract
      * @since  2.0.0
      *
      * @param int|null $blog_id
-     * @param bool     $send_skip
      */
     private function skip_site_connection($blog_id = \null)
     {
@@ -3379,7 +3300,7 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  2.0.0
      *
-     * @param array [string]array $plugins
+     * @param array $plugins
      *
      * @return string
      */
@@ -3442,7 +3363,7 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  2.0.0
      *
-     * @param string[] string           $override
+     * @param string[] $override
      * @param bool     $only_diff
      * @param bool     $is_keepalive
      * @param bool     $include_plugins Since 1.1.8 by default include plugin changes.
@@ -3461,7 +3382,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @param array    $site
      * @param FS_Site  $install
-     * @param string[] string $override
+     * @param string[] $override
      *
      * @return array
      */
@@ -3491,7 +3412,7 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.9
      *
-     * @param string[] string $override
+     * @param string[] $override
      * @param bool     $flush
      * @param bool     $is_two_way_sync @since 2.5.0 If true and there's a successful API request, the install sync cron will be cleared.
      *
@@ -3506,7 +3427,7 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  2.0.0
      *
-     * @param string[] string $override
+     * @param string[] $override
      * @param bool     $flush
      * @param bool     $is_two_way_sync @since 2.5.0 If true and there's a successful API request, the install sync cron will be cleared.
      *
@@ -3540,7 +3461,7 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.9
      *
-     * @param string[] string $override
+     * @param string[] $override
      * @param bool     $flush
      */
     function sync_install($override = array(), $flush = \false)
@@ -3552,7 +3473,7 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.9
      *
-     * @param string[] string $override
+     * @param string[] $override
      * @param bool     $flush
      */
     private function sync_installs($override = array(), $flush = \false)
@@ -6461,7 +6382,6 @@ class Freemius extends \Freemius_Abstract
      * @param bool        $redirect
      *
      * @return string|object
-     * @use    WP_Error
      */
     function opt_in($email = \false, $first = \false, $last = \false, $license_key = \false, $is_uninstall = \false, $trial_plan_id = \false, $is_disconnected = \false, $is_marketing_allowed = \null, $sites = array(), $redirect = \true)
     {
@@ -7188,7 +7108,7 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.1.6
      *
-     * @param string[] string $key_value
+     * @param string[] $key_value
      *
      * @uses   fs_override_i18n()
      */
@@ -8017,8 +7937,8 @@ class Freemius extends \Freemius_Abstract
      * @author Leo Fajardo (@leorw)
      * @since  2.3.2
      *
-     * @param number              $user_id
-     * @param array[string]number $install_ids_by_slug_map
+     * @param number        $user_id
+     * @param array[string] $install_ids_by_slug_map
      *
      */
     private function complete_ownership_change_by_license($user_id, $install_ids_by_slug_map)
@@ -11107,111 +11027,6 @@ class FS_User_Lock
     {
     }
 }
-/**
- * Class Zerif_Customizer_Theme_Info_Main
- *
- * @since  1.0.0
- * @access public
- */
-class FS_Customizer_Support_Section extends \WP_Customize_Section
-{
-    function __construct($manager, $id, $args = array())
-    {
-    }
-    /**
-     * The type of customize section being rendered.
-     *
-     * @since  1.0.0
-     * @access public
-     * @var    string
-     */
-    public $type = 'freemius-support-section';
-    /**
-     * @var Freemius
-     */
-    public $fs = \null;
-    /**
-     * Add custom parameters to pass to the JS via JSON.
-     *
-     * @since  1.0.0
-     */
-    public function json()
-    {
-    }
-    /**
-     * Outputs the Underscore.js template.
-     *
-     * @since  1.0.0
-     */
-    protected function render_template()
-    {
-    }
-}
-/**
- * Class FS_Customizer_Upsell_Control
- */
-class FS_Customizer_Upsell_Control extends \WP_Customize_Control
-{
-    /**
-     * Control type
-     *
-     * @var string control type
-     */
-    public $type = 'freemius-upsell-control';
-    /**
-     * @var Freemius
-     */
-    public $fs = \null;
-    /**
-     * @param WP_Customize_Manager $manager the customize manager class.
-     * @param string               $id      id.
-     * @param array                $args    customizer manager parameters.
-     */
-    public function __construct(\WP_Customize_Manager $manager, $id, array $args)
-    {
-    }
-    /**
-     * Enqueue resources for the control.
-     */
-    public function enqueue()
-    {
-    }
-    /**
-     * Json conversion
-     */
-    public function to_json()
-    {
-    }
-    /**
-     * Control content
-     */
-    public function content_template()
-    {
-    }
-}
-/**
- * Extends Debug Bar plugin by adding a panel to show all Freemius API requests.
- *
- * @author Vova Feldman (@svovaf)
- * @since  1.1.7.3
- *
- * Class Freemius_Debug_Bar_Panel
- */
-class Freemius_Debug_Bar_Panel extends \Debug_Bar_Panel
-{
-    public function init()
-    {
-    }
-    public static function requests_count()
-    {
-    }
-    public static function total_time()
-    {
-    }
-    public function render()
-    {
-    }
-}
 class FS_Entity
 {
     /**
@@ -11254,8 +11069,8 @@ class FS_Entity
      * @author Vova Feldman (@svovaf)
      * @since  1.0.9
      *
-     * @param  string|array[string]mixed $key
-     * @param string|bool $val
+     * @param  string|array[string] $key
+     * @param string|bool           $val
      *
      * @return bool
      */
@@ -16807,8 +16622,8 @@ function fs_esc_html_echo_inline($text, $key = '', $slug = 'freemius')
  * @author Vova Feldman (@svovaf)
  * @since  1.1.6
  *
- * @param array[string]string $key_value
- * @param string              $slug
+ * @param array     $key_value
+ * @param string    $slug
  *
  * @global $fs_text_overrides
  */
