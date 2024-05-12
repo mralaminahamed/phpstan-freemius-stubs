@@ -3358,7 +3358,6 @@ class Freemius extends \Freemius_Abstract
      * @since  2.0.0
      *
      * @param int|null $blog_id
-     * @param bool     $send_skip
      */
     private function skip_site_connection($blog_id = \null)
     {
