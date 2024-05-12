@@ -5052,9 +5052,9 @@ class Freemius extends \Freemius_Abstract
      * @param int         $blog_id
      *
      * @return array {
-     *      @var bool   $success
-     *      @var string $error
-     *      @var string $next_page
+     *      @type bool   $success
+     *      @type string $error
+     *      @type string $next_page
      * }
      *
      * @uses Freemius::activate_license()

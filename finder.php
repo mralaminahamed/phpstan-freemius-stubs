@@ -1,7 +1,5 @@
 <?php
 
-require_once 'vendor/autoload.php';
-
 return \StubsGenerator\Finder::create()
     ->in( array(
         'source/vendor/freemius/wordpress-sdk/includes',
@@ -35,7 +33,7 @@ return \StubsGenerator\Finder::create()
             ->depth('< 1')
             ->path('start.php')
     )
-    ->notPath('source/vendor/freemius/wordpress-sdk/includes/customizer')
-    ->notPath('source/vendor/freemius/wordpress-sdk/includes/debug')
+    ->notPath('customizer')
+    ->notPath('debug')
     ->sortByName(true)
 ;
