@@ -1,7 +1,5 @@
 <?php
 
-require_once 'vendor/autoload.php';
-
 return \StubsGenerator\Finder::create()
     ->in( array(
         'source/vendor/freemius/wordpress-sdk/includes',

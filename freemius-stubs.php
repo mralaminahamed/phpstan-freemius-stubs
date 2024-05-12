@@ -5097,9 +5097,9 @@ class Freemius extends \Freemius_Abstract
      *
      *
      * @return array {
-     *      @var bool   $success
-     *      @var string $error
-     *      @var string $next_page
+     *      @type bool   $success
+     *      @type string $error
+     *      @type string $next_page
      * }
      */
     private function activate_license($license_key, $sites = array(), $is_marketing_allowed = \null, $blog_id = \null, $plugin_id = \null, $license_owner_id = \null, $is_extensions_tracking_allowed = \null, $is_diagnostic_tracking_allowed = \null)
@@ -15848,19 +15848,6 @@ class Freemius_Api_WordPress extends \Freemius_Api_Base
     {
     }
     #endregion
-}
-/**
- * Initialize Freemius custom debug panels.
- *
- * @param array $panels Debug bar panels objects
- *
- * @return array Debug bar panels with your custom panels
- */
-function fs_custom_panels_init($panels)
-{
-}
-function fs_custom_status_init($statuses)
-{
 }
 /**
  * Get object's public variables.
