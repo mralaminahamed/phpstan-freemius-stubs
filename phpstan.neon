@@ -1,5 +1,6 @@
 parameters:
     paths:
+        - freemius-constants-stubs.php
         - freemius-stubs.php
     level: 5
     tipsOfTheDay: false
@@ -8,4 +9,5 @@ parameters:
         - '#has an unused parameter#'
         - '#^(Property|Static property|Method|Static method) \S+ is unused\.$#'
         - '#is never read, only written\.$#'
-        - '#has invalid (return )?type (WP_Error|WP_Customize_Manager)\.#'
+        - '#has invalid (return )?type (WP_Error|WP_Customize_Manager|WP_User|WP_Site|WP_Upgrader)\.#'
+        - '#extends unknown class (WP_Customize_Section|WP_Customize_Control)\.#'

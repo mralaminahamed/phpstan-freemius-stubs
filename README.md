@@ -34,5 +34,6 @@ Include stubs in PHPStan configuration file.
 ```yaml
 parameters:
     bootstrapFiles:
+        - vendor/mralaminahamed/freemius-stubs/freemius-constants-stubs.php
         - vendor/mralaminahamed/freemius-stubs/freemius-stubs.php
 ```
