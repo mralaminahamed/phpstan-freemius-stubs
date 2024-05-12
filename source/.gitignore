@@ -1,3 +1,5 @@
 *
 !/.gitignore
+!/bootstrap.php
 !/composer.json
+!/debug_bar_panel.php

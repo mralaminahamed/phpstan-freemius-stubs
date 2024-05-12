@@ -1,0 +1,11 @@
+parameters:
+    paths:
+        - freemius-stubs.php
+    level: 5
+    tipsOfTheDay: false
+    ignoreErrors:
+        - '#but return statement is missing\.$#'
+        - '#has an unused parameter#'
+        - '#^(Property|Static property|Method|Static method) \S+ is unused\.$#'
+        - '#is never read, only written\.$#'
+        - '#has invalid (return )?type (WP_Error|WP_Customize_Manager)\.#'
