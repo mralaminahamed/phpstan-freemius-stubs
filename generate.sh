@@ -22,4 +22,5 @@ test -d "source/vendor/freemius/wordpress-sdk"
     --classes \
     --interfaces \
     --traits \
+    --constants \
     --out="$FILE"

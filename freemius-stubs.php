@@ -15956,6 +15956,7 @@ class Freemius_Api_WordPress extends \Freemius_Api_Base
     }
     #endregion
 }
+\define('WP_FS__SECURITY_PARAMS_PREFIX', 's_');
 /**
  * Initialize Freemius custom debug panels.
  *
@@ -16946,6 +16947,18 @@ function _fs_text($text)
 function _fs_x($text, $context)
 {
 }
+\define('FS_API__VERSION', '1');
+\define('FS_SDK__PATH', \dirname(__FILE__));
+\define('FS_SDK__EXCEPTIONS_PATH', \FS_SDK__PATH . '/Exceptions/');
+\define('FS_SDK__USER_AGENT', 'fs-php-' . \Freemius_Api_Base::VERSION);
+\define('FS_SDK__SIMULATE_NO_CURL', \false);
+\define('FS_SDK__SIMULATE_NO_API_CONNECTIVITY_CLOUDFLARE', \false);
+\define('FS_SDK__SIMULATE_NO_API_CONNECTIVITY_SQUID_ACL', \false);
+\define('FS_SDK__SSLVERIFY', \false);
+\define('FS_API__PROTOCOL', \version_compare($curl_version['version'], '7.37', '>=') ? 'https' : 'http');
+\define('FS_API__LOGGER_ON', \false);
+\define('FS_API__ADDRESS', '://api.freemius.com');
+\define('FS_API__SANDBOX_ADDRESS', '://sandbox-api.freemius.com');
 /**
  * Find the plugin main file path based on any given file inside the plugin's folder.
  *
