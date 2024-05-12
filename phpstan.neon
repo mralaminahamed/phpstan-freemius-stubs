@@ -17,4 +17,4 @@ parameters:
         - '#Variable \$\S+ might not be defined\.$#'
         - '#Function \S+ not found\.#'
         - '#tag @var above a method has no effect.#'
-        # - '#extends unknown class (WP_Customize_Section|WP_Customize_Control)\.#'
+        

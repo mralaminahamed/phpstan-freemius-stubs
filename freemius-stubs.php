@@ -3300,7 +3300,7 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  2.0.0
      *
-     * @param array [string]array $plugins
+     * @param array $plugins
      *
      * @return string
      */
@@ -3363,7 +3363,7 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  2.0.0
      *
-     * @param string[] string           $override
+     * @param string[] $override
      * @param bool     $only_diff
      * @param bool     $is_keepalive
      * @param bool     $include_plugins Since 1.1.8 by default include plugin changes.
@@ -3382,7 +3382,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @param array    $site
      * @param FS_Site  $install
-     * @param string[] string $override
+     * @param string[] $override
      *
      * @return array
      */
@@ -3412,7 +3412,7 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.9
      *
-     * @param string[] string $override
+     * @param string[] $override
      * @param bool     $flush
      * @param bool     $is_two_way_sync @since 2.5.0 If true and there's a successful API request, the install sync cron will be cleared.
      *
@@ -3427,7 +3427,7 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  2.0.0
      *
-     * @param string[] string $override
+     * @param string[] $override
      * @param bool     $flush
      * @param bool     $is_two_way_sync @since 2.5.0 If true and there's a successful API request, the install sync cron will be cleared.
      *
@@ -3461,7 +3461,7 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.9
      *
-     * @param string[] string $override
+     * @param string[] $override
      * @param bool     $flush
      */
     function sync_install($override = array(), $flush = \false)
@@ -3473,7 +3473,7 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.9
      *
-     * @param string[] string $override
+     * @param string[] $override
      * @param bool     $flush
      */
     private function sync_installs($override = array(), $flush = \false)
@@ -6382,7 +6382,6 @@ class Freemius extends \Freemius_Abstract
      * @param bool        $redirect
      *
      * @return string|object
-     * @use    WP_Error
      */
     function opt_in($email = \false, $first = \false, $last = \false, $license_key = \false, $is_uninstall = \false, $trial_plan_id = \false, $is_disconnected = \false, $is_marketing_allowed = \null, $sites = array(), $redirect = \true)
     {
@@ -7109,7 +7108,7 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.1.6
      *
-     * @param string[] string $key_value
+     * @param string[] $key_value
      *
      * @uses   fs_override_i18n()
      */
@@ -7938,8 +7937,8 @@ class Freemius extends \Freemius_Abstract
      * @author Leo Fajardo (@leorw)
      * @since  2.3.2
      *
-     * @param number              $user_id
-     * @param array[string]number $install_ids_by_slug_map
+     * @param number        $user_id
+     * @param array[string] $install_ids_by_slug_map
      *
      */
     private function complete_ownership_change_by_license($user_id, $install_ids_by_slug_map)
@@ -11070,8 +11069,8 @@ class FS_Entity
      * @author Vova Feldman (@svovaf)
      * @since  1.0.9
      *
-     * @param  string|array[string]mixed $key
-     * @param string|bool $val
+     * @param  string|array[string] $key
+     * @param string|bool           $val
      *
      * @return bool
      */
@@ -16623,8 +16622,8 @@ function fs_esc_html_echo_inline($text, $key = '', $slug = 'freemius')
  * @author Vova Feldman (@svovaf)
  * @since  1.1.6
  *
- * @param array[string]string $key_value
- * @param string              $slug
+ * @param array     $key_value
+ * @param string    $slug
  *
  * @global $fs_text_overrides
  */
