@@ -1,7 +1,6 @@
 {
     "name": "mralaminahamed/freemius-stubs",
     "description": "freemius wordpress-sdk function and class declaration stubs for static analysis.",
-    "type": "phpstan-extension",
     "keywords": [
         "freemius",
         "wordpress",
