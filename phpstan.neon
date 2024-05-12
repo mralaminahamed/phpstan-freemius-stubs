@@ -7,8 +7,7 @@ parameters:
     level: 5
     tipsOfTheDay: false
     ignoreErrors:
-        - '#is always true.#'
-        - '#is always false.#'
+        - '#is always (true|false).#'
         - '#but return statement is missing\.$#'
         - '#has an unused parameter#'
         - '#^(Property|Static property|Method|Static method) \S+ is unused\.$#'
@@ -17,4 +16,5 @@ parameters:
         - '#Parameter \d+ of \S+ is never used\.$#'
         - '#Variable \$\S+ might not be defined\.$#'
         - '#Function \S+ not found\.#'
+        - '#tag @var above a method has no effect.#'
         # - '#extends unknown class (WP_Customize_Section|WP_Customize_Control)\.#'
