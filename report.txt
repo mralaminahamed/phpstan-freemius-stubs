@@ -1,0 +1,27 @@
+ -------- ------------------------------------------------------------------------------------------------------------------------------------------------ 
+  Line     freemius-stubs.php                                                                                                                              
+ -------- ------------------------------------------------------------------------------------------------------------------------------------------------ 
+  :3363    PHPDoc tag @param references unknown parameter: $send_skip                                                                                      
+  :3386    PHPDoc tag @param has invalid value (array [string]array $plugins): Unexpected token "[", expected variable at offset 239                       
+  :3453    PHPDoc tag @param has invalid value (string[] string           $override): Unexpected token "string", expected variable at offset 240           
+  :3468    PHPDoc tag @param has invalid value (string[] string $override): Unexpected token "string", expected variable at offset 277                     
+  :3500    PHPDoc tag @param has invalid value (string[] string $override): Unexpected token "string", expected variable at offset 145                     
+  :3515    PHPDoc tag @param has invalid value (string[] string $override): Unexpected token "string", expected variable at offset 146                     
+  :3546    PHPDoc tag @param has invalid value (string[] string $override): Unexpected token "string", expected variable at offset 145                     
+  :3558    PHPDoc tag @param has invalid value (string[] string $override): Unexpected token "string", expected variable at offset 145                     
+  :5141    PHPDoc tag @var above a method has no effect.                                                                                                   
+  :5184    PHPDoc tag @var above a method has no effect.                                                                                                   
+  :6466    PHPDoc tag @use has invalid value (WP_Error): Unexpected token "\r\n     ", expected '<' at offset 1132                                         
+  :7195    PHPDoc tag @param has invalid value (string[] string $key_value): Unexpected token "string", expected variable at offset 149                    
+  :8024    PHPDoc tag @param has invalid value (array[string]number $install_ids_by_slug_map): Unexpected token "number", expected variable at offset 198  
+  :11116   Class FS_Customizer_Support_Section extends unknown class WP_Customize_Section.                                                                 
+           💡 Learn more at https://phpstan.org/user-guide/discovering-symbols                                                                             
+  :11153   Class FS_Customizer_Upsell_Control extends unknown class WP_Customize_Control.                                                                  
+           💡 Learn more at https://phpstan.org/user-guide/discovering-symbols                                                                             
+  :11262   PHPDoc tag @param has invalid value (string|array[string]mixed $key): Unexpected token "mixed", expected variable at offset 143                 
+  :16815   PHPDoc tag @param has invalid value (array[string]string $key_value): Unexpected token "string", expected variable at offset 129                
+ -------- ------------------------------------------------------------------------------------------------------------------------------------------------ 
+
+
+ [ERROR] Found 17 errors                                                                                                
+
