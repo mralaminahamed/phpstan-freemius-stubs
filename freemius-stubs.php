@@ -3551,7 +3551,7 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  2.2.1
      *
-     * @param string $is_premium
+     * @param bool $is_premium
      * @param string $caller
      *
      * @return void
