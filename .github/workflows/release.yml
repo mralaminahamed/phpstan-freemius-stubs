@@ -1,0 +1,40 @@
+name: Release new version
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+
+jobs:
+  relase-new-stubs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Release new stubs from latest version
+        run: bash release-latest-versions.sh
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.PERSONAL_TOKEN }}
+          commit-message: Generate stubs from latest version
+          committer: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+          author: ${{ github.actor }} <${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com>
+          signoff: false
+          branch: main
+          delete-branch: true
+          title: 'Generate stubs from latest version'
+          body: |
+            This PR updates the codebase with the latest changes from the packagist
+            - Update from packagist
+          labels: |
+            update
+            automated pr
+          assignees: mralaminahamed
+          draft: false
+
+      - name: Check Output
+        run: |
+          echo "Pull Request created successfully!"
