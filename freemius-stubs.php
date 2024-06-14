@@ -640,7 +640,7 @@ class Freemius extends \Freemius_Abstract
     /**
      * @since 1.0.4
      *
-     * @var FS_Plugin|false
+     * @var FS_Plugin
      */
     private $_plugin = \false;
     /**
@@ -652,19 +652,19 @@ class Freemius extends \Freemius_Abstract
     /**
      * @since 1.1.1
      *
-     * @var Freemius|false
+     * @var Freemius
      */
     private $_parent = \false;
     /**
      * @since 1.0.1
      *
-     * @var FS_User|false
+     * @var FS_User
      */
     private $_user = \false;
     /**
      * @since 1.0.1
      *
-     * @var FS_Site|false
+     * @var FS_Site
      */
     private $_site = \false;
     /**
@@ -676,11 +676,11 @@ class Freemius extends \Freemius_Abstract
     /**
      * @since 1.0.2
      *
-     * @var FS_Plugin_Plan[]|false
+     * @var FS_Plugin_Plan[]
      */
     private $_plans = \false;
     /**
-     * @var FS_Plugin_License[]|false
+     * @var FS_Plugin_License[]
      * @since 1.0.5
      */
     private $_licenses = \false;
@@ -3280,6 +3280,7 @@ class Freemius extends \Freemius_Abstract
      * @since  2.0.0
      *
      * @param int|null $blog_id
+     * @param bool     $send_skip
      */
     private function skip_site_connection($blog_id = \null)
     {
@@ -3551,7 +3552,7 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  2.2.1
      *
-     * @param bool $is_premium
+     * @param string $is_premium
      * @param string $caller
      *
      * @return void
