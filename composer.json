@@ -7,7 +7,7 @@
         "static analysis",
         "phpstan"
     ],
-    "homepage": "https://github.com/mralaminahamed/freemius-stubs",
+    "homepage": "https://github.com/mralaminahamed/phpstan-freemius-stubs",
     "license": "MIT",
     "require": {
         "php-stubs/wordpress-stubs": "^5.3 || ^6.0"

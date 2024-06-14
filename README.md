@@ -3,7 +3,6 @@
 [![Packagist stats](https://img.shields.io/packagist/dt/mralaminahamed/freemius-stubs.svg)](https://packagist.org/packages/mralaminahamed/freemius-stubs/stats)
 [![Packagist](https://img.shields.io/packagist/v/mralaminahamed/freemius-stubs.svg?color=4CC61E&style=popout)](https://packagist.org/packages/mralaminahamed/freemius-stubs)
 [![Tweet](https://img.shields.io/badge/Tweet-share-d5d5d5?style=social&logo=twitter)](https://twitter.com/intent/tweet?text=https%3A%2F%2Fgithub.com%2Fmralaminahamed%2Fphpstan-freemius-stubs&url=I%20use%20mralaminahamed%2Fphpstan-freemius-stubs%20for%20IDE%20completion%20and%20static%20analysis)
-[![Build Status](https://app.travis-ci.com/mralaminahamed/freemius-stubs.svg?branch=master)](https://app.travis-ci.com/mralaminahamed/freemius-stubs)
 
 This package provides stub declarations for the [Freemius WordPress SDK plugin](https://github.com/freemius/wordpress-sdk)
 functions, classes and interfaces.
