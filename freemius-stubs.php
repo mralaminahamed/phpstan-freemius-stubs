@@ -17,7 +17,9 @@
  */
 abstract class Freemius_Abstract
 {
-    #region Identity ------------------------------------------------------------------
+    #----------------------------------------------------------------------------------
+    #region Identity
+    #----------------------------------------------------------------------------------
     /**
      * Check if user registered with Freemius by connecting his account.
      *
@@ -41,8 +43,66 @@ abstract class Freemius_Abstract
      * @return bool
      */
     abstract function is_activation_mode();
-    #endregion Identity ------------------------------------------------------------------
-    #region Permissions ------------------------------------------------------------------
+    #endregion
+    #----------------------------------------------------------------------------------
+    #region Usage Tracking
+    #----------------------------------------------------------------------------------
+    /**
+     * Returns TRUE if the user opted-in and didn't disconnect (opt-out).
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since 1.2.1.5
+     *
+     * @return bool
+     */
+    abstract function is_tracking_allowed();
+    /**
+     * Returns TRUE if the user never opted-in or manually opted-out.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since 1.2.1.5
+     *
+     * @return bool
+     */
+    function is_tracking_prohibited()
+    {
+    }
+    /**
+     * Opt-out from usage tracking.
+     *
+     * Note: This will not delete the account information but will stop all tracking.
+     *
+     * Returns:
+     *  1. FALSE  - If the user never opted-in.
+     *  2. TRUE   - If successfully opted-out.
+     *  3. object - API Result on failure.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  1.2.1.5
+     *
+     * @return bool|object
+     */
+    abstract function stop_tracking();
+    /**
+     * Opt-in back into usage tracking.
+     *
+     * Note: This will only work if the user opted-in previously.
+     *
+     * Returns:
+     *  1. FALSE  - If the user never opted-in.
+     *  2. TRUE   - If successfully opted-in back to usage tracking.
+     *  3. object - API result on failure.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  1.2.1.5
+     *
+     * @return bool|object
+     */
+    abstract function allow_tracking();
+    #endregion
+    #----------------------------------------------------------------------------------
+    #region Permissions
+    #----------------------------------------------------------------------------------
     /**
      * Check if plugin must be WordPress.org compliant.
      *
@@ -62,7 +122,7 @@ abstract class Freemius_Abstract
     function is_allowed_to_install()
     {
     }
-    #endregion Permissions ------------------------------------------------------------------
+    #endregion
     /**
      * Check if user in trial or in free plan (not paying).
      *
@@ -101,7 +161,9 @@ abstract class Freemius_Abstract
      * @return bool
      */
     abstract function can_use_premium_code();
-    #region Premium Only ------------------------------------------------------------------
+    #----------------------------------------------------------------------------------
+    #region Premium Only
+    #----------------------------------------------------------------------------------
     /**
      * All logic wrapped in methods with "__premium_only()" suffix will be only
      * included in the premium code.
@@ -198,8 +260,10 @@ abstract class Freemius_Abstract
     function can_use_premium_code__premium_only()
     {
     }
-    #endregion Premium Only ------------------------------------------------------------------
-    #region Trial ------------------------------------------------------------------
+    #endregion
+    #----------------------------------------------------------------------------------
+    #region Trial
+    #----------------------------------------------------------------------------------
     /**
      * Check if the user in a trial.
      *
@@ -216,8 +280,10 @@ abstract class Freemius_Abstract
      * @return bool
      */
     abstract function is_trial_utilized();
-    #endregion Trial ------------------------------------------------------------------
-    #region Plans ------------------------------------------------------------------
+    #endregion
+    #----------------------------------------------------------------------------------
+    #region Plans
+    #----------------------------------------------------------------------------------
     /**
      * Check if plugin using the free plan.
      *
@@ -301,7 +367,7 @@ abstract class Freemius_Abstract
     function is_freemium()
     {
     }
-    #endregion Plans ------------------------------------------------------------------
+    #endregion
     /**
      * Check if running payments in sandbox mode.
      *
@@ -357,7 +423,9 @@ abstract class Freemius_Abstract
      * @return bool
      */
     abstract function is_plugin_new_install();
-    #region Marketing ------------------------------------------------------------------
+    #----------------------------------------------------------------------------------
+    #region Marketing
+    #----------------------------------------------------------------------------------
     /**
      * Check if current user purchased any other plugins before.
      *
@@ -394,7 +462,7 @@ abstract class Freemius_Abstract
      * @return bool
      */
     abstract function is_business();
-    #endregion ------------------------------------------------------------------
+    #endregion
 }
 // "final class"
 class Freemius extends \Freemius_Abstract
@@ -490,6 +558,17 @@ class Freemius extends \Freemius_Abstract
      * @var bool Hints the SDK if the plugin has any paid plans.
      */
     private $_has_paid_plans;
+    /**
+     * @since 1.2.1.5
+     * @var int Hints the SDK if the plugin offers a trial period. If negative, no trial, if zero - has a trial but
+     *      without a specified period, if positive - the number of trial days.
+     */
+    private $_trial_days = -1;
+    /**
+     * @since 1.2.1.5
+     * @var bool Hints the SDK if the trial requires a payment method or not.
+     */
+    private $_is_trial_require_payment = \false;
     /**
      * @since 1.0.7
      * @var bool Hints the SDK if the plugin is WordPress.org compliant.
@@ -592,7 +671,7 @@ class Freemius extends \Freemius_Abstract
      * @var Freemius[]
      */
     private static $_instances = array();
-    // Reason IDs
+    #region Uninstall Reasons IDs
     const REASON_NO_LONGER_NEEDED = 1;
     const REASON_FOUND_A_BETTER_PLUGIN = 2;
     const REASON_NEEDED_FOR_A_SHORT_PERIOD = 3;
@@ -608,6 +687,7 @@ class Freemius extends \Freemius_Abstract
     const REASON_NOT_WHAT_I_WAS_LOOKING_FOR = 13;
     const REASON_DIDNT_WORK_AS_EXPECTED = 14;
     const REASON_TEMPORARY_DEACTIVATION = 15;
+    #endregion
     /* Ctor
     ------------------------------------------------------------------------------------------------------------------*/
     /**
@@ -729,7 +809,9 @@ class Freemius extends \Freemius_Abstract
     private function _find_caller_plugin_file($is_init = \false)
     {
     }
-    #region Deactivation Feedback Form ------------------------------------------------------------------
+    #----------------------------------------------------------------------------------
+    #region Deactivation Feedback Form
+    #----------------------------------------------------------------------------------
     /**
      * Displays a confirmation and feedback dialog box when the user clicks on the "Deactivate" link on the plugins
      * page.
@@ -761,8 +843,10 @@ class Freemius extends \Freemius_Abstract
     function _submit_uninstall_reason_action()
     {
     }
-    #endregion Deactivation Feedback Form ------------------------------------------------------------------
-    #region Instance ------------------------------------------------------------------
+    #endregion
+    #----------------------------------------------------------------------------------
+    #region Instance
+    #----------------------------------------------------------------------------------
     /**
      * Main singleton instance.
      *
@@ -919,6 +1003,9 @@ class Freemius extends \Freemius_Abstract
     private static function _load_required_static()
     {
     }
+    #----------------------------------------------------------------------------------
+    #region Localization
+    #----------------------------------------------------------------------------------
     /**
      * Load framework's text domain.
      *
@@ -928,7 +1015,10 @@ class Freemius extends \Freemius_Abstract
     static function _load_textdomain()
     {
     }
-    #region Debugging ------------------------------------------------------------------
+    #endregion
+    #----------------------------------------------------------------------------------
+    #region Debugging
+    #----------------------------------------------------------------------------------
     /**
      * @author Vova Feldman (@svovaf)
      * @since  1.0.8
@@ -957,8 +1047,10 @@ class Freemius extends \Freemius_Abstract
     static function _debug_page_render()
     {
     }
-    #endregion ------------------------------------------------------------------
-    #region Connectivity Issues ------------------------------------------------------------------
+    #endregion
+    #----------------------------------------------------------------------------------
+    #region Connectivity Issues
+    #----------------------------------------------------------------------------------
     /**
      * Check if Freemius should be turned on for the current plugin install.
      *
@@ -1082,8 +1174,10 @@ class Freemius extends \Freemius_Abstract
     static function _add_firewall_issues_javascript()
     {
     }
-    #endregion Connectivity Issues ------------------------------------------------------------------
-    #region Email ------------------------------------------------------------------
+    #endregion
+    #----------------------------------------------------------------------------------
+    #region Email
+    #----------------------------------------------------------------------------------
     /**
      * Generates and sends an HTML email with customizable sections.
      *
@@ -1111,8 +1205,10 @@ class Freemius extends \Freemius_Abstract
     private function get_email_sections()
     {
     }
-    #endregion Email ------------------------------------------------------------------
-    #region Initialization ------------------------------------------------------------------
+    #endregion
+    #----------------------------------------------------------------------------------
+    #region Initialization
+    #----------------------------------------------------------------------------------
     /**
      * Init plugin's Freemius instance.
      *
@@ -1139,6 +1235,68 @@ class Freemius extends \Freemius_Abstract
      * @throws Freemius_Exception
      */
     function dynamic_init(array $plugin_info)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     *
+     * @since  1.2.1.5
+     */
+    function _stop_tracking_callback()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  1.2.1.5
+     */
+    function _allow_tracking_callback()
+    {
+    }
+    /**
+     * Opt-out from usage tracking.
+     *
+     * Note: This will not delete the account information but will stop all tracking.
+     *
+     * Returns:
+     *  1. FALSE  - If the user never opted-in.
+     *  2. TRUE   - If successfully opted-out.
+     *  3. object - API result on failure.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  1.2.1.5
+     *
+     * @return bool|object
+     */
+    function stop_tracking()
+    {
+    }
+    /**
+     * Opt-in back into usage tracking.
+     *
+     * Note: This will only work if the user opted-in previously.
+     *
+     * Returns:
+     *  1. FALSE  - If the user never opted-in.
+     *  2. TRUE   - If successfully opted-in back to usage tracking.
+     *  3. object - API result on failure.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  1.2.1.5
+     *
+     * @return bool|object
+     */
+    function allow_tracking()
+    {
+    }
+    /**
+     * If user opted-in and later disabled usage-tracking,
+     * re-allow tracking for licensing and updates.
+     *
+     * @author Leo Fajardo (@leorw)
+     *
+     * @since  1.2.1.5
+     */
+    private function reconnect_locally()
     {
     }
     /**
@@ -1199,8 +1357,10 @@ class Freemius extends \Freemius_Abstract
     function _plugin_code_type_changed()
     {
     }
-    #endregion Initialization ------------------------------------------------------------------
-    #region Add-ons -------------------------------------------------------------------------
+    #endregion
+    #----------------------------------------------------------------------------------
+    #region Add-ons
+    #----------------------------------------------------------------------------------
     /**
      * Check if add-on installed and activated on site.
      *
@@ -1307,8 +1467,10 @@ class Freemius extends \Freemius_Abstract
     private function deactivate_premium_only_addon_without_license($is_after_trial_cancel = \false)
     {
     }
-    #endregion ------------------------------------------------------------------
-    #region Sandbox ------------------------------------------------------------------
+    #endregion
+    #----------------------------------------------------------------------------------
+    #region Sandbox
+    #----------------------------------------------------------------------------------
     /**
      * Set Freemius into sandbox mode for debugging.
      *
@@ -1331,7 +1493,7 @@ class Freemius extends \Freemius_Abstract
     function is_payments_sandbox()
     {
     }
-    #endregion Sandbox ------------------------------------------------------------------
+    #endregion
     /**
      * Check if running test vs. live plugin.
      *
@@ -1375,7 +1537,9 @@ class Freemius extends \Freemius_Abstract
     function is_org_repo_compliant()
     {
     }
-    #region Daily Sync Cron ------------------------------------------------------------------
+    #----------------------------------------------------------------------------------
+    #region Daily Sync Cron
+    #----------------------------------------------------------------------------------
     /**
      * @author Vova Feldman (@svovaf)
      * @since  1.1.7.3
@@ -1465,7 +1629,9 @@ class Freemius extends \Freemius_Abstract
     {
     }
     #endregion Daily Sync Cron ------------------------------------------------------------------
-    #region Async Install Sync ------------------------------------------------------------------
+    #----------------------------------------------------------------------------------
+    #region Async Install Sync
+    #----------------------------------------------------------------------------------
     /**
      * @author Vova Feldman (@svovaf)
      * @since  1.1.7.3
@@ -1540,8 +1706,9 @@ class Freemius extends \Freemius_Abstract
      * @since  1.0.7
      *
      * @param bool|string $email
+     * @param bool        $is_pending_trial Since 1.2.1.5
      */
-    function _add_pending_activation_notice($email = \false)
+    function _add_pending_activation_notice($email = \false, $is_pending_trial = \false)
     {
     }
     /**
@@ -1650,6 +1817,17 @@ class Freemius extends \Freemius_Abstract
      * @return bool
      */
     function is_plugin_new_install()
+    {
+    }
+    /**
+     * Check if it's the first plugin release that is running Freemius.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.5
+     *
+     * @return bool
+     */
+    function is_first_freemius_powered_version()
     {
     }
     /**
@@ -1802,8 +1980,6 @@ class Freemius extends \Freemius_Abstract
      *
      * @param string[] string $override
      * @param bool     $flush
-     *
-     * @return false|object|string
      */
     private function sync_install($override = array(), $flush = \false)
     {
@@ -1892,7 +2068,9 @@ class Freemius extends \Freemius_Abstract
     public static function _uninstall_plugin_hook()
     {
     }
-    #region Plugin Information ------------------------------------------------------------------
+    #----------------------------------------------------------------------------------
+    #region Plugin Information
+    #----------------------------------------------------------------------------------
     /**
      * Load WordPress core plugin.php essential module.
      *
@@ -1938,6 +2116,24 @@ class Freemius extends \Freemius_Abstract
      * @return number Plugin ID.
      */
     function get_id()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.5
+     *
+     * @return string Freemius SDK version
+     */
+    function get_sdk_version()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.5
+     *
+     * @return number Parent plugin ID (if parent exist).
+     */
+    function get_parent_id()
     {
     }
     /**
@@ -2064,7 +2260,7 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.6
      *
-     * @return FS_Plugin[]|false
+     * @return array<number,FS_Plugin[]>|false
      */
     private static function get_all_addons()
     {
@@ -2086,6 +2282,17 @@ class Freemius extends \Freemius_Abstract
      * @return bool
      */
     function is_registered()
+    {
+    }
+    /**
+     * Returns TRUE if the user opted-in and didn't disconnect (opt-out).
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  1.2.1.5
+     *
+     * @return bool
+     */
+    function is_tracking_allowed()
     {
     }
     /**
@@ -2123,9 +2330,11 @@ class Freemius extends \Freemius_Abstract
      *
      * @since  1.1.7.3 If not yet loaded, fetch data from the API.
      *
+     * @param bool $flush
+     *
      * @return FS_Plugin[]|false
      */
-    function get_addons()
+    function get_addons($flush = \false)
     {
     }
     /**
@@ -2169,12 +2378,16 @@ class Freemius extends \Freemius_Abstract
      *
      * @param string $slug
      *
+     * @param bool   $flush
+     *
      * @return FS_Plugin|false
      */
-    function get_addon_by_slug($slug)
+    function get_addon_by_slug($slug, $flush = \false)
     {
     }
-    #region Plans & Licensing ------------------------------------------------------------------
+    #----------------------------------------------------------------------------------
+    #region Plans & Licensing
+    #----------------------------------------------------------------------------------
     /**
      * Check if running premium plugin code.
      *
@@ -2212,7 +2425,7 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.9
      *
-     * @return FS_Plugin_Plan
+     * @return FS_Plugin_Plan|false
      */
     function get_plan()
     {
@@ -2301,7 +2514,7 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.5
      *
-     * @return FS_Plugin_License
+     * @return FS_Plugin_License|false
      */
     function _get_available_premium_license()
     {
@@ -2323,7 +2536,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @param number $id
      *
-     * @return FS_Plugin_Plan
+     * @return FS_Plugin_Plan|false
      */
     function _get_plan_by_id($id)
     {
@@ -2358,7 +2571,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @param number $id
      *
-     * @return FS_Plugin_License
+     * @return FS_Plugin_License|false
      */
     function _get_license_by_id($id)
     {
@@ -2474,12 +2687,22 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Displays the opt-out dialog box when the user clicks on the "Opt Out" link on the "Plugins"
+     * page.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  1.2.1.5
+     */
+    function _add_optout_dialog()
+    {
+    }
+    /**
      * Prepare page to include all required UI and logic for the license activation dialog.
      *
      * @author Vova Feldman (@svovaf)
      * @since  1.2.0
      */
-    function _require_license_activation_dialog()
+    function _add_license_activation()
     {
     }
     /**
@@ -2490,13 +2713,44 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Billing update AJAX callback.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.5
+     */
+    function _update_billing_ajax_action()
+    {
+    }
+    /**
+     * Trial start for anonymous users (AJAX callback).
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.5
+     */
+    function _start_trial_ajax_action()
+    {
+    }
+    /**
      * @author Leo Fajardo (@leorw)
      * @since  1.2.0
      */
     function _resend_license_key_ajax_action()
     {
     }
+    /**
+     * Helper method to check if user in the plugins page.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.5
+     *
+     * @return bool
+     */
+    private function is_plugins_page()
+    {
+    }
+    #----------------------------------------------------------------------------------
     #region URL Generators
+    #----------------------------------------------------------------------------------
     /**
      * Alias to pricing_url().
      *
@@ -2857,7 +3111,9 @@ class Freemius extends \Freemius_Abstract
     static function _get_user_by_email($email)
     {
     }
-    #region Account (Loading, Updates & Activation) ------------------------------------------------------------------
+    #----------------------------------------------------------------------------------
+    #region Account (Loading, Updates & Activation)
+    #----------------------------------------------------------------------------------
     /***
      * Load account information (user + site).
      *
@@ -2890,6 +3146,9 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * 1. If successful opt-in or pending activation returns the next page that the user should be redirected to.
+     * 2. If there was an API error, return the API result.
+     *
      * @author Vova Feldman (@svovaf)
      * @since  1.1.7.4
      *
@@ -2900,12 +3159,12 @@ class Freemius extends \Freemius_Abstract
      * @param bool        $is_uninstall       If "true", this means that the module is currently being uninstalled.
      *                                        In this case, the user and site info will be sent to the server but no
      *                                        data will be saved to the WP installation's database.
+     * @param number|bool $trial_plan_id
      *
-     * @return bool Is successful opt-in (or set to pending).
-     *
+     * @return string|object
      * @use    WP_Error
      */
-    function opt_in($email = \false, $first = \false, $last = \false, $license_key = \false, $is_uninstall = \false)
+    function opt_in($email = \false, $first = \false, $last = \false, $license_key = \false, $is_uninstall = \false, $trial_plan_id = \false)
     {
     }
     /**
@@ -2918,7 +3177,7 @@ class Freemius extends \Freemius_Abstract
      * @param FS_Site $site
      * @param bool    $redirect
      *
-     * @return bool False if account already set.
+     * @return string If redirect is `false`, returns the next page the user should be redirected to.
      */
     function setup_account(\FS_User $user, \FS_Site $site, $redirect = \true)
     {
@@ -2945,6 +3204,8 @@ class Freemius extends \Freemius_Abstract
      * @param string $install_public_key
      * @param string $install_secret_key
      * @param bool   $redirect
+     *
+     * @return string If redirect is `false`, returns the next page the user should be redirected to.
      */
     private function install_with_new_user($user_id, $user_public_key, $user_secret_key, $install_id, $install_public_key, $install_secret_key, $redirect = \true)
     {
@@ -2953,10 +3214,14 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.1.7.4
      *
-     * @param bool $email
-     * @param bool $redirect
+     * @param string|bool $email
+     * @param bool        $redirect
+     * @param string|bool $license_key      Since 1.2.1.5
+     * @param bool        $is_pending_trial Since 1.2.1.5
+     *
+     * @return string Since 1.2.1.5 if $redirect is `false`, return the pending activation page.
      */
-    private function set_pending_confirmation($email = \false, $redirect = \true)
+    private function set_pending_confirmation($email = \false, $redirect = \true, $license_key = \false, $is_pending_trial = \false)
     {
     }
     /**
@@ -2972,11 +3237,14 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.1.7.4
      *
-     * @param bool $redirect
+     * @param string|bool $license_key
+     * @param number|bool $trial_plan_id
+     * @param bool        $redirect
      *
-     * @return object|string
+     * @return string|object If redirect is `false`, returns the next page the user should be redirected to, or the
+     *                       API error object if failed to install.
      */
-    private function install_with_current_user($redirect = \true)
+    private function install_with_current_user($license_key = \false, $trial_plan_id = \false, $redirect = \true)
     {
     }
     /**
@@ -2990,8 +3258,10 @@ class Freemius extends \Freemius_Abstract
     private function _activate_addon_account(\Freemius $parent_fs)
     {
     }
-    #endregion ------------------------------------------------------------------
-    #region Admin Menu Items ------------------------------------------------------------------
+    #endregion
+    #----------------------------------------------------------------------------------
+    #region Admin Menu Items
+    #----------------------------------------------------------------------------------
     private $_menu_items = array();
     /**
      * @author Vova Feldman (@svovaf)
@@ -3024,8 +3294,6 @@ class Freemius extends \Freemius_Abstract
     /**
      * @author Vova Feldman (@svovaf)
      * @since  1.0.1
-     *
-     * @return string
      */
     function _redirect_on_clicked_menu_link()
     {
@@ -3116,8 +3384,9 @@ class Freemius extends \Freemius_Abstract
      * @param bool|callable $before_render_function
      * @param int           $priority
      * @param bool          $show_submenu
+     * @param string        $class Since 1.2.1.5 can add custom classes to menu items.
      */
-    function add_submenu_item($menu_title, $render_function, $page_title = \false, $capability = 'manage_options', $menu_slug = \false, $before_render_function = \false, $priority = \WP_FS__DEFAULT_PRIORITY, $show_submenu = \true)
+    function add_submenu_item($menu_title, $render_function, $page_title = \false, $capability = 'manage_options', $menu_slug = \false, $before_render_function = \false, $priority = \WP_FS__DEFAULT_PRIORITY, $show_submenu = \true, $class = '')
     {
     }
     /**
@@ -3202,8 +3471,43 @@ class Freemius extends \Freemius_Abstract
      * @param int      $accepted_args
      *
      * @uses   add_action()
+     *
+     * @return bool True if action added, false if no need to add the action since the AJAX call isn't matching.
      */
     function add_ajax_action($tag, $function_to_add, $priority = \WP_FS__DEFAULT_PRIORITY, $accepted_args = 1)
+    {
+    }
+    /**
+     * Send a JSON response back to an Ajax request.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.5
+     *
+     * @param mixed $response
+     */
+    function shoot_ajax_response($response)
+    {
+    }
+    /**
+     * Send a JSON response back to an Ajax request, indicating success.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.5
+     *
+     * @param mixed $data Data to encode as JSON, then print and exit.
+     */
+    function shoot_ajax_success($data = \null)
+    {
+    }
+    /**
+     * Send a JSON response back to an Ajax request, indicating failure.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.5
+     *
+     * @param mixed $error Optional error message.
+     */
+    function shoot_ajax_failure($error = '')
     {
     }
     /**
@@ -3465,6 +3769,16 @@ class Freemius extends \Freemius_Abstract
     }
     /**
      * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.5
+     * @uses   FS_Api
+     *
+     * @return \FS_Billing|mixed
+     */
+    function _fetch_billing()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
      * @since  1.0.4
      *
      * @param FS_Plugin_Plan $plan
@@ -3687,7 +4001,9 @@ class Freemius extends \Freemius_Abstract
     function _fetch_latest_version($addon_id = \false, $flush = \true)
     {
     }
-    #region Download Plugin ------------------------------------------------------------------
+    #----------------------------------------------------------------------------------
+    #region Download Plugin
+    #----------------------------------------------------------------------------------
     /**
      * Download latest plugin version, based on plan.
      *
@@ -3801,6 +4117,9 @@ class Freemius extends \Freemius_Abstract
     private function _update_email($new_email)
     {
     }
+    #----------------------------------------------------------------------------------
+    #region API Error Handling
+    #----------------------------------------------------------------------------------
     /**
      * @author Vova Feldman (@svovaf)
      * @since  1.1.1
@@ -3810,6 +4129,48 @@ class Freemius extends \Freemius_Abstract
      * @return bool Is API result contains an error.
      */
     private function is_api_error($result)
+    {
+    }
+    /**
+     * Checks if given API result is a non-empty and not an error object.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.5
+     *
+     * @param mixed       $result
+     * @param string|null $required_property Optional property we want to verify that is set.
+     *
+     * @return bool
+     */
+    function is_api_result_object($result, $required_property = \null)
+    {
+    }
+    /**
+     * Checks if given API result is a non-empty entity object with non-empty ID.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.5
+     *
+     * @param mixed $result
+     *
+     * @return bool
+     */
+    private function is_api_result_entity($result)
+    {
+    }
+    #endregion
+    /**
+     * Make sure a given argument is an array of a specific type.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.5
+     *
+     * @param mixed  $array
+     * @param string $class
+     *
+     * @return bool
+     */
+    private function is_array_instanceof($array, $class)
     {
     }
     /**
@@ -3872,6 +4233,17 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.5
+     *
+     * @param array $params
+     *
+     * @return string
+     */
+    function get_reconnect_url($params = array())
+    {
+    }
+    /**
      * Get the URL of the page that should be loaded after the user connect or skip in the opt-in screen.
      *
      * @author Vova Feldman (@svovaf)
@@ -3881,7 +4253,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return string
      */
-    private function get_after_activation_url($filter)
+    function get_after_activation_url($filter)
     {
     }
     /**
@@ -3950,7 +4322,9 @@ class Freemius extends \Freemius_Abstract
     function _pricing_page_render()
     {
     }
-    #region Contact Us ------------------------------------------------------------------
+    #----------------------------------------------------------------------------------
+    #region Contact Us
+    #----------------------------------------------------------------------------------
     /**
      * Render contact-us page.
      *
@@ -3960,7 +4334,7 @@ class Freemius extends \Freemius_Abstract
     function _contact_page_render()
     {
     }
-    #endregion ------------------------------------------------------------------
+    #endregion ------------------------------------------------------------------------
     /**
      * Hide all admin notices to prevent distractions.
      *
@@ -4056,12 +4430,35 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * During trial promotion the "upgrade" submenu item turns to
+     * "start trial" to encourage the trial. Since we want to keep
+     * the same menu item handler and there's no robust way to
+     * add new arguments to the menu item link's querystring,
+     * use JavaScript to find the menu item and update the href of
+     * the link.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.5
+     */
+    function _fix_start_trial_menu_item_url()
+    {
+    }
+    /**
      * Show trial promotional notice (if any trial exist).
      *
      * @author Vova Feldman (@svovaf)
      * @since  1.0.9
+     *
+     * @return bool If trial notice added.
      */
     function _add_trial_notice()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.5
+     */
+    function _enqueue_common_css()
     {
     }
     /* Action Links
@@ -4108,6 +4505,15 @@ class Freemius extends \Freemius_Abstract
      * @since  1.1.9
      */
     function _add_license_action_link()
+    {
+    }
+    /**
+     * Adds "Opt in" or "Opt out" link to the main "Plugins" page link actions collection.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  1.2.1.5
+     */
+    function _add_tracking_links()
     {
     }
     /**
@@ -4210,7 +4616,9 @@ class Freemius extends \Freemius_Abstract
     static function _include_plugins_in_auto_update($update, $item)
     {
     }
-    #region Versioning ------------------------------------------------------------------
+    #----------------------------------------------------------------------------------
+    #region Versioning
+    #----------------------------------------------------------------------------------
     /**
      * Check if Freemius in SDK upgrade mode.
      *
@@ -4227,8 +4635,6 @@ class Freemius extends \Freemius_Abstract
      *
      * @author Vova Feldman (@svovaf)
      * @since  1.0.9
-     *
-     * @return bool
      */
     function set_sdk_upgrade_complete()
     {
@@ -4255,8 +4661,10 @@ class Freemius extends \Freemius_Abstract
     function set_plugin_upgrade_complete()
     {
     }
-    #endregion ------------------------------------------------------------------
-    #region Permissions ------------------------------------------------------------------
+    #endregion
+    #----------------------------------------------------------------------------------
+    #region Permissions
+    #----------------------------------------------------------------------------------
     /**
      * Check if specific permission requested.
      *
@@ -4270,8 +4678,10 @@ class Freemius extends \Freemius_Abstract
     function is_permission_requested($permission)
     {
     }
-    #endregion Permissions ------------------------------------------------------------------
-    #region Marketing ------------------------------------------------------------------
+    #endregion
+    #----------------------------------------------------------------------------------
+    #region Marketing
+    #----------------------------------------------------------------------------------
     /**
      * Check if current user purchased any other plugins before.
      *
@@ -4316,7 +4726,7 @@ class Freemius extends \Freemius_Abstract
     function is_business()
     {
     }
-    #endregion ------------------------------------------------------------------
+    #endregion
 }
 /**
  * Class FS_Api
@@ -4457,6 +4867,19 @@ class FS_Api
     {
     }
     /**
+     * Invalidate a cached version of the API request.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.5
+     *
+     * @param string $path
+     * @param string $method
+     * @param array  $params
+     */
+    function purge_cache($path, $method = 'GET', $params = array())
+    {
+    }
+    /**
      * @param string $path
      * @param string $method
      * @param array  $params
@@ -4553,6 +4976,48 @@ class FS_Api
     static function clear_cache()
     {
     }
+    #----------------------------------------------------------------------------------
+    #region Error Handling
+    #----------------------------------------------------------------------------------
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.5
+     *
+     * @param mixed $result
+     *
+     * @return bool Is API result contains an error.
+     */
+    static function is_api_error($result)
+    {
+    }
+    /**
+     * Checks if given API result is a non-empty and not an error object.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.5
+     *
+     * @param mixed       $result
+     * @param string|null $required_property Optional property we want to verify that is set.
+     *
+     * @return bool
+     */
+    static function is_api_result_object($result, $required_property = \null)
+    {
+    }
+    /**
+     * Checks if given API result is a non-empty entity object with non-empty ID.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.5
+     *
+     * @param mixed $result
+     *
+     * @return bool
+     */
+    static function is_api_result_entity($result)
+    {
+    }
+    #endregion
 }
 class FS_Logger
 {
@@ -4611,6 +5076,18 @@ class FS_Logger
     {
     }
     function error($message, $wrapper = \false)
+    {
+    }
+    /**
+     * Log API error.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.5
+     *
+     * @param mixed $api_result
+     * @param bool  $wrapper
+     */
+    function api_error($api_result, $wrapper = \false)
     {
     }
     function entrance($message = '', $wrapper = \false)
@@ -4864,6 +5341,84 @@ class FS_Entity
      * @return bool
      */
     static function is_valid_id($id)
+    {
+    }
+}
+class FS_Billing extends \FS_Entity
+{
+    #region Properties
+    /**
+     * @var int
+     */
+    public $entity_id;
+    /**
+     * @var string (Enum) Linked entity type. One of: developer, plugin, user, install
+     */
+    public $entity_type;
+    /**
+     * @var string
+     */
+    public $business_name;
+    /**
+     * @var string
+     */
+    public $first;
+    /**
+     * @var string
+     */
+    public $last;
+    /**
+     * @var string
+     */
+    public $email;
+    /**
+     * @var string
+     */
+    public $phone;
+    /**
+     * @var string
+     */
+    public $website;
+    /**
+     * @var string Tax or VAT ID.
+     */
+    public $tax_id;
+    /**
+     * @var string
+     */
+    public $address_street;
+    /**
+     * @var string
+     */
+    public $address_apt;
+    /**
+     * @var string
+     */
+    public $address_city;
+    /**
+     * @var string
+     */
+    public $address_country;
+    /**
+     * @var string Two chars country code.
+     */
+    public $address_country_code;
+    /**
+     * @var string
+     */
+    public $address_state;
+    /**
+     * @var number Numeric ZIP code (cab be with leading zeros).
+     */
+    public $address_zip;
+    #endregion Properties
+    /**
+     * @param object|bool $event
+     */
+    function __construct($event = \false)
+    {
+    }
+    static function get_type()
     {
     }
 }
@@ -5298,6 +5853,10 @@ class FS_Plugin extends \FS_Scope_Entity
      * @var string
      */
     public $slug;
+    /**
+     * @var string 'plugin' or 'theme'
+     */
+    public $type;
     #region Install Specific Properties
     /**
      * @var string
@@ -5497,6 +6056,15 @@ class FS_Site extends \FS_Scope_Entity
      */
     public $platform_version;
     /**
+     * Freemius SDK version
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  1.2.2
+     *
+     * @var string SDK version (e.g.: 1.2.2)
+     */
+    public $sdk_version;
+    /**
      * @var string Programming language version (e.g PHP version).
      */
     public $programming_language_version;
@@ -5522,6 +6090,14 @@ class FS_Site extends \FS_Scope_Entity
      * @var bool
      */
     public $is_premium = \false;
+    /**
+     * @author Leo Fajardo (@leorw)
+     *
+     * @since  1.2.1.5
+     *
+     * @var bool
+     */
+    public $is_disconnected = \false;
     /**
      * @param stdClass|bool $site
      */
@@ -6100,7 +6676,6 @@ class FS_Admin_Menu_Manager
     {
     }
     /**
-     *
      * @author Vova Feldman (@svovaf)
      * @since  1.1.4
      *
@@ -6109,6 +6684,18 @@ class FS_Admin_Menu_Manager
      * @return array[string]mixed
      */
     function override_menu_item($function)
+    {
+    }
+    /**
+     * Adds a counter to the module's top level menu item.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.5
+     *
+     * @param int    $counter
+     * @param string $class
+     */
+    function add_counter_to_menu_item($counter = 1, $class = '')
     {
     }
     #endregion Top level menu Override
@@ -7129,7 +7716,7 @@ abstract class Freemius_Api_Base
     protected $_scope;
     protected $_isSandbox;
     /**
-     * @param string $pScope     'app', 'developer', 'user' or 'install'.
+     * @param string $pScope     'app', 'developer', 'plugin', 'user' or 'install'.
      * @param number $pID        Element's id.
      * @param string $pPublic    Public key.
      * @param string $pSecret    Element's secret key.
@@ -7396,9 +7983,6 @@ function fs_get_object_public_vars($object)
 function fs_dummy()
 {
 }
-function starts_with($haystack, $needle)
-{
-}
 /* Url.
 	--------------------------------------------------------------------------------------------*/
 function fs_get_url_daily_cache_killer()
@@ -7462,6 +8046,21 @@ function fs_get_action($action_key = 'action')
 function fs_request_is_action($action, $action_key = 'action')
 {
 }
+/**
+ * @author Vova Feldman (@svovaf)
+ * @since  1.0.0
+ *
+ * @since  1.2.1.5 Allow nonce verification.
+ *
+ * @param string $action
+ * @param string $action_key
+ * @param string $nonce_key
+ *
+ * @return bool
+ */
+function fs_request_is_action_secure($action, $action_key = 'action', $nonce_key = 'nonce')
+{
+}
 function fs_is_plugin_page($menu_slug)
 {
 }
@@ -7505,28 +8104,22 @@ function fs_ui_get_action_button($slug, $page, $action, $title, $params = array(
 function fs_ui_action_link($slug, $page, $action, $title, $params = array())
 {
 }
-/*function fs_error_handler($errno, $errstr, $errfile, $errline)
-	{
-		if (false === strpos($errfile, 'freemius/'))
-		{
-			// @todo Dump Freemius errors to local log.
-		}
-
-//		switch ($errno) {
-//			case E_USER_ERROR:
-//				break;
-//			case E_WARNING:
-//			case E_USER_WARNING:
-//				break;
-//			case E_NOTICE:
-//			case E_USER_NOTICE:
-//				break;
-//			default:
-//				break;
-//		}
-	}
-
-	set_error_handler('fs_error_handler');*/
+/**
+ * Retrieve URL with nonce added to URL query.
+ *
+ * Originally was using `wp_nonce_url()` but the new version
+ * changed the return value to escaped URL, that's not the expected
+ * behaviour.
+ *
+ * @author Vova Feldman (@svovaf)
+ * @since  ~1.1.3
+ *
+ * @param string     $actionurl URL to add nonce action.
+ * @param int|string $action    Optional. Nonce action name. Default -1.
+ * @param string     $name      Optional. Nonce name. Default '_wpnonce'.
+ *
+ * @return string Escaped URL with nonce action added.
+ */
 function fs_nonce_url($actionurl, $action = -1, $name = '_wpnonce')
 {
 }
@@ -7608,12 +8201,13 @@ function fs_sort_by_priority($a, $b)
  * @since 1.5.1
  * @uses  apply_filters() Calls 'wp_redirect' hook on $location and $status.
  *
- * @param string $location The path to redirect to
- * @param int    $status   Status code to use
+ * @param string $location The path to redirect to.
+ * @param bool   $exit     If true, exit after redirect (Since 1.2.1.5).
+ * @param int    $status   Status code to use.
  *
  * @return bool False if $location is not set
  */
-function fs_redirect($location, $status = 302)
+function fs_redirect($location, $exit = \true, $status = 302)
 {
 }
 /**
