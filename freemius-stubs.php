@@ -1816,15 +1816,14 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
-     * @author Vova Feldman (@svovaf)
-     * @since  1.1.7.4
+     * @author Leo Fajardo (@leorw)
+     * @since  2.5.4
      *
-     * @param int|null $blog_id      Since 2.0.0.
-     * @param bool     $is_gdpr_test Since 2.0.2. Perform only the GDPR test.
+     * @param bool $is_update
      *
-     * @return object|false
+     * @return bool
      */
-    private function ping($blog_id = \null, $is_gdpr_test = \false)
+    private function should_turn_fs_on($is_update = \true)
     {
     }
     /**
@@ -1835,19 +1834,35 @@ class Freemius extends \Freemius_Abstract
      *
      * @param bool $flush_if_no_connectivity
      *
-     * @return bool
+     * @return bool|null
      */
     function has_api_connectivity($flush_if_no_connectivity = \false)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.4
+     */
+    private function clear_connectivity_info()
     {
     }
     /**
      * @author Vova Feldman (@svovaf)
      * @since  1.1.7.4
      *
-     * @param object $pong
-     * @param bool   $is_connected
+     * @param object    $pong
+     * @param bool|null $is_connected
      */
     private function store_connectivity_info($pong, $is_connected)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.4
+     *
+     * @param bool $is_connected
+     */
+    private function update_connectivity_info($is_connected)
     {
     }
     /**
@@ -1924,41 +1939,6 @@ class Freemius extends \Freemius_Abstract
      * @return bool
      */
     static function is_valid_email($email)
-    {
-    }
-    /**
-     * Generate API connectivity issue message.
-     *
-     * @author Vova Feldman (@svovaf)
-     * @since  1.0.9
-     *
-     * @param mixed $api_result
-     * @param bool  $is_first_failure
-     */
-    function _add_connectivity_issue_message($api_result, $is_first_failure = \true)
-    {
-    }
-    /**
-     * Handle user request to resolve connectivity issue.
-     * This method will send an email to Freemius API technical staff for resolution.
-     * The email will contain server's info and installed plugins (might be caching issue).
-     *
-     * @author Vova Feldman (@svovaf)
-     * @since  1.0.9
-     */
-    function _email_about_firewall_issue()
-    {
-    }
-    /**
-     * Handle connectivity test retry approved by the user.
-     *
-     * @author Vova Feldman (@svovaf)
-     * @since  1.1.7.4
-     */
-    function _retry_connectivity_test()
-    {
-    }
-    static function _add_firewall_issues_javascript()
     {
     }
     #endregion
@@ -2832,11 +2812,13 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.7
      *
-     * @param bool|string $email
+     * @param bool|string $email_address
      * @param bool        $is_pending_trial Since 1.2.1.5
      * @param bool        $is_suspicious_email Since 2.5.0 Set to true when there's an indication that email address the user opted in with is fake/dummy/placeholder.
+     * @param bool        $has_upgrade_context Since 2.5.3
+     * @param bool        $support_email_address Since 2.5.3
      */
-    function _add_pending_activation_notice($email = \false, $is_pending_trial = \false, $is_suspicious_email = \false)
+    function _add_pending_activation_notice($email_address = \false, $is_pending_trial = \false, $is_suspicious_email = \false, $has_upgrade_context = \false, $support_email_address = \false)
     {
     }
     /**
@@ -3237,6 +3219,13 @@ class Freemius extends \Freemius_Abstract
      * @param bool|int|int[] $network_or_blog_ids Since 2.0.0.
      */
     private function reset_anonymous_mode($network_or_blog_ids = \false)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.3
+     */
+    private function update_license_required_permissions_if_anonymous()
     {
     }
     /**
@@ -6518,10 +6507,13 @@ class Freemius extends \Freemius_Abstract
      * @param bool        $redirect
      * @param string|bool $license_key      Since 1.2.1.5
      * @param bool        $is_pending_trial Since 1.2.1.5
+     * @param bool        $is_suspicious_email Since 2.5.0
+     * @param bool        $has_upgrade_context Since 2.5.3
+     * @param bool|string $support_email_address Since 2.5.3
      *
      * @return string Since 1.2.1.5 if $redirect is `false`, return the pending activation page.
      */
-    private function set_pending_confirmation($email = \false, $redirect = \true, $license_key = \false, $is_pending_trial = \false, $is_suspicious_email = \false)
+    private function set_pending_confirmation($email = \false, $redirect = \true, $license_key = \false, $is_pending_trial = \false, $is_suspicious_email = \false, $has_upgrade_context = \false, $support_email_address = \false)
     {
     }
     /**
@@ -7592,6 +7584,17 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.4
+     *
+     * @param mixed $result
+     *
+     * @return string
+     */
+    private function generate_api_blocked_notice_message_from_result($result)
+    {
+    }
+    /**
      * Include the required JS at the footer of the admin to trigger the license activation dialog box.
      *
      * @author Vova Feldman (@svovaf)
@@ -8465,6 +8468,26 @@ class Freemius extends \Freemius_Abstract
     }
     /**
      * @author Leo Fajardo (@leorw)
+     * @since 2.5.3
+     *
+     * @param string $message_before_the_instructions
+     * @param string $message_id
+     * @param string $plan_title
+     */
+    private function add_complete_upgrade_instructions_notice($message_before_the_instructions, $message_id, $plan_title = '')
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.3
+     *
+     * @param bool $is_upgrade
+     */
+    private function add_after_plan_activation_or_upgrade_instructions_notice($is_upgrade = \true)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
      * @since 2.1.0
      *
      * @param string $url
@@ -8820,15 +8843,6 @@ class Freemius extends \Freemius_Abstract
     #--------------------------------------------------------------------------------
     /**
      * @author Leo Fajardo (@leorw)
-     * @since 2.1.0
-     *
-     * @return bool
-     */
-    function fetch_and_store_current_user_gdpr_anonymously()
-    {
-    }
-    /**
-     * @author Leo Fajardo (@leorw)
      * @since  2.1.0
      *
      * @param array $user_plugins
@@ -8870,6 +8884,13 @@ class Freemius extends \Freemius_Abstract
      * @since  2.1.0
      */
     private function disable_opt_in_notice_and_lock_user()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.5.4
+     */
+    static function _add_api_connectivity_notice_handler_js()
     {
     }
     /**
@@ -9321,11 +9342,11 @@ class FS_Api
      * @param string $path
      * @param string $method
      * @param array  $params
-     * @param bool   $retry Is in retry or first call attempt.
+     * @param bool   $in_retry Is in retry or first call attempt.
      *
      * @return array|mixed|string|void
      */
-    private function _call($path, $method = 'GET', $params = array(), $retry = \false)
+    private function _call($path, $method = 'GET', $params = array(), $in_retry = \false)
     {
     }
     /**
@@ -9359,6 +9380,20 @@ class FS_Api
      * @return stdClass|mixed
      */
     function get($path = '/', $flush = \false, $expiration = \WP_FS__TIME_24_HOURS_IN_SEC)
+    {
+    }
+    /**
+     * @todo Remove this method after migrating Freemius::safe_remote_post() to FS_Api::call().
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.4
+     *
+     * @param string $url
+     * @param array  $remote_args
+     *
+     * @return mixed
+     */
+    static function remote_request($url, $remote_args)
     {
     }
     /**
@@ -9415,16 +9450,23 @@ class FS_Api
     {
     }
     /**
-     * Test API connectivity.
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.4
      *
-     * @author Vova Feldman (@svovaf)
-     * @since  1.0.9 If fails, try to fallback to HTTP.
-     * @since  1.1.6 Added a 5-min caching mechanism, to prevent from overloading the server if the API if
-     *         temporary down.
-     *
-     * @return bool True if successful connectivity to the API.
+     * @param bool $is_http
      */
-    static function test()
+    private function toggle_force_http($is_http)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.4
+     *
+     * @param mixed $response
+     *
+     * @return bool
+     */
+    static function is_blocked($response)
     {
     }
     /**
@@ -9448,20 +9490,6 @@ class FS_Api
     {
     }
     /**
-     * Ping API for connectivity test, and return result object.
-     *
-     * @author   Vova Feldman (@svovaf)
-     * @since    1.0.9
-     *
-     * @param null|string $unique_anonymous_id
-     * @param array       $params
-     *
-     * @return object
-     */
-    function ping($unique_anonymous_id = \null, $params = array())
-    {
-    }
-    /**
      * Check if based on the API result we should try
      * to re-run the same request with HTTP instead of HTTPS.
      *
@@ -9475,19 +9503,6 @@ class FS_Api
     private static function should_try_with_http($result)
     {
     }
-    /**
-     * Check if valid ping request result.
-     *
-     * @author Vova Feldman (@svovaf)
-     * @since  1.1.1
-     *
-     * @param mixed $pong
-     *
-     * @return bool
-     */
-    function is_valid_ping($pong)
-    {
-    }
     function get_url($path = '')
     {
     }
@@ -9498,6 +9513,13 @@ class FS_Api
      * @since  1.0.9
      */
     static function clear_cache()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.5.4
+     */
+    static function clear_force_http_flag()
     {
     }
     #----------------------------------------------------------------------------------
@@ -9519,10 +9541,22 @@ class FS_Api
      * @since  2.0.0
      *
      * @param mixed $result
+     * @param bool  $ignore_message
      *
      * @return bool Is API result contains an error.
      */
-    static function is_api_error_object($result)
+    static function is_api_error_object($result, $ignore_message = \false)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.4
+     *
+     * @param WP_Error|object|string $response
+     *
+     * @return bool
+     */
+    static function is_ssl_error_response($response)
     {
     }
     /**
@@ -11889,6 +11923,11 @@ class FS_Plugin extends \FS_Scope_Entity
      * @var null|string
      */
     public $bundle_public_key;
+    /**
+     * @since 2.5.4
+     * @var null|array
+     */
+    public $opt_in_moderation;
     const AFFILIATE_MODERATION_CUSTOMERS = 'customers';
     #endregion Install Specific Properties
     /**
@@ -14096,15 +14135,6 @@ class FS_GDPR_Manager
      * @author Leo Fajardo (@leorw)
      * @since  2.1.0
      *
-     * @return bool|null
-     */
-    public function is_required()
-    {
-    }
-    /**
-     * @author Leo Fajardo (@leorw)
-     * @since  2.1.0
-     *
      * @param bool $is_required
      */
     public function store_is_required($is_required)
@@ -14792,6 +14822,14 @@ class FS_Permission_Manager
     {
     }
     /**
+     * @since 2.5.3
+     *
+     * @return bool
+     */
+    function is_premium_context()
+    {
+    }
+    /**
      * @param bool    $is_license_activation
      * @param array[] $extra_permissions
      *
@@ -15444,6 +15482,14 @@ class Freemius_Api_WordPress extends \Freemius_Api_Base
     {
     }
     /**
+     * Sets API connection protocol to HTTPS.
+     *
+     * @since 2.5.4
+     */
+    public static function SetHttps()
+    {
+    }
+    /**
      * @since 1.0.4
      *
      * @return bool
@@ -15512,6 +15558,17 @@ class Freemius_Api_WordPress extends \Freemius_Api_Base
     {
     }
     /**
+     * @author Leo Fajardo (@leorw)
+     *
+     * @param string $pUrl
+     * @param array  $pWPRemoteArgs
+     *
+     * @return mixed
+     */
+    static function RemoteRequest($pUrl, $pWPRemoteArgs)
+    {
+    }
+    /**
      * @return array
      */
     static function GetLogger()
@@ -15565,20 +15622,6 @@ class Freemius_Api_WordPress extends \Freemius_Api_Base
     #----------------------------------------------------------------------------------
     #region Connectivity Test
     #----------------------------------------------------------------------------------
-    /**
-     * If successful connectivity to the API endpoint using ping.json endpoint.
-     *
-     *      - OR -
-     *
-     * Validate if ping result object is valid.
-     *
-     * @param mixed $pPong
-     *
-     * @return bool
-     */
-    public static function Test($pPong = \null)
-    {
-    }
     /**
      * Ping API to test connectivity.
      *

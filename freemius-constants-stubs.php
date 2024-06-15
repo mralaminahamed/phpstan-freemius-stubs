@@ -47,7 +47,7 @@
 \define('WP_FS__DOMAIN_LOCALHOST', 'wp.freemius');
 \define('WP_FS__ADDRESS_LOCALHOST', 'http://' . \WP_FS__DOMAIN_LOCALHOST . ':8080');
 \define('WP_FS__TESTING_DOMAIN', 'fswp');
-\define('WP_FS__IS_HTTP_REQUEST', isset($_SERVER['HTTP_HOST']));
+\define('WP_FS__IS_HTTP_REQUEST', isset($_SERVER['HTTP_HOST']) && isset($_SERVER['REQUEST_METHOD']));
 \define('WP_FS__IS_HTTPS', \WP_FS__IS_HTTP_REQUEST && isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && 'https' === \strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) || isset($_SERVER['HTTPS']) && 'on' == $_SERVER['HTTPS'] || isset($_SERVER['SERVER_PORT']) && 443 == $_SERVER['SERVER_PORT']);
 \define('WP_FS__IS_POST_REQUEST', \WP_FS__IS_HTTP_REQUEST && \strtoupper($_SERVER['REQUEST_METHOD']) == 'POST');
 \define('WP_FS__REMOTE_ADDR', \fs_get_ip());
