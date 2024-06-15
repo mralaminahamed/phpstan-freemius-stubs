@@ -13888,17 +13888,6 @@ function fs_apply_filter($module_unique_affix, $tag, $value)
 {
 }
 /**
- * @author Leo Fajardo (@leorw)
- * @since 2.2.1
- *
- * @param bool $delete_cache
- *
- * @return array
- */
-function fs_get_plugins($delete_cache = \false)
-{
-}
-/**
  * Redirects to another page, with a workaround for the IIS Set-Cookie bug.
  *
  * @link  http://support.microsoft.com/kb/q176113/
@@ -14052,6 +14041,17 @@ function _fs_x($text, $context)
  * @return string
  */
 function fs_find_direct_caller_plugin_file($file)
+{
+}
+/**
+ * @author Leo Fajardo (@leorw)
+ * @since 2.2.1
+ *
+ * @param bool $delete_cache
+ *
+ * @return array
+ */
+function fs_get_plugins($delete_cache = \false)
 {
 }
 /**
