@@ -15623,6 +15623,16 @@ class Freemius_Api_WordPress extends \Freemius_Api_Base
     #region Connectivity Test
     #----------------------------------------------------------------------------------
     /**
+     * This method exists only for backward compatibility to prevent a fatal error from happening when called from an outdated piece of code.
+     *
+     * @param mixed $pPong
+     *
+     * @return bool
+     */
+    public static function Test($pPong = \null)
+    {
+    }
+    /**
      * Ping API to test connectivity.
      *
      * @return object
