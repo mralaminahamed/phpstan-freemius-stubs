@@ -640,7 +640,7 @@ class Freemius extends \Freemius_Abstract
     /**
      * @since 1.0.4
      *
-     * @var FS_Plugin|false
+     * @var FS_Plugin
      */
     private $_plugin = \false;
     /**
@@ -652,19 +652,19 @@ class Freemius extends \Freemius_Abstract
     /**
      * @since 1.1.1
      *
-     * @var Freemius|false
+     * @var Freemius
      */
     private $_parent = \false;
     /**
      * @since 1.0.1
      *
-     * @var FS_User|false
+     * @var FS_User
      */
     private $_user = \false;
     /**
      * @since 1.0.1
      *
-     * @var FS_Site|false
+     * @var FS_Site
      */
     private $_site = \false;
     /**
@@ -676,11 +676,11 @@ class Freemius extends \Freemius_Abstract
     /**
      * @since 1.0.2
      *
-     * @var FS_Plugin_Plan[]|false
+     * @var FS_Plugin_Plan[]
      */
     private $_plans = \false;
     /**
-     * @var FS_Plugin_License[]|false
+     * @var FS_Plugin_License[]
      * @since 1.0.5
      */
     private $_licenses = \false;
@@ -1678,7 +1678,7 @@ class Freemius extends \Freemius_Abstract
     /**
      * @author Leo Fajardo (@leorw)
      * @since 2.5.0
-     *
+     *        
      * @param int|null $blog_id
      * @param bool     $strip_protocol
      * @param bool     $add_trailing_slash
@@ -1787,7 +1787,7 @@ class Freemius extends \Freemius_Abstract
     /**
      * @author Leo Fajardo (@leorw)
      * @since  2.5.0
-     *
+     * 
      * @return array
      */
     static function get_all_modules_sites()
@@ -3056,7 +3056,7 @@ class Freemius extends \Freemius_Abstract
      * @since  1.2.2
      *
      * @param  string        $slug_or_name Old theme's slug or name.
-     * @param  bool|\WP_Theme $old_theme    WP_Theme instance of the old theme if it still exists.
+     * @param  bool|WP_Theme $old_theme    WP_Theme instance of the old theme if it still exists.
      */
     function _activate_theme_event_hook($slug_or_name, $old_theme = \false)
     {
@@ -3279,7 +3279,8 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  2.0.0
      *
-     * @param int|null|bool $blog_id
+     * @param int|null $blog_id
+     * @param bool     $send_skip
      */
     private function skip_site_connection($blog_id = \null)
     {
@@ -3551,7 +3552,7 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  2.2.1
      *
-     * @param bool $is_premium
+     * @param string $is_premium
      * @param string $caller
      *
      * @return void
@@ -5044,7 +5045,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @author Vova Feldman (@svovaf)
      * @since  2.3.0
-     *
+     *         
      * @param string      $license_key
      * @param null|bool   $is_marketing_allowed
      * @param null|number $plugin_id
@@ -8020,7 +8021,7 @@ class Freemius extends \Freemius_Abstract
      * Adds CSS classes for the body tag in the admin.
      *
      * @param string $classes Space-separated string of class names.
-     *
+     * 
      * @return string $classes FS Admin body tag class names.
      */
     public function fs_addons_body_class($classes)
@@ -8145,9 +8146,9 @@ class Freemius extends \Freemius_Abstract
        ------------------------------------------------------------------------------------------------------------------*/
     /*		function _enqueue_script($handle, $src) {
                         $url = plugins_url( substr( WP_FS__DIR_JS, strlen( $this->_plugin_dir_path ) ) . '/assets/js/' . $src );
-
+    
                         $this->_logger->entrance( 'script = ' . $url );
-
+    
                         wp_enqueue_script( $handle, $url );
                     }*/
     /* SDK
@@ -13105,7 +13106,7 @@ class FS_Admin_Menu_Manager
      * @since  1.0.9
      *
      * @param bool $remove_top_level_menu
-     *
+     * 
      * @return false|array[string]mixed
      */
     function remove_menu_item($remove_top_level_menu = \false)
@@ -16802,7 +16803,7 @@ function fs_html_get_sanitized_html($raw_html)
  * @since 1.2.1.6
  *
  * @param string $text
- *
+ * 
  * @return string
  */
 function _fs_text($text)
@@ -16820,8 +16821,8 @@ function _fs_text($text)
  * @since 1.2.1.6
  *
  * @param string $text
- * @param string $context
- *
+ * @param string $context 
+ * 
  * @return string
  */
 function _fs_x($text, $context)
