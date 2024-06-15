@@ -664,6 +664,13 @@ class Freemius extends \Freemius_Abstract
      */
     private $_has_addons;
     /**
+     * @since 2.4.5
+     * @var string Navigation type: 'menu' or 'tabs'.
+     */
+    private $_navigation;
+    const NAVIGATION_MENU = 'menu';
+    const NAVIGATION_TABS = 'tabs';
+    /**
      * @since 1.1.6
      * @var string[]bool.
      */
@@ -814,6 +821,13 @@ class Freemius extends \Freemius_Abstract
      * @var string
      */
     private $_dynamically_added_top_level_page_hook_name = '';
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.3.1
+     *
+     * @var bool
+     */
+    private $is_whitelabeled;
     #region Uninstall Reasons IDs
     const REASON_NO_LONGER_NEEDED = 1;
     const REASON_FOUND_A_BETTER_PLUGIN = 2;
@@ -875,6 +889,41 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * If `true` the opt-in should be shown as a modal dialog box on the themes.php page. WordPress.org themes guidelines prohibit from redirecting the user from the themes.php page after activating a theme.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.4.5
+     *
+     * @return bool
+     */
+    function show_opt_in_on_themes_page()
+    {
+    }
+    /**
+     * If `true` the opt-in should be shown on the product's main setting page.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.4.5
+     *
+     * @return bool
+     *
+     * @uses show_opt_in_on_themes_page();
+     */
+    function show_opt_in_on_setting_page()
+    {
+    }
+    /**
+     * If `true` the settings should be shown using tabs.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.4.5
+     *
+     * @return bool
+     */
+    function show_settings_with_tabs()
+    {
+    }
+    /**
      * Check if the context module is free wp.org theme.
      *
      * This method is helpful because:
@@ -901,12 +950,11 @@ class Freemius extends \Freemius_Abstract
      * @since  1.2.2.7 Even if the menu item was specified to be hidden, when it is the context page, then show the submenu item so the user will have the right context page.
      *
      * @param string $slug
-     * @param bool   $ignore_free_wp_org_theme_context This is used to decide if the associated tab should be shown
-     *                                                 or hidden.
+     * @param bool   $is_tabs_visibility_check This is used to decide if the associated tab should be shown or hidden.
      *
      * @return bool
      */
-    function is_submenu_item_visible($slug, $ignore_free_wp_org_theme_context = \false)
+    function is_submenu_item_visible($slug, $is_tabs_visibility_check = \false)
     {
     }
     /**
@@ -1102,7 +1150,16 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.9
      */
-    private function _register_hooks()
+    private function register_constructor_hooks()
+    {
+    }
+    /**
+     * Register the required hooks right after the settings parse is completed.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.3.1
+     */
+    private function register_after_settings_parse_hooks()
     {
     }
     /**
@@ -2986,7 +3043,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return array
      */
-    private function get_sites_for_network_level_optin()
+    function get_sites_for_network_level_optin()
     {
     }
     /**
@@ -3401,9 +3458,11 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.1
      *
+     * @param bool $reparse_plugin_metadata
+     *
      * @return array
      */
-    function get_plugin_data()
+    function get_plugin_data($reparse_plugin_metadata = \false)
     {
     }
     /**
@@ -3456,6 +3515,15 @@ class Freemius extends \Freemius_Abstract
     }
     /**
      * @author Vova Feldman (@svovaf)
+     * @since  2.3.1
+     *
+     * @return string|null Bundle public key.
+     */
+    function get_bundle_public_key()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
      * @since  1.2.1.5
      *
      * @return string Freemius SDK version
@@ -3470,6 +3538,24 @@ class Freemius extends \Freemius_Abstract
      * @return number Parent plugin ID (if parent exist).
      */
     function get_parent_id()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  2.3.1
+     *
+     * @return string
+     */
+    function get_usage_tracking_terms_url()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  2.3.1
+     *
+     * @return string
+     */
+    function get_eula_url()
     {
     }
     /**
@@ -3527,9 +3613,11 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.0
      *
+     * @param bool $reparse_plugin_metadata
+     *
      * @return string
      */
-    function get_plugin_version()
+    function get_plugin_version($reparse_plugin_metadata = \false)
     {
     }
     /**
@@ -3646,6 +3734,21 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * This method can also return non-entity or non-entities collection option like the `user_id_license_ids_map` option.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since 2.3.1
+     *
+     * @param string        $option_name
+     * @param mixed         $default
+     * @param null|bool|int $network_level_or_blog_id When an integer, use the given blog storage. When `true` use the multisite storage (if there's a network). When `false`, use the current context blog storage. When `null`, the decision which storage to use (MS vs. Current S) will be handled internally and determined based on the $option (based on self::$_SITE_LEVEL_PARAMS).
+     *
+     * @return mixed|FS_Plugin[]|FS_User[]|FS_Site[]|FS_Plugin_License[]|FS_Plugin_Plan[]|FS_Plugin_Tag[]
+     */
+    private static function maybe_get_entities_account_option($option_name, $default = \null, $network_level_or_blog_id = \null)
+    {
+    }
+    /**
      * @author Vova Feldman (@svovaf)
      * @since  1.0.6
      *
@@ -3755,7 +3858,7 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.6
      *
-     * @return FS_Plugin[]|false
+     * @return number[]|false
      */
     private static function get_all_account_addons()
     {
@@ -3833,7 +3936,7 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.6
      *
-     * @return FS_Plugin[]|false
+     * @return number[]|false
      */
     function get_account_addons()
     {
@@ -4063,9 +4166,11 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.1.7.3
      *
+     * @param bool $including_foreign
+     *
      * @return bool
      */
-    function has_any_license()
+    function has_any_license($including_foreign = \true)
     {
     }
     /**
@@ -4306,6 +4411,20 @@ class Freemius extends \Freemius_Abstract
      * Activate a given license on a collection of blogs/sites that are not yet opted-in.
      *
      * @author Vova Feldman (@svovaf)
+     * @since  2.3.1
+     *
+     * @param \FS_User $user
+     * @param string   $license_key
+     *
+     * @return true|mixed True if successful, otherwise, the API result.
+     */
+    private function activate_license_on_site(\FS_User $user, $license_key)
+    {
+    }
+    /**
+     * Activate a given license on a collection of blogs/sites that are not yet opted-in.
+     *
+     * @author Vova Feldman (@svovaf)
      * @since  2.0.0
      *
      * @param \FS_User $user
@@ -4314,7 +4433,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return true|mixed True if successful, otherwise, the API result.
      */
-    private function activate_license_on_many_sites(\FS_User $user, $license_key, array $site_ids)
+    private function activate_license_on_many_sites(\FS_User $user, $license_key, array $site_ids = array())
     {
     }
     /**
@@ -4328,6 +4447,66 @@ class Freemius extends \Freemius_Abstract
      * @return FS_Plugin_License|null
      */
     function _update_site_license($new_license)
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  2.3.1
+     *
+     * @param \FS_Plugin_License $license
+     */
+    private function set_license(\FS_Plugin_License $license = \null)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.3.1
+     *
+     * @param FS_Plugin_License $license
+     */
+    private function maybe_update_whitelabel_flag($license)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.3.1
+     *
+     * @param FS_Plugin_License $license
+     * @param FS_User           $license_user
+     */
+    private function store_last_activated_license_data(\FS_Plugin_License $license, $license_user = \null)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.3.1
+     *
+     * @param bool $ignore_data_debug_mode
+     *
+     * @return bool
+     */
+    function is_whitelabeled_by_flag($ignore_data_debug_mode = \false)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.3.1
+     *
+     * @return number
+     */
+    function get_last_license_user_id()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.3.1
+     *
+     * @param int  $blog_id
+     * @param bool $ignore_data_debug_mode
+     *
+     * @return bool
+     */
+    function is_whitelabeled($ignore_data_debug_mode = \false, $blog_id = \null)
     {
     }
     /**
@@ -4394,9 +4573,11 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.2.1.7
      *
+     * @param bool $double_check In some cases developers prefer to release their paid offering as premium-only, even though there is a free version. For those cases, looking at the 'is_premium_only' value isn't enough because the result will return false even when the product has only signle paid plan.
+     *
      * @return bool
      */
-    function is_single_plan()
+    function is_single_plan($double_check = \false)
     {
     }
     /**
@@ -4456,6 +4637,13 @@ class Freemius extends \Freemius_Abstract
      * @since  1.1.9
      */
     function _add_license_activation_dialog_box()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.3.1
+     */
+    function _add_data_debug_mode_dialog_box()
     {
     }
     /**
@@ -5207,6 +5395,8 @@ class Freemius extends \Freemius_Abstract
      *
      * @param int     $blog_id
      * @param FS_Site $install
+     *
+     * @return bool Since 2.3.1 returns if a switch was made.
      */
     function switch_to_blog($blog_id, \FS_Site $install = \null)
     {
@@ -5429,6 +5619,17 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Check if currently in the product's main admin page.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.3.1
+     *
+     * @return bool
+     */
+    function is_main_admin_page()
+    {
+    }
+    /**
      * Get module's main admin setting page URL.
      *
      * @author Vova Feldman (@svovaf)
@@ -5447,8 +5648,21 @@ class Freemius extends \Freemius_Abstract
      * @since  1.2.2.7
      *
      * @return bool
+     *
+     * @deprecated Please use is_product_settings_page() instead;
      */
     function is_theme_settings_page()
+    {
+    }
+    /**
+     * Check if currently on the product's main setting page or on any of the Freemius added pages (via tabs).
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2.7
+     *
+     * @return bool
+     */
+    function is_product_settings_page()
     {
     }
     /**
@@ -5890,7 +6104,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return \FS_Site|object|string If redirect is `false`, returns the next page the user should be redirected to, or the API error object if failed to install. If $setup_account is set to `false`, return the newly created install.
      */
-    private function install_with_user(\FS_User $user, $license_key = \false, $trial_plan_id = \false, $redirect = \true, $setup_account = \true, $sites = array())
+    function install_with_user(\FS_User $user, $license_key = \false, $trial_plan_id = \false, $redirect = \true, $setup_account = \true, $sites = array())
     {
     }
     /**
@@ -6151,6 +6365,22 @@ class Freemius extends \Freemius_Abstract
     {
     }
     #endregion ------------------------------------------------------------------
+    #--------------------------------------------------------------------------------
+    #region Admin Notices
+    #--------------------------------------------------------------------------------
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  2.3.1
+     *
+     * @param string|string[] $ids
+     * @param int|null        $network_level_or_blog_id
+     *
+     * @uses FS_Admin_Notices::remove_sticky()
+     */
+    function remove_sticky($ids, $network_level_or_blog_id = \null)
+    {
+    }
+    #endregion
     #--------------------------------------------------------------------------------
     #region Actions / Hooks / Filters
     #--------------------------------------------------------------------------------
@@ -6744,6 +6974,20 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.3.1
+     */
+    function is_data_debug_mode()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.3.1
+     */
+    function _set_data_debug_mode()
+    {
+    }
+    /**
      * Check if a given license is active & valid (not expired).
      *
      * @author Vova Feldman (@svovaf)
@@ -6867,7 +7111,8 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.5
      *
-     * @param bool $background
+     * @param bool                   $background
+     * @param FS_Plugin_License|null $premium_license
      */
     protected function _activate_license($background = \false, $premium_license = \null)
     {
@@ -7421,6 +7666,17 @@ class Freemius extends \Freemius_Abstract
      * @return FS_Api
      */
     function get_api_plugin_scope()
+    {
+    }
+    /**
+     * Get bundle public API scope.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.3.1
+     *
+     * @return FS_Api
+     */
+    function get_api_bundle_scope()
     {
     }
     /**
@@ -9999,6 +10255,15 @@ class FS_Entity
     static function is_valid_id($id)
     {
     }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.3.1
+     *
+     * @return string
+     */
+    public static function get_class_name()
+    {
+    }
 }
 class FS_Scope_Entity extends \FS_Entity
 {
@@ -10483,6 +10748,10 @@ class FS_Plugin_License extends \FS_Entity
      */
     public $secret_key;
     /**
+     * @var bool
+     */
+    public $is_whitelabeled;
+    /**
      * @var bool $is_free_localhost Defaults to true. If true, allow unlimited localhost installs with the same
      *      license.
      */
@@ -10651,6 +10920,26 @@ class FS_Plugin_License extends \FS_Entity
      * @return int
      */
     function total_activations()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since 2.3.1
+     *
+     * @return string
+     */
+    function get_html_escaped_masked_secret_key()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  2.3.1
+     *
+     * @param string $secret_key
+     *
+     * @return string
+     */
+    static function mask_secret_key_for_html($secret_key)
     {
     }
 }
@@ -10905,6 +11194,11 @@ class FS_Plugin extends \FS_Scope_Entity
      * @var null|number
      */
     public $bundle_id;
+    /**
+     * @since 2.3.1
+     * @var null|string
+     */
+    public $bundle_public_key;
     const AFFILIATE_MODERATION_CUSTOMERS = 'customers';
     #endregion Install Specific Properties
     /**
@@ -10960,6 +11254,13 @@ class FS_Pricing extends \FS_Entity
      * @var null|float
      */
     public $lifetime_price;
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.3.1
+     *
+     * @var string One of the following: `usd`, `gbp`, `eur`.
+     */
+    public $currency;
     #endregion Properties
     /**
      * @param object|bool $pricing
@@ -11039,6 +11340,15 @@ class FS_Pricing extends \FS_Entity
      * @return float
      */
     function annual_savings()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.3.1
+     *
+     * @return bool
+     */
+    function is_usd()
     {
     }
 }
@@ -11251,9 +11561,15 @@ class FS_Subscription extends \FS_Entity
      */
     public $trial_ends;
     /**
-     * @var string|null Datetime of the next payment, or null if cancelled
+     * @var string|null Datetime of the next payment, or null if cancelled.
      */
     public $next_payment;
+    /**
+     * @since 2.3.1
+     *
+     * @var string|null Datetime of the cancellation.
+     */
+    public $canceled_at;
     /**
      * @var string|null
      */
@@ -11281,6 +11597,15 @@ class FS_Subscription extends \FS_Entity
      * @return bool
      */
     function is_active()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  2.3.1
+     *
+     * @return bool
+     */
+    function is_canceled()
     {
     }
     /**
@@ -11828,9 +12153,26 @@ class FS_Admin_Menu_Manager
      * @author Vova Feldman (@svovaf)
      * @since  1.0.8
      *
+     * @param bool $show_opt_in_on_themes_page Since 2.3.1
+     *
+     * @return bool
+     *
+     * @deprecated Please use is_activation_page() instead.
+     */
+    function is_main_settings_page($show_opt_in_on_themes_page = \false)
+    {
+    }
+    /**
+     * Is user on product's admin activation page.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.3.1
+     *
+     * @param bool $show_opt_in_on_themes_page Since 2.3.1
+     *
      * @return bool
      */
-    function is_main_settings_page()
+    function is_activation_page($show_opt_in_on_themes_page = \false)
     {
     }
     #region Submenu Override
@@ -12959,6 +13301,10 @@ class FS_Option_Manager
      */
     private $_is_network_storage;
     /**
+     * @var bool|null
+     */
+    private $_autoload;
+    /**
      * @var array[string]FS_Option_Manager {
      * @key   string
      * @value FS_Option_Manager
@@ -12969,24 +13315,26 @@ class FS_Option_Manager
      * @author Vova Feldman (@svovaf)
      * @since  1.0.3
      *
-     * @param string   $id
-     * @param bool     $load
-     * @param bool|int $network_level_or_blog_id Since 2.0.0
+     * @param string    $id
+     * @param bool      $load
+     * @param bool|int  $network_level_or_blog_id Since 2.0.0
+     * @param bool|null $autoload
      */
-    private function __construct($id, $load = \false, $network_level_or_blog_id = \false)
+    private function __construct($id, $load = \false, $network_level_or_blog_id = \false, $autoload = \null)
     {
     }
     /**
      * @author Vova Feldman (@svovaf)
      * @since  1.0.3
      *
-     * @param string   $id
-     * @param bool     $load
-     * @param bool|int $network_level_or_blog_id Since 2.0.0
+     * @param string    $id
+     * @param bool      $load
+     * @param bool|int  $network_level_or_blog_id Since 2.0.0
+     * @param bool|null $autoload
      *
-     * @return FS_Option_Manager
+     * @return \FS_Option_Manager
      */
-    static function get_manager($id, $load = \false, $network_level_or_blog_id = \false)
+    static function get_manager($id, $load = \false, $network_level_or_blog_id = \false, $autoload = \null)
     {
     }
     /**
@@ -13724,8 +14072,6 @@ function fs_require_once_template($path, &$params = \null)
 function fs_get_template($path, &$params = \null)
 {
 }
-/* Scripts and styles including.
-   --------------------------------------------------------------------------------------------*/
 /**
  * Generates an absolute URL to the given path. This function ensures that the URL will be correct whether the asset
  * is inside a plugin's folder or a theme's folder.
@@ -13831,8 +14177,6 @@ function fs_is_plugin_page($page_slug)
 function fs_get_raw_referer()
 {
 }
-/* Core UI.
-   --------------------------------------------------------------------------------------------*/
 /**
  * @param number      $module_id
  * @param string      $page
@@ -13873,6 +14217,30 @@ function fs_ui_get_action_button($module_id, $page, $action, $title, $button_cla
 {
 }
 function fs_ui_action_link($module_id, $page, $action, $title, $params = array())
+{
+}
+/**
+ * @author Leo Fajardo (@leorw)
+ * @since 2.3.1
+ *
+ * @param mixed  $entity
+ * @param string $class
+ *
+ * @return FS_Plugin|FS_User|FS_Site|FS_Plugin_License|FS_Plugin_Plan|FS_Plugin_Tag|FS_Subscription
+ */
+function fs_get_entity($entity, $class)
+{
+}
+/**
+ * @author Leo Fajardo (@leorw)
+ * @since 2.3.1
+ *
+ * @param mixed  $entities
+ * @param string $class_name
+ *
+ * @return FS_Plugin[]|FS_User[]|FS_Site[]|FS_Plugin_License[]|FS_Plugin_Plan[]|FS_Plugin_Tag[]|FS_Subscription[]
+ */
+function fs_get_entities($entities, $class_name)
 {
 }
 /**
@@ -13962,7 +14330,6 @@ function fs_canonize_query_string(array $params, array &$ignore_params, $params_
 function fs_urlencode_rfc3986($input)
 {
 }
-#endregion Url Canonization ------------------------------------------------------------------
 /**
  * @author Vova Feldman (@svovaf)
  *
@@ -13976,8 +14343,6 @@ function fs_urlencode_rfc3986($input)
 function fs_download_image($from, $to)
 {
 }
-/* General Utilities
-   --------------------------------------------------------------------------------------------*/
 /**
  * Sorts an array by the value of the priority key.
  *
