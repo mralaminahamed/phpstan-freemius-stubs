@@ -9665,7 +9665,7 @@ class FS_Product_Garbage_Collector implements \FS_I_Garbage_Collector
     private function get_products()
     {
     }
-    private function get_products_to_clean()
+    private function get_filtered_products()
     {
     }
     /**
@@ -11876,6 +11876,10 @@ class FS_Plugin_Plan extends \FS_Entity
      * @var bool Is featured plan.
      */
     public $is_featured;
+    /**
+     * @var bool Is hidden plan.
+     */
+    public $is_hidden;
     #endregion Properties
     /**
      * @param object|bool $plan
@@ -12220,6 +12224,7 @@ class FS_Pricing extends \FS_Entity
 /**
  * @property int $blog_id
  */
+#[\AllowDynamicProperties]
 class FS_Site extends \FS_Scope_Entity
 {
     /**
@@ -15298,6 +15303,7 @@ class FS_Plan_Manager
     }
     /**
      * Find all plans that have trial.
+     * Since 2.6.2 call get_filtered_plan
      *
      * @author Vova Feldman (@svovaf)
      * @since  1.0.9
@@ -15307,6 +15313,36 @@ class FS_Plan_Manager
      * @return FS_Plugin_Plan[]
      */
     function get_trial_plans($plans)
+    {
+    }
+    /**
+     * Find all plans that are not hidden and have trial.
+     *
+     * @author Daniele Alessandra (@danielealessandra)
+     *
+     * @param FS_Plugin_Plan[] $plans
+     *
+     * @return FS_Plugin_Plan[]
+     * @since  2.6.3
+     *
+     */
+    function get_visible_trial_plans($plans)
+    {
+    }
+    /**
+     * Find all plans filtered by trial or visibility.
+     *
+     * @author Daniele Alessandra (@danielealessandra)
+     *
+     * @param FS_Plugin_Plan[] $plans
+     * @param boolean          $should_have_trials
+     * @param boolean          $should_be_visible
+     *
+     * @return FS_Plugin_Plan[]
+     * @since  2.6.3
+     *
+     */
+    function get_filtered_plans($plans, $should_have_trials = \false, $should_be_visible = \false)
     {
     }
     /**
@@ -15877,7 +15913,7 @@ function fs_asset_url($asset_abs_path)
 function fs_enqueue_local_style($handle, $path, $deps = array(), $ver = \false, $media = 'all')
 {
 }
-function fs_enqueue_local_script($handle, $path, $deps = array(), $ver = \false, $in_footer = 'all')
+function fs_enqueue_local_script($handle, $path, $deps = array(), $ver = \false, $in_footer = \true)
 {
 }
 function fs_img_url($path, $img_dir = \WP_FS__DIR_IMG)
