@@ -7433,7 +7433,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return bool|FS_Plugin_Tag
      */
-    function get_update($plugin_id = \false, $flush = \true, $expiration = \WP_FS__TIME_24_HOURS_IN_SEC, $newer_than = \false)
+    function get_update($plugin_id = \false, $flush = \true, $expiration = \FS_Plugin_Updater::UPDATES_CHECK_CACHE_EXPIRATION, $newer_than = \false)
     {
     }
     /**
@@ -7820,7 +7820,7 @@ class Freemius extends \Freemius_Abstract
      * @param int         $expiration Since 1.2.2.7
      * @param bool|string $newer_than Since 2.2.1
      */
-    private function check_updates($background = \false, $plugin_id = \false, $flush = \true, $expiration = \WP_FS__TIME_24_HOURS_IN_SEC, $newer_than = \false)
+    private function check_updates($background = \false, $plugin_id = \false, $flush = \true, $expiration = \FS_Plugin_Updater::UPDATES_CHECK_CACHE_EXPIRATION, $newer_than = \false)
     {
     }
     /**
@@ -10262,6 +10262,7 @@ class FS_Plugin_Updater
      */
     private $_translation_updates;
     private static $_upgrade_basename = \null;
+    const UPDATES_CHECK_CACHE_EXPIRATION = \WP_FS__TIME_24_HOURS_IN_SEC / 24;
     #--------------------------------------------------------------------------------
     #region Singleton
     #--------------------------------------------------------------------------------
