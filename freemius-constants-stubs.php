@@ -102,6 +102,7 @@
 // Set to true to show network level settings even if delegated to site admins.
 \define('WP_FS__SHOW_NETWORK_EVEN_WHEN_DELEGATED', \false);
 \define('WP_FS__DEMO_MODE', \false);
+\define('FS_SDK__SSLVERIFY', \false);
 \define('WP_FS__SECURITY_PARAMS_PREFIX', 's_');
 \define('FS_API__VERSION', '1');
 \define('FS_SDK__PATH', \dirname(__FILE__));
