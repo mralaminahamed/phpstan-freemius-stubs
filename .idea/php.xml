@@ -28,8 +28,8 @@
       <path value="$PROJECT_DIR$/vendor/symfony/deprecation-contracts" />
       <path value="$PROJECT_DIR$/vendor/symfony/console" />
       <path value="$PROJECT_DIR$/vendor/composer" />
-      <path value="$PROJECT_DIR$/source/vendor/composer" />
       <path value="$PROJECT_DIR$/source/vendor/freemius/wordpress-sdk" />
+      <path value="$PROJECT_DIR$/source/vendor/composer" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.0">
@@ -43,5 +43,10 @@
   <component name="PhpStanOptionsConfiguration">
     <option name="config" value="$PROJECT_DIR$/phpstan.neon" />
     <option name="transferred" value="true" />
+  </component>
+  <component name="PhpUnit">
+    <phpunit_settings>
+      <PhpUnitSettings custom_loader_path="$PROJECT_DIR$/source/vendor/autoload.php" />
+    </phpunit_settings>
   </component>
 </project>

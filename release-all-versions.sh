@@ -39,7 +39,7 @@ while IFS= read -r VERSION; do
         sed -i -e "$SED_EXP" source/composer.json
 
         # Run post-install commands
-        composer --working-dir=source/ require --dev
+        composer --working-dir=source/ require "freemius/wordpress-sdk:${VERSION}"
 
         # Generate stubs
         echo "Generating stubs ..."
