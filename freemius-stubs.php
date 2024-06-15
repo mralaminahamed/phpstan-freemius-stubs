@@ -1652,6 +1652,19 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Define cookie constants which are required by Freemius::_get_current_wp_user() since
+     * it uses wp_get_current_user() which needs the cookie constants set. When a plugin
+     * is network activated the cookie constants are only configured after the network
+     * plugins activation, therefore, if we don't define those constants WP will throw
+     * PHP warnings/notices.
+     *
+     * @author   Vova Feldman (@svovaf)
+     * @since    2.1.1
+     */
+    private static function wp_cookie_constants()
+    {
+    }
+    /**
      * @author Vova Feldman (@svovaf)
      * @since  2.1.0
      *
