@@ -592,9 +592,34 @@ class Freemius extends \Freemius_Abstract
      * @var Freemius[]
      */
     private static $_instances = array();
+    // Reason IDs
+    const REASON_NO_LONGER_NEEDED = 1;
+    const REASON_FOUND_A_BETTER_PLUGIN = 2;
+    const REASON_NEEDED_FOR_A_SHORT_PERIOD = 3;
+    const REASON_BROKE_MY_SITE = 4;
+    const REASON_SUDDENLY_STOPPED_WORKING = 5;
+    const REASON_CANT_PAY_ANYMORE = 6;
+    const REASON_OTHER = 7;
+    const REASON_DIDNT_WORK = 8;
+    const REASON_DONT_LIKE_TO_SHARE_MY_INFORMATION = 9;
+    const REASON_COULDNT_MAKE_IT_WORK = 10;
+    const REASON_GREAT_BUT_NEED_SPECIFIC_FEATURE = 11;
+    const REASON_NOT_WORKING = 12;
+    const REASON_NOT_WHAT_I_WAS_LOOKING_FOR = 13;
+    const REASON_DIDNT_WORK_AS_EXPECTED = 14;
+    const REASON_TEMPORARY_DEACTIVATION = 15;
     /* Ctor
     ------------------------------------------------------------------------------------------------------------------*/
-    private function __construct($slug)
+    /**
+     * Main singleton instance.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.0.0
+     *
+     * @param string $slug
+     * @param bool   $is_init Since 1.2.1 Is initiation sequence.
+     */
+    private function __construct($slug, $is_init = \false)
     {
     }
     /**
@@ -695,11 +720,13 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.6
      *
+     * @param bool $is_init Is initiation sequence.
+     *
      * @return string
      *
      * @uses   fs_find_caller_plugin_file
      */
-    private function _find_caller_plugin_file()
+    private function _find_caller_plugin_file($is_init = \false)
     {
     }
     #region Deactivation Feedback Form ------------------------------------------------------------------
@@ -742,11 +769,12 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.0
      *
-     * @param $slug
+     * @param string $slug
+     * @param bool   $is_init Is initiation sequence.
      *
      * @return Freemius
      */
-    static function instance($slug)
+    static function instance($slug, $is_init = \false)
     {
     }
     /**
@@ -889,6 +917,15 @@ class Freemius extends \Freemius_Abstract
      * @since  1.0.1
      */
     private static function _load_required_static()
+    {
+    }
+    /**
+     * Load framework's text domain.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1
+     */
+    static function _load_textdomain()
     {
     }
     #region Debugging ------------------------------------------------------------------
@@ -1772,6 +1809,61 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Track install's custom event.
+     *
+     * IMPORTANT:
+     *      Custom event tracking is currently only supported for specific clients.
+     *      If you are not one of them, please don't use this method. If you will,
+     *      the API will simply ignore your request based on the plugin ID.
+     *
+     * Need custom tracking for your plugin or theme?
+     *      If you are interested in custom event tracking please contact yo@freemius.com
+     *      for further details.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1
+     *
+     * @param string $name       Event name.
+     * @param array  $properties Associative key/value array with primitive values only
+     * @param bool   $process_at A valid future date-time in the following format Y-m-d H:i:s.
+     * @param bool   $once       If true, event will be tracked only once. IMPORTANT: Still trigger the API call.
+     *
+     * @return object|false Event data or FALSE on failure.
+     *
+     * @throws \Freemius_InvalidArgumentException
+     */
+    public function track_event($name, $properties = array(), $process_at = \false, $once = \false)
+    {
+    }
+    /**
+     * Track install's custom event only once, but it still triggers the API call.
+     *
+     * IMPORTANT:
+     *      Custom event tracking is currently only supported for specific clients.
+     *      If you are not one of them, please don't use this method. If you will,
+     *      the API will simply ignore your request based on the plugin ID.
+     *
+     * Need custom tracking for your plugin or theme?
+     *      If you are interested in custom event tracking please contact yo@freemius.com
+     *      for further details.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1
+     *
+     * @param string $name       Event name.
+     * @param array  $properties Associative key/value array with primitive values only
+     * @param bool   $process_at A valid future date-time in the following format Y-m-d H:i:s.
+     *
+     * @return object|false Event data or FALSE on failure.
+     *
+     * @throws \Freemius_InvalidArgumentException
+     *
+     * @user   Freemius::track_event()
+     */
+    public function track_event_once($name, $properties = array(), $process_at = \false)
+    {
+    }
+    /**
      * Plugin uninstall hook.
      *
      * @author Vova Feldman (@svovaf)
@@ -2167,7 +2259,7 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
-     * Check if the user has an activated and valid paid license on current plugin's install.
+     * Check if the user has an activate, non-expired license on current plugin's install.
      *
      * @since 1.0.9
      *
@@ -2804,11 +2896,16 @@ class Freemius extends \Freemius_Abstract
      * @param string|bool $email
      * @param string|bool $first
      * @param string|bool $last
-     * @param string|bool $license_secret_key
+     * @param string|bool $license_key
+     * @param bool        $is_uninstall       If "true", this means that the module is currently being uninstalled.
+     *                                        In this case, the user and site info will be sent to the server but no
+     *                                        data will be saved to the WP installation's database.
      *
      * @return bool Is successful opt-in (or set to pending).
+     *
+     * @use    WP_Error
      */
-    function opt_in($email = \false, $first = \false, $last = \false, $license_secret_key = \false)
+    function opt_in($email = \false, $first = \false, $last = \false, $license_key = \false, $is_uninstall = \false)
     {
     }
     /**
@@ -2876,6 +2973,8 @@ class Freemius extends \Freemius_Abstract
      * @since  1.1.7.4
      *
      * @param bool $redirect
+     *
+     * @return object|string
      */
     private function install_with_current_user($redirect = \true)
     {
@@ -2938,6 +3037,15 @@ class Freemius extends \Freemius_Abstract
      * @since  1.0.1
      */
     private function override_plugin_menu_with_activation()
+    {
+    }
+    /**
+     * @author Leo Fajardo (leorw)
+     * @since  1.2.1
+     *
+     * return string
+     */
+    function get_top_level_menu_capability()
     {
     }
     /**
@@ -3037,7 +3145,18 @@ class Freemius extends \Freemius_Abstract
      *
      * @return string
      */
-    private function get_action_tag($tag)
+    public function get_action_tag($tag)
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1
+     *
+     * @param string $tag
+     *
+     * @return string
+     */
+    private function get_ajax_action_tag($tag)
     {
     }
     /**
@@ -3069,6 +3188,22 @@ class Freemius extends \Freemius_Abstract
      * @uses   add_action()
      */
     function add_action($tag, $function_to_add, $priority = \WP_FS__DEFAULT_PRIORITY, $accepted_args = 1)
+    {
+    }
+    /**
+     * Add AJAX action, specific for the current context plugin.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1
+     *
+     * @param string   $tag
+     * @param callable $function_to_add
+     * @param int      $priority
+     * @param int      $accepted_args
+     *
+     * @uses   add_action()
+     */
+    function add_ajax_action($tag, $function_to_add, $priority = \WP_FS__DEFAULT_PRIORITY, $accepted_args = 1)
     {
     }
     /**
@@ -3250,18 +3385,6 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
-     * @author Vova Feldman (@svovaf)
-     * @since  1.0.5
-     * @uses   FS_Api
-     *
-     * @param bool $flush
-     *
-     * @return object|\FS_Site
-     */
-    private function _fetch_site($flush = \false)
-    {
-    }
-    /**
      * @param bool $store
      *
      * @return FS_Plugin_Plan|object|false
@@ -3387,10 +3510,21 @@ class Freemius extends \Freemius_Abstract
     /**
      * Check if site assigned with active license.
      *
-     * @author Vova Feldman (@svovaf)
-     * @since  1.0.6
+     * @author     Vova Feldman (@svovaf)
+     * @since      1.0.6
+     *
+     * @deprecated Please use has_active_valid_license() instead because license can be cancelled.
      */
     function has_active_license()
+    {
+    }
+    /**
+     * Check if site assigned with active & valid (not expired) license.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1
+     */
+    function has_active_valid_license()
     {
     }
     /**
@@ -3556,22 +3690,6 @@ class Freemius extends \Freemius_Abstract
     #region Download Plugin ------------------------------------------------------------------
     /**
      * Download latest plugin version, based on plan.
-     * The download will be fetched via the API first.
-     *
-     * @author Vova Feldman (@svovaf)
-     * @since  1.0.4
-     *
-     * @param bool|number $plugin_id
-     *
-     * @uses   FS_Api
-     *
-     * @deprecated
-     */
-    private function _download_latest($plugin_id = \false)
-    {
-    }
-    /**
-     * Download latest plugin version, based on plan.
      *
      * Not like _download_latest(), this will redirect the page
      * to secure download url to prevent dual download (from FS to WP server,
@@ -3660,7 +3778,7 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.4
      *
-     * @param bool $flush Since 1.1.7.3 by default add 24 hour cache.
+     * @param bool $flush Since 1.1.7.3 add 24 hour cache by default.
      *
      * @return FS_Plugin[]
      *
@@ -3746,9 +3864,11 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.1.2
      *
+     * @param array $params
+     *
      * @return string
      */
-    private function get_activation_url()
+    private function get_activation_url($params = array())
     {
     }
     /**
@@ -3949,15 +4069,6 @@ class Freemius extends \Freemius_Abstract
     private $_action_links_hooked = \false;
     private $_action_links = array();
     /**
-     * @author Vova Feldman (@svovaf)
-     * @since  1.0.0
-     *
-     * @return bool
-     */
-    private function is_plugin_action_links_hooked()
-    {
-    }
-    /**
      * Hook to plugin action links filter.
      *
      * @author Vova Feldman (@svovaf)
@@ -4058,6 +4169,21 @@ class Freemius extends \Freemius_Abstract
      * @param string $type
      */
     function add_sticky_admin_message($message, $id, $title = '', $type = 'success')
+    {
+    }
+    /**
+     * Helper function that returns the final steps for the upgrade completion.
+     *
+     * If the module is already running the premium code, returns an empty string.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1
+     *
+     * @param string $plan_title
+     *
+     * @return string
+     */
+    private function get_complete_upgrade_instructions($plan_title = '')
     {
     }
     /* Plugin Auto-Updates (@since 1.0.4)
@@ -4315,6 +4441,29 @@ class FS_Api
     function get($path = '/', $flush = \false, $expiration = \WP_FS__TIME_24_HOURS_IN_SEC)
     {
     }
+    /**
+     * Check if there's a cached version of the API request.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1
+     *
+     * @param string $path
+     * @param string $method
+     * @param array  $params
+     *
+     * @return bool
+     */
+    function is_cached($path, $method = 'GET', $params = array())
+    {
+    }
+    /**
+     * @param string $path
+     * @param string $method
+     * @param array  $params
+     *
+     * @return string
+     * @throws \Freemius_Exception
+     */
     private function get_cache_key($path, $method = 'GET', $params = array())
     {
     }
@@ -4528,6 +4677,9 @@ class FS_Plugin_Updater
      *
      * @author Vova Feldman (@svovaf)
      * @since  1.1.6
+     *
+     * @param string $file
+     * @param array $plugin_data
      */
     function edit_and_echo_plugin_update_row($file, $plugin_data)
     {
@@ -4621,9 +4773,23 @@ class FS_Security
     private function __construct()
     {
     }
+    /**
+     * @param \FS_Scope_Entity $entity
+     * @param int              $timestamp
+     * @param string           $action
+     *
+     * @return string
+     */
     function get_secure_token(\FS_Scope_Entity $entity, $timestamp, $action = '')
     {
     }
+    /**
+     * @param \FS_Scope_Entity $entity
+     * @param int|bool         $timestamp
+     * @param string           $action
+     *
+     * @return array
+     */
     function get_context_params(\FS_Scope_Entity $entity, $timestamp = \false, $action = '')
     {
     }
@@ -4643,7 +4809,7 @@ class FS_Entity
      */
     public $created;
     /**
-     * @param bool|stdClass $entity
+     * @param bool|object $entity
      */
     function __construct($entity = \false)
     {
@@ -4894,6 +5060,17 @@ class FS_Plugin_License extends \FS_Entity
     {
     }
     /**
+     * Check if license is not expired.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1
+     *
+     * @return bool
+     */
+    function is_valid()
+    {
+    }
+    /**
      * @author Vova Feldman (@svovaf)
      * @since  1.0.6
      *
@@ -4925,6 +5102,15 @@ class FS_Plugin_License extends \FS_Entity
     {
     }
     /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1
+     *
+     * @return bool
+     */
+    function is_active()
+    {
+    }
+    /**
      * Check if license's plan features are enabled.
      *
      *  - Either if plan not expired
@@ -4952,6 +5138,11 @@ class FS_Plugin_License extends \FS_Entity
     {
     }
 }
+/**
+ * Class FS_Plugin_Plan
+ *
+ * @property FS_Pricing[] $pricing
+ */
 class FS_Plugin_Plan extends \FS_Entity
 {
     #region Properties
@@ -5657,7 +5848,7 @@ class FS_Admin_Menu_Manager
     /**
      * @since 1.1.3
      *
-     * @var string[]bool
+     * @var array<string,bool>
      */
     private $_default_submenu_items;
     /**
@@ -7205,6 +7396,9 @@ function fs_get_object_public_vars($object)
 function fs_dummy()
 {
 }
+function starts_with($haystack, $needle)
+{
+}
 /* Url.
 	--------------------------------------------------------------------------------------------*/
 function fs_get_url_daily_cache_killer()
@@ -7575,17 +7769,19 @@ function freemius($slug)
  * @param bool   $is_premium Hints freemius if running the premium plugin or not.
  *
  * @return Freemius
+ *
+ * @deprecated Please use fs_dynamic_init().
  */
 function fs_init($slug, $plugin_id, $public_key, $is_live = \true, $is_premium = \true)
 {
 }
 /**
- * @param array [string]string $plugin
+ * @param array<string,string> $module Plugin or Theme details.
  *
  * @return Freemius
  * @throws Freemius_Exception
  */
-function fs_dynamic_init($plugin)
+function fs_dynamic_init($module)
 {
 }
 function fs_dump_log()
