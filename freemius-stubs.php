@@ -1074,6 +1074,9 @@ class Freemius extends \Freemius_Abstract
     function _plugins_loaded()
     {
     }
+    function _run_garbage_collector()
+    {
+    }
     /**
      * Opens the support forum subemenu item in a new browser page.
      *
@@ -9620,6 +9623,120 @@ class FS_Api
     }
     #endregion
 }
+interface FS_I_Garbage_Collector
+{
+    function clean();
+}
+class FS_Product_Garbage_Collector implements \FS_I_Garbage_Collector
+{
+    /**
+     * @var FS_Options
+     */
+    private $_accounts;
+    /**
+     * @var string[]
+     */
+    private $_options_names;
+    /**
+     * @var string
+     */
+    private $_type;
+    /**
+     * @var string
+     */
+    private $_plural_type;
+    /**
+     * @var array<string, int> Map of product slugs to their last load timestamp, only for products that are not active.
+     */
+    private $_gc_timestamp;
+    /**
+     * @var array<string, array<string, mixed>> Map of product slugs to their data, as stored by the primary storage of `Freemius` class.
+     */
+    private $_storage_data;
+    function __construct(\FS_Options $_accounts, $option_names, $type)
+    {
+    }
+    function clean()
+    {
+    }
+    private function get_all_option_names()
+    {
+    }
+    private function get_products()
+    {
+    }
+    private function get_products_to_clean()
+    {
+    }
+    /**
+     * @param string $slug
+     *
+     * @return bool
+     */
+    private function is_product_active($slug)
+    {
+    }
+    private function load_options()
+    {
+    }
+    /**
+     * Updates the garbage collector timestamp, only if it was not already set by the product's primary storage.
+     *
+     * @param array $products
+     *
+     * @return void
+     */
+    private function update_gc_timestamp($products)
+    {
+    }
+    private function get_last_load_timestamp($slug)
+    {
+    }
+}
+class FS_User_Garbage_Collector implements \FS_I_Garbage_Collector
+{
+    private $_accounts;
+    private $_types;
+    function __construct(\FS_Options $_accounts, array $types)
+    {
+    }
+    function clean()
+    {
+    }
+    private function get_user_has_install_map()
+    {
+    }
+}
+// Main entry-level class.
+class FS_Garbage_Collector implements \FS_I_Garbage_Collector
+{
+    /**
+     * @var FS_Garbage_Collector
+     * @since 2.6.0
+     */
+    private static $_instance;
+    /**
+     * @return FS_Garbage_Collector
+     */
+    static function instance()
+    {
+    }
+    #endregion
+    private function __construct()
+    {
+    }
+    function clean()
+    {
+    }
+    /**
+     * @param FS_Options $_accounts
+     *
+     * @return FS_I_Garbage_Collector[]
+     */
+    private function get_product_cleaners(\FS_Options $_accounts)
+    {
+    }
+}
 /**
  * Class FS_Lock
  *
@@ -15960,6 +16077,17 @@ function fs_nonce_url($actionurl, $action = -1, $name = '_wpnonce')
 {
 }
 /**
+ * Returns the query parameters of the given URL if there are any.
+ *
+ * @param string $url
+ * @param bool   $html_entity_decode
+ *
+ * @return array<string, string> Key value pair where key represents the parameter name and value represents the parameter value.
+ */
+function fs_parse_url_params($url, $html_entity_decode = \false)
+{
+}
+/**
  * Check if string starts with.
  *
  * @author Vova Feldman (@svovaf)
@@ -16498,6 +16626,20 @@ function fs_is_blog_admin()
  * @uses   apply_filters()
  */
 function fs_apply_filter($module_unique_affix, $tag, $value)
+{
+}
+/**
+ * Gets the value of an optional constant. If the constant is not defined, the default value will be returned.
+ *
+ * @author Swashata Ghosh (@swashata)
+ * @since 2.5.12.5
+ *
+ * @param string $constant_name
+ * @param mixed $default_value
+ *
+ * @return mixed
+ */
+function fs_get_optional_constant($constant_name, $default_value = \null)
 {
 }
 /**
