@@ -92,6 +92,15 @@ abstract class Freemius_Abstract
     function is_paying_or_trial()
     {
     }
+    /**
+     * Check if user in a trial or have feature enabled license.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7
+     *
+     * @return bool
+     */
+    abstract function can_use_premium_code();
     #region Premium Only ------------------------------------------------------------------
     /**
      * All logic wrapped in methods with "__premium_only()" suffix will be only
@@ -176,6 +185,19 @@ abstract class Freemius_Abstract
     function is_paying__fs__()
     {
     }
+    /**
+     * Check if user in a trial or have feature enabled license.
+     *
+     * All code wrapped in this statement will be only included in the premium code.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.9
+     *
+     * @return bool
+     */
+    function can_use_premium_code__premium_only()
+    {
+    }
     #endregion Premium Only ------------------------------------------------------------------
     #region Trial ------------------------------------------------------------------
     /**
@@ -257,6 +279,28 @@ abstract class Freemius_Abstract
      * @return bool
      */
     abstract function has_free_plan();
+    /**
+     * Check if plugin is premium only (no free plans).
+     *
+     * NOTE: is__premium_only() is very different method, don't get confused.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.9
+     *
+     * @return bool
+     */
+    abstract function is_only_premium();
+    /**
+     * Checks if it's a freemium plugin.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.9
+     *
+     * @return bool
+     */
+    function is_freemium()
+    {
+    }
     #endregion Plans ------------------------------------------------------------------
     /**
      * Check if running payments in sandbox mode.
@@ -437,6 +481,11 @@ class Freemius extends \Freemius_Abstract
      */
     private $_anonymous_mode;
     /**
+     * @since 1.1.9
+     * @var bool Hints the SDK if plugin have any free plans.
+     */
+    private $_is_premium_only;
+    /**
      * @since 1.0.8
      * @var bool Hints the SDK if the plugin has any paid plans.
      */
@@ -475,7 +524,7 @@ class Freemius extends \Freemius_Abstract
     /**
      * @since 1.0.4
      *
-     * @var FS_Plugin
+     * @var FS_Plugin|false
      */
     private $_parent_plugin = \false;
     /**
@@ -563,6 +612,48 @@ class Freemius extends \Freemius_Abstract
      * @param string $sdk_version
      */
     function _data_migration($sdk_prev_version, $sdk_version)
+    {
+    }
+    /**
+     * This action is connected to the 'plugins_loaded' hook and helps to determine
+     * if this is a new plugin installation or a plugin update.
+     *
+     * There are 3 different use-cases:
+     *    1) New plugin installation right with Freemius:
+     *       1.1 _activate_plugin_event_hook() will be executed first
+     *       1.2 Since $this->_storage->is_plugin_new_install is not set,
+     *           and $this->_storage->plugin_last_version is not set,
+     *           $this->_storage->is_plugin_new_install will be set to TRUE.
+     *       1.3 When _plugins_loaded() will be executed, $this->_storage->is_plugin_new_install will
+     *           be already set to TRUE.
+     *
+     *    2) Plugin update, didn't have Freemius before, and now have the SDK:
+     *       2.1 _activate_plugin_event_hook() will not be executed, because
+     *           the activation hook do NOT fires on updates since WP 3.1.
+     *       2.2 When _plugins_loaded() will be executed, $this->_storage->is_plugin_new_install will
+     *           be empty, therefore, it will be set to FALSE.
+     *
+     *    3) Plugin update, had Freemius in prev version as well:
+     *       3.1 _version_updates_handler() will be executed 1st, since FS was installed
+     *           before, $this->_storage->plugin_last_version will NOT be empty,
+     *           therefore, $this->_storage->is_plugin_new_install will be set to FALSE.
+     *       3.2 When _plugins_loaded() will be executed, $this->_storage->is_plugin_new_install is
+     *           already set, therefore, it will not be modified.
+     *
+     *    Use-case #3 is backward compatible, #3.1 will be executed since 1.0.9.
+     *
+     * NOTE:
+     *    The only fallback of this mechanism is if an admin updates a plugin based on use-case #2,
+     *    and then, the next immediate PageView is the plugin's main settings page, it will not
+     *    show the opt-in right away. The reason it will happen is because Freemius execution
+     *    will be turned off till the plugin is fully loaded at least once
+     *    (till $this->_storage->was_plugin_loaded is TRUE).
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.9
+     *
+     */
+    function _plugins_loaded()
     {
     }
     /**
@@ -720,9 +811,11 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.7
      *
+     * @param bool $and_on
+     *
      * @return bool
      */
-    function is_activation_mode()
+    function is_activation_mode($and_on = \true)
     {
     }
     /**
@@ -2247,6 +2340,24 @@ class Freemius extends \Freemius_Abstract
     function has_free_plan()
     {
     }
+    /**
+     * Displays a license activation dialog box when the user clicks on the "Activate License"
+     * or "Change License" link on the plugins
+     * page.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  1.1.9
+     */
+    function _add_license_activation_dialog_box()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  1.1.9
+     */
+    function _activate_license_ajax_action()
+    {
+    }
     #region URL Generators
     /**
      * Alias to pricing_url().
@@ -2339,12 +2450,36 @@ class Freemius extends \Freemius_Abstract
     /**
      * Check if plugin can work in anonymous mode.
      *
+     * @author     Vova Feldman (@svovaf)
+     * @since      1.0.9
+     *
+     * @return bool
+     *
+     * @deprecated Please use is_enable_anonymous() instead
+     */
+    function enable_anonymous()
+    {
+    }
+    /**
+     * Check if plugin can work in anonymous mode.
+     *
      * @author Vova Feldman (@svovaf)
-     * @since  1.0.9
+     * @since  1.1.9
      *
      * @return bool
      */
-    function enable_anonymous()
+    function is_enable_anonymous()
+    {
+    }
+    /**
+     * Check if plugin is premium only (no free plans).
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.9
+     *
+     * @return bool
+     */
+    function is_only_premium()
     {
     }
     /**
@@ -2580,10 +2715,11 @@ class Freemius extends \Freemius_Abstract
      * @param string|bool $email
      * @param string|bool $first
      * @param string|bool $last
+     * @param string|bool $license_key
      *
      * @return bool Is successful opt-in (or set to pending).
      */
-    function opt_in($email = \false, $first = \false, $last = \false)
+    function opt_in($email = \false, $first = \false, $last = \false, $license_secret_key = \false)
     {
     }
     /**
@@ -3737,6 +3873,15 @@ class Freemius extends \Freemius_Abstract
      * @since  1.0.0
      */
     function _add_upgrade_action_link()
+    {
+    }
+    /**
+     * Adds "Activate License" or "Change License" link to the main Plugins page link actions collection.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  1.1.9
+     */
+    function _add_license_action_link()
     {
     }
     /**
@@ -5680,7 +5825,7 @@ class FS_Admin_Notice_Manager
      * @author Vova Feldman (@svovaf)
      * @since  1.0.7
      *
-     * @param string $ids
+     * @param string|string[] $ids
      */
     function remove_sticky($ids)
     {
