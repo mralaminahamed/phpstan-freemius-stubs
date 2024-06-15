@@ -97,7 +97,7 @@
 \define('WP_FS__SCRIPT_START_TIME', \time());
 \define('WP_FS__DEFAULT_PRIORITY', 10);
 \define('WP_FS__LOWEST_PRIORITY', 999999999);
-\define('WP_FS__IS_NETWORK_ADMIN', \is_multisite() && (\is_network_admin() || (\defined('DOING_AJAX') && \DOING_AJAX && isset($_REQUEST['_fs_network_admin']) || \defined('WP_UNINSTALL_PLUGIN'))));
+\define('WP_FS__IS_NETWORK_ADMIN', \is_multisite() && (\is_network_admin() || (\defined('DOING_AJAX') && \DOING_AJAX && (isset($_REQUEST['_fs_network_admin']) && 'true' === $_REQUEST['_fs_network_admin']) || \defined('WP_UNINSTALL_PLUGIN'))));
 \define('WP_FS__IS_BLOG_ADMIN', \is_blog_admin() || \defined('DOING_AJAX') && \DOING_AJAX && isset($_REQUEST['_fs_blog_admin']));
 // Set to true to show network level settings even if delegated to site admins.
 \define('WP_FS__SHOW_NETWORK_EVEN_WHEN_DELEGATED', \false);
