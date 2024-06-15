@@ -55,7 +55,7 @@
 // By default, run with Freemius production servers.
 \define('WP_FS__IS_PRODUCTION_MODE', \true);
 \define('WP_FS__ADDRESS', \WP_FS__IS_PRODUCTION_MODE ? \WP_FS__ADDRESS_PRODUCTION : \WP_FS__ADDRESS_LOCALHOST);
-\define('WP_FS__API_ADDRESS_LOCALHOST', 'http://api.freemius:8080');
+\define('WP_FS__API_ADDRESS_LOCALHOST', 'http://api.freemius-local.com:8080');
 \define('WP_FS__API_SANDBOX_ADDRESS_LOCALHOST', 'http://sandbox-api.freemius:8080');
 \define('FS_CHECKOUT__ADDRESS_PRODUCTION', 'https://checkout.freemius.com');
 \define('FS_CHECKOUT__ADDRESS_LOCALHOST', 'http://checkout.freemius-local.com:8080');
@@ -97,7 +97,7 @@
 \define('WP_FS__SCRIPT_START_TIME', \time());
 \define('WP_FS__DEFAULT_PRIORITY', 10);
 \define('WP_FS__LOWEST_PRIORITY', 999999999);
-\define('WP_FS__IS_NETWORK_ADMIN', \is_network_admin() || \is_multisite() && (\defined('DOING_AJAX') && \DOING_AJAX && isset($_REQUEST['_fs_network_admin']) || \defined('WP_UNINSTALL_PLUGIN')));
+\define('WP_FS__IS_NETWORK_ADMIN', \is_multisite() && (\is_network_admin() || (\defined('DOING_AJAX') && \DOING_AJAX && isset($_REQUEST['_fs_network_admin']) || \defined('WP_UNINSTALL_PLUGIN'))));
 \define('WP_FS__IS_BLOG_ADMIN', \is_blog_admin() || \defined('DOING_AJAX') && \DOING_AJAX && isset($_REQUEST['_fs_blog_admin']));
 // Set to true to show network level settings even if delegated to site admins.
 \define('WP_FS__SHOW_NETWORK_EVEN_WHEN_DELEGATED', \false);
