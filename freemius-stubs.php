@@ -1121,7 +1121,7 @@ class Freemius extends \Freemius_Abstract
      * @author Leo Fajardo (@leorw)
      * @since 2.2.3
      *
-     * @return string
+     * @return void
      */
     static function _prepend_fs_allow_updater_and_dialog_flag_url_param()
     {
@@ -1683,6 +1683,17 @@ class Freemius extends \Freemius_Abstract
      * @return string
      */
     static function get_unfiltered_site_url($blog_id = \null, $strip_protocol = \false, $add_trailing_slash = \false)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.6.0
+     *
+     * @param int|null $blog_id
+     *
+     * @return string
+     */
+    private static function get_site_url_from_wp_option($blog_id = \null)
     {
     }
     /**
@@ -3541,7 +3552,7 @@ class Freemius extends \Freemius_Abstract
      * @param string $is_premium
      * @param string $caller
      *
-     * @return string
+     * @return void
      */
     function set_basename($is_premium, $caller)
     {
@@ -6225,7 +6236,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return FS_User|false
      */
-    static function _get_user_by_email($email)
+    public static function _get_user_by_email($email)
     {
     }
     #----------------------------------------------------------------------------------
@@ -6471,7 +6482,7 @@ class Freemius extends \Freemius_Abstract
      * @param bool      $trial_plan_id
      * @param bool      $redirect
      *
-     * @return string If redirect is `false`, returns the next page the user should be redirected to.
+     * @return void
      */
     private function install_many_pending_with_user($user_id, $user_public_key, $user_secret_key, $is_marketing_allowed, $is_extensions_tracking_allowed, $is_diagnostic_tracking_allowed, $site_ids, $license_key = \false, $trial_plan_id = \false, $redirect = \true)
     {
@@ -8001,6 +8012,16 @@ class Freemius extends \Freemius_Abstract
      *
      */
     private function _handle_account_edits()
+    {
+    }
+    /**
+     * Adds CSS classes for the body tag in the admin.
+     *
+     * @param string $classes Space-separated string of class names.
+     * 
+     * @return string $classes FS Admin body tag class names.
+     */
+    public function fs_addons_body_class($classes)
     {
     }
     /**
@@ -16300,7 +16321,7 @@ function fs_esc_js_x_inline($text, $context, $key = '', $slug = 'freemius')
  * @param string $key     String key for overrides.
  * @param string $slug    Module slug for overrides.
  *
- * @return string
+ * @return void
  */
 function fs_esc_js_echo_x_inline($text, $context, $key = '', $slug = 'freemius')
 {
