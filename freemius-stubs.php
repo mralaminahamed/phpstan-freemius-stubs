@@ -2103,6 +2103,31 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * @author Vova Feldman (@svovaf)
+     * @since  2.3.2
+     *
+     * @return bool
+     */
+    function is_extensions_tracking_allowed()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  2.3.2
+     */
+    function _update_tracking_permission_callback()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.3.2
+     *
+     * @param bool $is_enabled
+     */
+    private function update_extensions_tracking_flag($is_enabled)
+    {
+    }
+    /**
      * Parse plugin's settings (as defined by the plugin dev).
      *
      * @author Vova Feldman (@svovaf)
@@ -2259,6 +2284,17 @@ class Freemius extends \Freemius_Abstract
      * @return bool
      */
     function is_addon()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  2.3.2
+     *
+     * @param number $parent_product_id
+     *
+     * @return bool
+     */
+    function is_addon_of($parent_product_id)
     {
     }
     /**
@@ -3306,6 +3342,15 @@ class Freemius extends \Freemius_Abstract
      * @return bool
      */
     private function should_send_keepalive_update($use_network_level_storage = \null)
+    {
+    }
+    /**
+     * Syncs the install owner's data if needed (i.e., if the install owner is different from the loaded user).
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  2.3.2
+     */
+    private function maybe_sync_install_user()
     {
     }
     /**
@@ -4640,6 +4685,28 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Returns a collection of IDs of installs that are associated with the context product and its add-ons, and activated with foreign licenses.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  2.3.2
+     *
+     * @return number[]
+     */
+    function get_installs_ids_with_foreign_licenses()
+    {
+    }
+    /**
+     * Displays the "Change User" dialog box when the user clicks on the "Change User" button on the "Account" page.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  2.3.2
+     *
+     * @param number[] $install_ids
+     */
+    function _add_user_change_dialog_box($install_ids)
+    {
+    }
+    /**
      * @author Leo Fajardo (@leorw)
      * @since  2.3.1
      */
@@ -4689,6 +4756,22 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Prepares page to include all required UI and logic for the "Change User" dialog.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  2.3.2
+     */
+    function _add_user_change_option()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.3.2
+     */
+    function should_handle_user_change()
+    {
+    }
+    /**
      * @author Leo Fajardo (@leorw)
      * @since  2.0.2
      */
@@ -4718,6 +4801,15 @@ class Freemius extends \Freemius_Abstract
      * @uses Freemius::activate_license()
      */
     function _activate_license_ajax_action()
+    {
+    }
+    /**
+     * User change WP AJAX handler.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  2.3.2
+     */
+    function _user_change_ajax_action()
     {
     }
     /**
@@ -4752,6 +4844,7 @@ class Freemius extends \Freemius_Abstract
      * @param null|bool   $is_marketing_allowed
      * @param null|int    $blog_id
      * @param null|number $plugin_id
+     * @param null|number $license_owner_id
      *
      * @return array {
      *      @var bool   $success
@@ -4759,7 +4852,22 @@ class Freemius extends \Freemius_Abstract
      *      @var string $next_page
      * }
      */
-    private function activate_license($license_key, $sites = array(), $is_marketing_allowed = \null, $blog_id = \null, $plugin_id = \null)
+    private function activate_license($license_key, $sites = array(), $is_marketing_allowed = \null, $blog_id = \null, $plugin_id = \null, $license_owner_id = \null, $is_extensions_tracking_allowed = \true)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.3.2
+     *
+     * @return array {
+     *      @key   string Product slug.
+     *      @value array {
+     *          @property FS_Site           $site
+     *          @property FS_Plugin_License $license
+     *      }
+     * }
+     */
+    private function get_parent_and_addons_installs_info()
     {
     }
     /**
@@ -5843,9 +5951,11 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  2.0.0
      *
+     * @param number|null $site_user_id
+     *
      * @return \FS_User|mixed
      */
-    private function fetch_user_by_install()
+    private function sync_user_by_current_install($site_user_id = \null)
     {
     }
     /**
@@ -6000,17 +6110,16 @@ class Freemius extends \Freemius_Abstract
      * @param string    $user_public_key
      * @param string    $user_secret_key
      * @param bool|null $is_marketing_allowed
+     * @param bool|null $is_extensions_tracking_allowed Since 2.3.2
      * @param number    $install_id
      * @param string    $install_public_key
      * @param string    $install_secret_key
      * @param bool      $redirect
-     * @param bool      $auto_install Since 1.2.1.7 If `true` and setting up an account with a valid license, will
-     *                                redirect (or return a URL) to the account page with a special parameter to
-     *                                trigger the auto installation processes.
+     * @param bool      $auto_install                   Since 1.2.1.7 If `true` and setting up an account with a valid license, will redirect (or return a URL) to the account page with a special parameter to trigger the auto installation processes.
      *
      * @return string If redirect is `false`, returns the next page the user should be redirected to.
      */
-    private function install_with_new_user($user_id, $user_public_key, $user_secret_key, $is_marketing_allowed, $install_id, $install_public_key, $install_secret_key, $redirect = \true, $auto_install = \false)
+    private function install_with_new_user($user_id, $user_public_key, $user_secret_key, $is_marketing_allowed, $is_extensions_tracking_allowed, $install_id, $install_public_key, $install_secret_key, $redirect = \true, $auto_install = \false)
     {
     }
     /**
@@ -6023,6 +6132,7 @@ class Freemius extends \Freemius_Abstract
      * @param string    $user_public_key
      * @param string    $user_secret_key
      * @param bool|null $is_marketing_allowed
+     * @param bool|null $is_extensions_tracking_allowed Since 2.3.2
      * @param array     $site_ids
      * @param bool      $license_key
      * @param bool      $trial_plan_id
@@ -6030,7 +6140,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return string If redirect is `false`, returns the next page the user should be redirected to.
      */
-    private function install_many_pending_with_user($user_id, $user_public_key, $user_secret_key, $is_marketing_allowed, $site_ids, $license_key = \false, $trial_plan_id = \false, $redirect = \true)
+    private function install_many_pending_with_user($user_id, $user_public_key, $user_secret_key, $is_marketing_allowed, $is_extensions_tracking_allowed, $site_ids, $license_key = \false, $trial_plan_id = \false, $redirect = \true)
     {
     }
     /**
@@ -6043,15 +6153,14 @@ class Freemius extends \Freemius_Abstract
      * @param string    $user_public_key
      * @param string    $user_secret_key
      * @param bool|null $is_marketing_allowed
+     * @param bool|null $is_extensions_tracking_allowed Since 2.3.2
      * @param object[]  $installs
      * @param bool      $redirect
-     * @param bool      $auto_install Since 1.2.1.7 If `true` and setting up an account with a valid license, will
-     *                                redirect (or return a URL) to the account page with a special parameter to
-     *                                trigger the auto installation processes.
+     * @param bool      $auto_install                   Since 1.2.1.7 If `true` and setting up an account with a valid license, will redirect (or return a URL) to the account page with a special parameter to trigger the auto installation processes.
      *
      * @return string If redirect is `false`, returns the next page the user should be redirected to.
      */
-    private function install_many_with_new_user($user_id, $user_public_key, $user_secret_key, $is_marketing_allowed, array $installs, $redirect = \true, $auto_install = \false)
+    private function install_many_with_new_user($user_id, $user_public_key, $user_secret_key, $is_marketing_allowed, $is_extensions_tracking_allowed, array $installs, $redirect = \true, $auto_install = \false)
     {
     }
     /**
@@ -7425,6 +7534,19 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Completes ownership change by license.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  2.3.2
+     *
+     * @param number              $user_id
+     * @param array[string]number $install_ids_by_slug_map
+     *
+     */
+    private function complete_ownership_change_by_license($user_id, $install_ids_by_slug_map)
+    {
+    }
+    /**
      * Handle user name update.
      *
      * @author Vova Feldman (@svovaf)
@@ -8353,6 +8475,22 @@ class Freemius extends \Freemius_Abstract
      * @since 2.1.0
      */
     function _fetch_is_marketing_required_flag_value_ajax_action()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.3.2
+     *
+     * @param number[] $install_ids
+     *
+     * @return array {
+     *      An array of objects containing the installs' licenses owners data.
+     *
+     *      @property number $id User ID.
+     *      @property string $email User email (can be masked email).
+     * }
+     */
+    private function fetch_installs_licenses_owners_data($install_ids)
     {
     }
     /**
