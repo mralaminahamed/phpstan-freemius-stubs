@@ -6895,7 +6895,7 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.9
      *
-     * @param $plans
+     * @param FS_Plugin_Plan[] $plans
      */
     function _check_for_trial_plans($plans)
     {
@@ -7124,10 +7124,11 @@ class Freemius extends \Freemius_Abstract
      * @param array       $request
      * @param int         $success_cache_expiration
      * @param int         $failure_cache_expiration
+     * @param bool        $maybe_enrich_request_for_debug
      *
      * @return WP_Error|array
      */
-    private static function safe_remote_post(&$url, $request, $success_cache_expiration = 0, $failure_cache_expiration = 0)
+    static function safe_remote_post(&$url, $request, $success_cache_expiration = 0, $failure_cache_expiration = 0, $maybe_enrich_request_for_debug = \true)
     {
     }
     /**
@@ -7613,6 +7614,23 @@ class Freemius extends \Freemius_Abstract
      * @return bool
      */
     function is_business()
+    {
+    }
+    #endregion
+    #----------------------------------------------------------------------------------
+    #region Helper
+    #----------------------------------------------------------------------------------
+    /**
+     * If running with a secret key, assume it's the developer and show pending plans as well.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.1.2
+     *
+     * @param string $path
+     *
+     * @return string
+     */
+    function add_show_pending($path)
     {
     }
     #endregion
@@ -8574,6 +8592,11 @@ class FS_Plugin_Updater
      * @since 1.1.8.1
      */
     private $_update_details;
+    /**
+     * @var array
+     * @since 2.1.2
+     */
+    private $_translation_updates;
     #--------------------------------------------------------------------------------
     #region Singleton
     #--------------------------------------------------------------------------------
@@ -8738,6 +8761,32 @@ class FS_Plugin_Updater
      * @return bool|mixed
      */
     static function _fetch_plugin_info_from_repository($action, $args)
+    {
+    }
+    /**
+     * Fetches module translation updates from wordpress.org.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  2.1.2
+     *
+     * @param string $module_type
+     * @param string $slug
+     *
+     * @return array|null
+     */
+    private function fetch_wp_org_module_translation_updates($module_type, $slug)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.1.2
+     *
+     * @param string $module_type
+     * @param string $slug
+     *
+     * @return array
+     */
+    private function get_installed_translations($module_type, $slug)
     {
     }
     /**
