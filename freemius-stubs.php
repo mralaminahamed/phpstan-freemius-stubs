@@ -1005,7 +1005,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return bool
      */
-    private static function set_network_upgrade_mode(\FS_Storage $storage)
+    public static function set_network_upgrade_mode(\FS_Storage $storage)
     {
     }
     /**
@@ -1324,7 +1324,7 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  2.4.3
      */
-    private static function reset_deactivation_snoozing($period = 0)
+    public static function reset_deactivation_snoozing($period = 0)
     {
     }
     /**
@@ -1652,6 +1652,12 @@ class Freemius extends \Freemius_Abstract
     private static function _load_required_static()
     {
     }
+    public static function get_static_logger()
+    {
+    }
+    public static function get_accounts()
+    {
+    }
     #--------------------------------------------------------------------------------
     #region Clone
     #--------------------------------------------------------------------------------
@@ -1723,7 +1729,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @since 2.1.3
      */
-    private static function migrate_options_to_network()
+    public static function migrate_options_to_network()
     {
     }
     #----------------------------------------------------------------------------------
@@ -1736,68 +1742,6 @@ class Freemius extends \Freemius_Abstract
      * @since  1.2.1
      */
     static function _load_textdomain()
-    {
-    }
-    #endregion
-    #----------------------------------------------------------------------------------
-    #region Debugging
-    #----------------------------------------------------------------------------------
-    /**
-     * @author Vova Feldman (@svovaf)
-     * @since  1.0.8
-     */
-    static function _add_debug_section()
-    {
-    }
-    /**
-     * @author Vova Feldman (@svovaf)
-     * @since  1.1.7.3
-     */
-    static function _toggle_debug_mode()
-    {
-    }
-    /**
-     * @author Vova Feldman (@svovaf)
-     * @since  1.2.1.6
-     */
-    static function _get_debug_log()
-    {
-    }
-    /**
-     * @author Vova Feldman (@svovaf)
-     * @since  1.2.1.7
-     */
-    static function _get_db_option()
-    {
-    }
-    /**
-     * @author Vova Feldman (@svovaf)
-     * @since  1.2.1.7
-     */
-    static function _set_db_option()
-    {
-    }
-    /**
-     * @author Vova Feldman (@svovaf)
-     * @since  1.0.8
-     */
-    static function _debug_page_actions()
-    {
-    }
-    /**
-     * @author Leo Fajardo (@leorw)
-     * @since  2.5.0
-     * 
-     * @return array
-     */
-    static function get_all_modules_sites()
-    {
-    }
-    /**
-     * @author Vova Feldman (@svovaf)
-     * @since  1.0.8
-     */
-    static function _debug_page_render()
     {
     }
     #endregion
@@ -2945,20 +2889,6 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
-     * Delete user.
-     *
-     * @author Vova Feldman (@svovaf)
-     * @since  2.0.0
-     *
-     * @param number $user_id
-     * @param bool   $store
-     *
-     * @return false|int The user ID if deleted. Otherwise, FALSE (when install not exist).
-     */
-    private static function delete_user($user_id, $store = \true)
-    {
-    }
-    /**
      * Delete plugin's plans information.
      *
      * @param bool $store                 Flush to Database if true.
@@ -3867,7 +3797,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return array[string]FS_Site
      */
-    private static function get_all_sites($module_type = \WP_FS__MODULE_TYPE_PLUGIN, $blog_id = \null, $is_backup = \false)
+    public static function get_all_sites($module_type = \WP_FS__MODULE_TYPE_PLUGIN, $blog_id = \null, $is_backup = \false)
     {
     }
     /**
@@ -3881,7 +3811,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return mixed
      */
-    private static function get_account_option($option_name, $module_type = \null, $network_level_or_blog_id = \null)
+    public static function get_account_option($option_name, $module_type = \null, $network_level_or_blog_id = \null)
     {
     }
     /**
@@ -3935,15 +3865,6 @@ class Freemius extends \Freemius_Abstract
      * @return FS_Plugin_License[]
      */
     private static function get_all_licenses($module_id = \null)
-    {
-    }
-    /**
-     * @author Leo Fajardo (@leorw)
-     * @since  2.0.0
-     *
-     * @return array
-     */
-    private static function get_all_licenses_by_module_type()
     {
     }
     /**
@@ -4029,7 +3950,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return array<number,FS_Plugin[]>|false
      */
-    private static function get_all_addons()
+    public static function get_all_addons()
     {
     }
     /**
@@ -4038,7 +3959,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return number[]|false
      */
-    private static function get_all_account_addons()
+    public static function get_all_account_addons()
     {
     }
     /**
@@ -4118,6 +4039,15 @@ class Freemius extends \Freemius_Abstract
      * @return FS_Site
      */
     function get_site()
+    {
+    }
+    /**
+     * @author Daniele Alessandra (@danielealessandra)
+     * @return FS_Storage
+     * @since  2.6.2
+     *
+     */
+    public function get_storage()
     {
     }
     /**
@@ -5343,6 +5273,19 @@ class Freemius extends \Freemius_Abstract
      * @return string
      */
     function pricing_url($billing_cycle = \WP_FS__PERIOD_ANNUALLY, $is_trial = \false)
+    {
+    }
+    /**
+     * Retrieves the filtered pricing URL.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  2.7.4
+     *
+     * @param string $url
+     *
+     * @return string
+     */
+    private function get_pricing_url_with_filter($url)
     {
     }
     /**
@@ -6821,8 +6764,9 @@ class Freemius extends \Freemius_Abstract
      * @param string $capability
      * @param int    $priority
      * @param bool   $show_submenu
+     * @param string $class
      */
-    function add_submenu_link_item($menu_title, $url, $menu_slug = \false, $capability = 'read', $priority = \WP_FS__DEFAULT_PRIORITY, $show_submenu = \true)
+    function add_submenu_link_item($menu_title, $url, $menu_slug = \false, $capability = 'read', $priority = \WP_FS__DEFAULT_PRIORITY, $show_submenu = \true, $class = '')
     {
     }
     #endregion ------------------------------------------------------------------
@@ -8512,16 +8456,6 @@ class Freemius extends \Freemius_Abstract
      * @author Leo Fajardo (@leorw)
      * @since 2.1.0
      *
-     * @param string $url
-     * @param array  $request
-     */
-    private static function enrich_request_for_debug(&$url, &$request)
-    {
-    }
-    /**
-     * @author Leo Fajardo (@leorw)
-     * @since 2.1.0
-     *
      * @param string      $url
      * @param array       $request
      * @param int         $success_cache_expiration
@@ -9831,6 +9765,9 @@ class FS_Logger
      * @var int ABSPATH length.
      */
     private static $_abspathLength;
+    /**
+     * @var FS_Logger[] $LOGGERS
+     */
     private static $LOGGERS = array();
     private static $LOG = array();
     private static $CNT = 0;
@@ -10294,6 +10231,22 @@ class FS_Plugin_Updater
     }
     /**
      * @author Leo Fajardo (@leorw)
+     * @since 2.7.4
+     */
+    function _add_fs_allow_updater_and_dialog_request_param()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.7.4
+     *
+     * @return bool
+     */
+    private function is_plugin_information_dialog_for_plugin()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
      * @since 2.1.4
      */
     function catch_plugin_information_dialog_contents()
@@ -10454,6 +10407,15 @@ class FS_Plugin_Updater
      * @return bool|mixed
      */
     static function _fetch_plugin_info_from_repository($action, $args)
+    {
+    }
+    /**
+     * Returns true if the product can fetch data from WordPress.org.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  2.7.4
+     */
+    private function can_fetch_data_from_wp_org()
     {
     }
     /**
@@ -10700,6 +10662,7 @@ class FS_Security
  * @property bool|null   $is_extensions_tracking_allowed
  * @property bool|null   $is_diagnostic_tracking_allowed
  * @property object      $sync_cron
+ * @property bool|int    $install_timestamp
  */
 class FS_Storage
 {
@@ -11881,6 +11844,14 @@ class FS_Plugin_Plan extends \FS_Entity
      * @var bool Is hidden plan.
      */
     public $is_hidden;
+    /**
+     * @var FS_Pricing[]
+     */
+    public $pricing;
+    /**
+     * @var object[]
+     */
+    public $features;
     #endregion Properties
     /**
      * @param object|bool $plan
