@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="ad4d1151-a7d6-4fdf-acd4-b3720707e64b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/bin/release.sh" beforeDir="false" afterPath="$PROJECT_DIR$/bin/release.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/source/composer.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -91,7 +92,7 @@
     "Notification.DoNotAsk-PHP Plugin Suggestion": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "feature/freemius-1.2.3",
+    "git-widget-placeholder": "feature/freemius-2.5.1",
     "last_opened_file_path": "/home/alamin/Contributions/phpstan-freemius-stubs",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
