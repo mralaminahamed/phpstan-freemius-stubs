@@ -4836,6 +4836,15 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * @author Edgar Melkonyan
+     * @since 2.4.1
+     *
+     * @throws Freemius_Exception
+     */
+    function _toggle_whitelabel_mode_ajax_handler()
+    {
+    }
+    /**
      * @author Leo Fajardo (@leorw)
      * @since  2.3.0
      */
