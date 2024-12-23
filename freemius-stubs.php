@@ -519,6 +519,12 @@ class Freemius extends \Freemius_Abstract
      */
     private $_admin_notices;
     /**
+     * @since 1.1.6
+     *
+     * @var FS_Admin_Notice_Manager
+     */
+    private static $_global_admin_notices;
+    /**
      * @var FS_Logger
      * @since 1.0.0
      */
@@ -749,12 +755,15 @@ class Freemius extends \Freemius_Abstract
     /**
      * Check if Freemius should be turned on for the current plugin install.
      *
+     * Note:
+     *  $this->_is_on is updated in has_api_connectivity()
+     *
      * @author Vova Feldman (@svovaf)
      * @since  1.0.9
      *
      * @return bool
      */
-    private function is_on()
+    function is_on()
     {
     }
     /**
@@ -767,7 +776,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return bool
      */
-    private function has_api_connectivity($flush = \false)
+    function has_api_connectivity($flush = \false)
     {
     }
     /**
@@ -1571,6 +1580,17 @@ class Freemius extends \Freemius_Abstract
      * @return FS_Plugin[]|false
      */
     function get_account_addons()
+    {
+    }
+    /**
+     * Check if user has any
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.6
+     *
+     * @return bool
+     */
+    function has_account_addons()
     {
     }
     /**
@@ -3390,7 +3410,7 @@ class FS_Api
      */
     private static $_options;
     /**
-     * @var FS_Option_Manager API Caching layer
+     * @var FS_Cache_Manager API Caching layer
      */
     private static $_cache;
     /**
@@ -3499,13 +3519,34 @@ class FS_Api
     /**
      * Test API connectivity.
      *
+     * @author Vova Feldman (@svovaf)
      * @since  1.0.9 If fails, try to fallback to HTTP.
-     *
-     * @param null|string $unique_anonymous_id
+     * @since  1.1.6 Added a 5-min caching mechanism, to prevent from overloading the server if the API if
+     *         temporary down.
      *
      * @return bool True if successful connectivity to the API.
      */
-    function test($unique_anonymous_id = \null)
+    static function test()
+    {
+    }
+    /**
+     * Check if API is temporary down.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.6
+     *
+     * @return bool
+     */
+    static function is_temporary_down()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.6
+     *
+     * @return object
+     */
+    private function get_temporary_unavailable_error()
     {
     }
     /**
@@ -3520,6 +3561,20 @@ class FS_Api
      * @return object
      */
     function ping($unique_anonymous_id = \null, $is_update = \false)
+    {
+    }
+    /**
+     * Check if based on the API result we should try
+     * to re-run the same request with HTTP instead of HTTPS.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.6
+     *
+     * @param $result
+     *
+     * @return bool
+     */
+    private static function should_try_with_http($result)
     {
     }
     /**
@@ -3641,6 +3696,24 @@ class FS_Plugin_Updater
      * @since  1.0.4
      */
     private function _filters()
+    {
+    }
+    /**
+     * Capture plugin update row by turning output buffering.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.6
+     */
+    function catch_plugin_update_row()
+    {
+    }
+    /**
+     * Overrides default update message format with "renew your license" message.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.6
+     */
+    function edit_and_echo_plugin_update_row($file, $plugin_data)
     {
     }
     /**
@@ -4829,6 +4902,138 @@ class FS_Admin_Notice_Manager
     {
     }
 }
+class FS_Cache_Manager
+{
+    /**
+     * @var FS_Option_Manager
+     */
+    private $_options;
+    /**
+     * @var FS_Logger
+     */
+    private $_logger;
+    /**
+     * @var FS_Cache_Manager[]
+     */
+    private static $_MANAGERS = array();
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.3
+     *
+     * @param string $id
+     */
+    private function __construct($id)
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.6
+     *
+     * @param $id
+     *
+     * @return FS_Cache_Manager
+     */
+    static function get_manager($id)
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.6
+     *
+     * @return bool
+     */
+    function is_empty()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.6
+     */
+    function clear()
+    {
+    }
+    /**
+     * Delete cache manager from DB.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.0.9
+     */
+    function delete()
+    {
+    }
+    /**
+     * Check if there's a cached item.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.6
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
+    function has($key)
+    {
+    }
+    /**
+     * Check if there's a valid cached item.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.6
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
+    function has_valid($key)
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.6
+     *
+     * @param string $key
+     * @param mixed  $default
+     *
+     * @return mixed
+     */
+    function get($key, $default = \null)
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.6
+     *
+     * @param string $key
+     * @param mixed  $default
+     *
+     * @return mixed
+     */
+    function get_valid($key, $default = \null)
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.6
+     *
+     * @param string $key
+     * @param mixed  $value
+     * @param int    $expiration
+     */
+    function set($key, $value, $expiration = \WP_FS__TIME_24_HOURS_IN_SEC)
+    {
+    }
+    /**
+     * Purge cached item.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.6
+     *
+     * @param string $key
+     */
+    function purge($key)
+    {
+    }
+}
 class FS_Key_Value_Storage implements \ArrayAccess, \Iterator, \Countable
 {
     /**
@@ -5490,15 +5695,15 @@ abstract class Freemius_Api_Base
     protected $_public;
     protected $_secret;
     protected $_scope;
-    protected $_sandbox;
+    protected $_isSandbox;
     /**
-     * @param string $pScope   'app', 'developer', 'user' or 'install'.
-     * @param number $pID      Element's id.
-     * @param string $pPublic  Public key.
-     * @param string $pSecret  Element's secret key.
-     * @param bool   $pSandbox Whether or not to run API in sandbox mode.
+     * @param string $pScope     'app', 'developer', 'user' or 'install'.
+     * @param number $pID        Element's id.
+     * @param string $pPublic    Public key.
+     * @param string $pSecret    Element's secret key.
+     * @param bool   $pIsSandbox Whether or not to run API in sandbox mode.
      */
-    public function Init($pScope, $pID, $pPublic, $pSecret, $pSandbox = \false)
+    public function Init($pScope, $pID, $pPublic, $pSecret, $pIsSandbox = \false)
     {
     }
     public function IsSandbox()
@@ -5516,37 +5721,6 @@ abstract class Freemius_Api_Base
      * @return object[]|object|null
      */
     private function _Api($pPath, $pMethod = 'GET', $pParams = array())
-    {
-    }
-    /**
-     * If successful connectivity to the API endpoint using ping.json endpoint.
-     *
-     *      - OR -
-     *
-     * Validate if ping result object is valid.
-     *
-     * @param mixed $pPong
-     *
-     * @return bool
-     */
-    public function Test($pPong = \null)
-    {
-    }
-    /**
-     * Ping API to test connectivity.
-     *
-     * @return object
-     */
-    public function Ping()
-    {
-    }
-    /**
-     * Find clock diff between current server to API server.
-     *
-     * @since 1.0.2
-     * @return int Clock diff in seconds.
-     */
-    public function FindClockDiff()
     {
     }
     public function Api($pPath, $pMethod = 'GET', $pParams = array())
@@ -5596,9 +5770,10 @@ class Freemius_Api extends \Freemius_Api_Base
     public function __construct($pScope, $pID, $pPublic, $pSecret = \false, $pSandbox = \false)
     {
     }
-    public function GetUrl($pCanonizedPath = '')
+    public static function GetUrl($pCanonizedPath = '', $pIsSandbox = \false)
     {
     }
+    #region Servers Clock Diff ------------------------------------------------------
     /**
      * @var int Clock diff in seconds between current server to API server.
      */
@@ -5613,6 +5788,16 @@ class Freemius_Api extends \Freemius_Api_Base
     public static function SetClockDiff($pSeconds)
     {
     }
+    /**
+     * Find clock diff between current server to API server.
+     *
+     * @since 1.0.2
+     * @return int Clock diff in seconds.
+     */
+    public static function FindClockDiff()
+    {
+    }
+    #endregion Servers Clock Diff ------------------------------------------------------
     /**
      * @var string http or https
      */
@@ -5641,9 +5826,11 @@ class Freemius_Api extends \Freemius_Api_Base
      *      {scope_entity_secret_key}))
      *
      * @param string $pResourceUrl
-     * @param array  $opts
+     * @param array  $pCurlOptions
+     *
+     * @return array
      */
-    protected function SignRequest($pResourceUrl, &$opts)
+    function SignRequest($pResourceUrl, $pCurlOptions)
     {
     }
     /**
@@ -5659,20 +5846,68 @@ class Freemius_Api extends \Freemius_Api_Base
     {
     }
     /**
+     * @param string        $pCanonizedPath
+     * @param string        $pMethod
+     * @param array         $pParams
+     * @param null|resource $pCurlHandler
+     * @param bool          $pIsSandbox
+     * @param null|callable $pBeforeExecutionFunction
+     *
+     * @return object[]|object|null
+     *
+     * @throws \Freemius_Exception
+     */
+    private static function MakeStaticRequest($pCanonizedPath, $pMethod = 'GET', $pParams = array(), $pCurlHandler = \null, $pIsSandbox = \false, $pBeforeExecutionFunction = \null)
+    {
+    }
+    /**
      * Makes an HTTP request. This method can be overridden by subclasses if
      * developers want to do fancier things or use something other than curl to
      * make the request.
      *
      * @param string        $pCanonizedPath The URL to make the request to
      * @param string        $pMethod        HTTP method
-     * @param array         $params         The parameters to use for the POST body
-     * @param null|resource $ch             Initialized curl handle
+     * @param array         $pParams        The parameters to use for the POST body
+     * @param null|resource $pCurlHandler   Initialized curl handle
      *
      * @return object[]|object|null
      *
      * @throws Freemius_Exception
      */
-    public function MakeRequest($pCanonizedPath, $pMethod = 'GET', $params = array(), $ch = \null)
+    public function MakeRequest($pCanonizedPath, $pMethod = 'GET', $pParams = array(), $pCurlHandler = \null)
+    {
+    }
+    #region Connectivity Test ------------------------------------------------------
+    /**
+     * If successful connectivity to the API endpoint using ping.json endpoint.
+     *
+     *      - OR -
+     *
+     * Validate if ping result object is valid.
+     *
+     * @param mixed $pPong
+     *
+     * @return bool
+     */
+    public static function Test($pPong = \null)
+    {
+    }
+    /**
+     * Ping API to test connectivity.
+     *
+     * @return object
+     */
+    public static function Ping()
+    {
+    }
+    #endregion Connectivity Test ------------------------------------------------------
+    #region Connectivity Exceptions ------------------------------------------------------
+    /**
+     * @param resource $pCurlHandler
+     *
+     * @throws Freemius_Exception
+     */
+    private static function ThrowCurlException($pCurlHandler)
     {
     }
     /**
@@ -5680,7 +5915,7 @@ class Freemius_Api extends \Freemius_Api_Base
      *
      * @throws Freemius_Exception
      */
-    private function ThrowNoCurlException($pResult = '')
+    private static function ThrowNoCurlException($pResult = '')
     {
     }
     /**
@@ -5688,7 +5923,7 @@ class Freemius_Api extends \Freemius_Api_Base
      *
      * @throws Freemius_Exception
      */
-    private function ThrowCloudFlareDDoSException($pResult = '')
+    private static function ThrowCloudFlareDDoSException($pResult = '')
     {
     }
     /**
@@ -5696,9 +5931,10 @@ class Freemius_Api extends \Freemius_Api_Base
      *
      * @throws Freemius_Exception
      */
-    private function ThrowSquidAclException($pResult = '')
+    private static function ThrowSquidAclException($pResult = '')
     {
     }
+    #endregion Connectivity Exceptions ------------------------------------------------------
 }
 /**
  * Get object's public variables.
@@ -5782,17 +6018,6 @@ function fs_request_is_action($action, $action_key = 'action')
 {
 }
 function fs_is_plugin_page($menu_slug)
-{
-}
-/**
- * Get client IP.
- *
- * @author Vova Feldman (@svovaf)
- * @since  1.1.2
- *
- * @return string|null
- */
-function fs_get_ip()
 {
 }
 /* Core UI.
@@ -5966,6 +6191,17 @@ function fs_override_i18n(array $key_value, $slug = 'freemius')
 {
 }
 /**
+ * Get client IP.
+ *
+ * @author Vova Feldman (@svovaf)
+ * @since  1.1.2
+ *
+ * @return string|null
+ */
+function fs_get_ip()
+{
+}
+/**
  * Leverage backtrace to find caller plugin file path.
  *
  * @author Vova Feldman (@svovaf)
@@ -6013,6 +6249,24 @@ function fs_newest_sdk_plugin_first()
  * @global $fs_active_plugins
  */
 function fs_fallback_to_newest_active_sdk()
+{
+}
+#region Actions / Filters -----------------------------------------
+/**
+ * Apply filter for specific plugin.
+ *
+ * @author Vova Feldman (@svovaf)
+ * @since  1.0.9
+ *
+ * @param string $slug  Plugin slug
+ * @param string $tag   The name of the filter hook.
+ * @param mixed  $value The value on which the filters hooked to `$tag` are applied on.
+ *
+ * @return mixed The filtered value after all hooked functions are applied to it.
+ *
+ * @uses   apply_filters()
+ */
+function fs_apply_filter($slug, $tag, $value)
 {
 }
 /**
