@@ -798,6 +798,15 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.7.4
+     *
+     * @return object|false
+     */
+    private function ping()
+    {
+    }
+    /**
      * Check if there's any connectivity issue to Freemius API.
      *
      * @author Vova Feldman (@svovaf)
@@ -808,6 +817,16 @@ class Freemius extends \Freemius_Abstract
      * @return bool
      */
     function has_api_connectivity($flush_if_no_connectivity = \false)
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.7.4
+     *
+     * @param object $pong
+     * @param bool   $is_connected
+     */
+    private function store_connectivity_info($pong, $is_connected)
     {
     }
     /**
@@ -822,14 +841,24 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.7.4
+     *
+     * @return \WP_User
+     */
+    static function _get_current_wp_user()
+    {
+    }
+    /**
      * Generate API connectivity issue message.
      *
      * @author Vova Feldman (@svovaf)
      * @since  1.0.9
      *
      * @param mixed $api_result
+     * @param bool  $is_first_failure
      */
-    function _add_connectivity_issue_message($api_result)
+    function _add_connectivity_issue_message($api_result, $is_first_failure = \true)
     {
     }
     /**
@@ -841,6 +870,15 @@ class Freemius extends \Freemius_Abstract
      * @since  1.0.9
      */
     function _email_about_firewall_issue()
+    {
+    }
+    /**
+     * Handle connectivity test retry approved by the user.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.7.4
+     */
+    function _retry_connectivity_test()
     {
     }
     static function _add_firewall_issues_javascript()
@@ -1242,7 +1280,8 @@ class Freemius extends \Freemius_Abstract
     /**
      * Unix timestamp for previous install sync cron execution or false if never executed.
      *
-     * @todo There's some very strange bug that $this->_storage->install_sync_timestamp value is not being updated. But for sure the sync event is working.
+     * @todo   There's some very strange bug that $this->_storage->install_sync_timestamp value is not being
+     *         updated. But for sure the sync event is working.
      *
      * @author Vova Feldman (@svovaf)
      * @since  1.1.7.3
@@ -2430,6 +2469,30 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7.4
+     *
+     * @param array $override_with
+     *
+     * @return array
+     */
+    function get_opt_in_params($override_with = array())
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7.4
+     *
+     * @param string|bool $email
+     * @param string|bool $first
+     * @param string|bool $last
+     *
+     * @return bool Is successful opt-in (or set to pending).
+     */
+    function opt_in($email = \false, $first = \false, $last = \false)
+    {
+    }
+    /**
      * Set user and site identities.
      *
      * @author Vova Feldman (@svovaf)
@@ -2454,12 +2517,48 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Install plugin with new user.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7.4
+     *
+     * @param number $user_id
+     * @param string $user_public_key
+     * @param string $user_secret_key
+     * @param number $install_id
+     * @param string $install_public_key
+     * @param string $install_secret_key
+     * @param bool   $redirect
+     */
+    private function install_with_new_user($user_id, $user_public_key, $user_secret_key, $install_id, $install_public_key, $install_secret_key, $redirect = \true)
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7.4
+     *
+     * @param bool $email
+     * @param bool $redirect
+     */
+    private function set_pending_confirmation($email = \false, $redirect = \true)
+    {
+    }
+    /**
      * Install plugin with current logged WP user info.
      *
      * @author Vova Feldman (@svovaf)
      * @since  1.0.7
      */
     function _install_with_current_user()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7.4
+     *
+     * @param bool $redirect
+     */
+    private function install_with_current_user($redirect = \true)
     {
     }
     /**
@@ -3297,6 +3396,8 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Get the URL of the page that should be loaded after the user connect or skip in the opt-in screen.
+     *
      * @author Vova Feldman (@svovaf)
      * @since  1.1.3
      *
@@ -3531,6 +3632,17 @@ class Freemius extends \Freemius_Abstract
      * @since  1.0.0
      */
     function _add_upgrade_action_link()
+    {
+    }
+    /**
+     * Get the URL of the page that should be loaded right after the plugin activation.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.7.4
+     *
+     * @return string
+     */
+    function get_after_plugin_activation_redirect_url()
     {
     }
     /**
@@ -6519,8 +6631,6 @@ function fs_dummy()
 function fs_get_url_daily_cache_killer()
 {
 }
-/* Templates / Views.
-	--------------------------------------------------------------------------------------------*/
 function fs_get_template_path($path)
 {
 }
@@ -6661,7 +6771,6 @@ function fs_nonce_url($actionurl, $action = -1, $name = '_wpnonce')
 function fs_starts_with($haystack, $needle)
 {
 }
-#region Url Canonization ------------------------------------------------------------------
 /**
  * @author Vova Feldman (@svovaf)
  * @since  1.1.3
@@ -6732,30 +6841,6 @@ function fs_sort_by_priority($a, $b)
  * @return bool False if $location is not set
  */
 function fs_redirect($location, $status = 302)
-{
-}
-/**
- * Sanitizes a URL for use in a redirect.
- *
- * @since 2.3
- *
- * @param string $location
- *
- * @return string redirect-sanitized URL
- */
-function fs_sanitize_redirect($location)
-{
-}
-/**
- * Removes any NULL characters in $string.
- *
- * @since 1.0.0
- *
- * @param string $string
- *
- * @return string
- */
-function fs_kses_no_null($string)
 {
 }
 /**
