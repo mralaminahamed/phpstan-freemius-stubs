@@ -51,7 +51,7 @@ process_version() {
         git pull origin "main" --force
         git merge --no-ff "${feature_branch}" -m "Merge feature/freemius-${version}"
         git tag -a "v${version}" -m "Release version ${version}"
-        git push origin "main" "v${version}"
+        git push origin "main" "v${version}" --force
         git branch -D "${feature_branch}"
 
         cleanup_source
