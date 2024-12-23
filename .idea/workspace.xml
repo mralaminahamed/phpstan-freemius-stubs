@@ -5,22 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ad4d1151-a7d6-4fdf-acd4-b3720707e64b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/lib/shared.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/phpstubs-freemius.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/phpstubs-freemius.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_6_14_24,_7_34_PM_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_6_14_24__7_34_PM__Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/generate.sh" beforeDir="false" afterPath="$PROJECT_DIR$/bin/generate.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/release.sh" beforeDir="false" afterPath="$PROJECT_DIR$/bin/release.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/configs/finder-constants.php" beforeDir="false" afterPath="$PROJECT_DIR$/configs/finder-constants.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/configs/finder.php" beforeDir="false" afterPath="$PROJECT_DIR$/configs/finder.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/freemius-constants-stubs.php" beforeDir="false" afterPath="$PROJECT_DIR$/freemius-constants-stubs.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/freemius-stubs.php" beforeDir="false" afterPath="$PROJECT_DIR$/freemius-stubs.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/freemius_versions.txt" beforeDir="false" afterPath="$PROJECT_DIR$/freemius_versions.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/phpstan.neon" beforeDir="false" afterPath="$PROJECT_DIR$/phpstan.neon" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/source/composer.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
