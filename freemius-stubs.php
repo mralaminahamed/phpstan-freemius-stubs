@@ -759,6 +759,30 @@ class Freemius extends \Freemius_Abstract
      * @var Freemius[]
      */
     private static $_instances = array();
+    /**
+     * @author Leo Fajardo (@leorw)
+     *
+     * @since 1.2.3
+     *
+     * @var FS_Affiliate
+     */
+    private $affiliate = \null;
+    /**
+     * @author Leo Fajardo (@leorw)
+     *
+     * @since 1.2.3
+     *
+     * @var FS_AffiliateTerms
+     */
+    private $plugin_affiliate_terms = \null;
+    /**
+     * @author Leo Fajardo (@leorw)
+     *
+     * @since 1.2.3
+     *
+     * @var FS_AffiliateTerms
+     */
+    private $custom_affiliate_terms = \null;
     #region Uninstall Reasons IDs
     const REASON_NO_LONGER_NEEDED = 1;
     const REASON_FOUND_A_BETTER_PLUGIN = 2;
@@ -866,6 +890,15 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Makes paths relative.
+     *
+     * @author Leo Fajardo
+     * @since 1.2.3
+     */
+    private function make_paths_relative()
+    {
+    }
+    /**
      * @author Vova Feldman (@svovaf)
      * @since  1.2.2.7
      *
@@ -961,6 +994,40 @@ class Freemius extends \Freemius_Abstract
      * @return string
      */
     private function _find_caller_plugin_file($is_init = \false)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 1.2.3
+     *
+     * @param string $path
+     *
+     * @return string
+     */
+    private function get_relative_path($path)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 1.2.3
+     *
+     * @param string      $path
+     * @param string|bool $module_type
+     *
+     * @return string
+     */
+    private function get_absolute_path($path, $module_type = \false)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 1.2.3
+     *
+     * @param string|bool $module_type
+     *
+     * @return string
+     */
+    private function get_module_root_dir_path($module_type = \false)
     {
     }
     /**
@@ -3188,6 +3255,62 @@ class Freemius extends \Freemius_Abstract
     {
     }
     #----------------------------------------------------------------------------------
+    #region Affiliation
+    #----------------------------------------------------------------------------------
+    /**
+     * @author Leo Fajardo
+     * @since 1.2.3
+     *
+     * @return bool
+     */
+    function has_affiliate_program()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 1.2.3
+     */
+    private function fetch_affiliate_and_terms()
+    {
+    }
+    /**
+     * @author Leo Fajardo
+     * @since 1.2.3
+     *
+     * @return FS_Affiliate
+     */
+    function get_affiliate()
+    {
+    }
+    /**
+     * @author Leo Fajardo
+     * @since 1.2.3
+     *
+     * @return FS_AffiliateTerms
+     */
+    function get_affiliate_terms()
+    {
+    }
+    /**
+     * @author Leo Fajardo
+     * @since 1.2.3
+     *
+     * @return FS_Affiliate|null
+     */
+    function _submit_affiliate_application()
+    {
+    }
+    /**
+     * @author Leo Fajardo
+     * @since 1.2.3
+     *
+     * @return array|null
+     */
+    function get_affiliate_application_data()
+    {
+    }
+    #endregion Affiliation ------------------------------------------------------------
+    #----------------------------------------------------------------------------------
     #region URL Generators
     #----------------------------------------------------------------------------------
     /**
@@ -3705,11 +3828,12 @@ class Freemius extends \Freemius_Abstract
      *                                        In this case, the user and site info will be sent to the server but no
      *                                        data will be saved to the WP installation's database.
      * @param number|bool $trial_plan_id
+     * @param bool        $is_disconnected Whether or not to opt in without tracking.
      *
      * @return string|object
      * @use    WP_Error
      */
-    function opt_in($email = \false, $first = \false, $last = \false, $license_key = \false, $is_uninstall = \false, $trial_plan_id = \false)
+    function opt_in($email = \false, $first = \false, $last = \false, $license_key = \false, $is_uninstall = \false, $trial_plan_id = \false, $is_disconnected = \false)
     {
     }
     /**
@@ -4993,6 +5117,15 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Renders the "Affiliation" page.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  1.2.3
+     */
+    function _affiliation_page_render()
+    {
+    }
+    /**
      * Render account page.
      *
      * @author Vova Feldman (@svovaf)
@@ -5183,6 +5316,17 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Lets users/customers know that the product has an affiliate program.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  1.2.2.11
+     *
+     * @return bool Returns true if the notice has been added.
+     */
+    function _add_affiliate_program_notice()
+    {
+    }
+    /**
      * @author Vova Feldman (@svovaf)
      * @since  1.2.1.5
      */
@@ -5343,6 +5487,43 @@ class Freemius extends \Freemius_Abstract
      * @return string
      */
     function get_text($key)
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.3
+     *
+     * @param string $text Translatable string.
+     * @param string $key  String key for overrides.
+     *
+     * @return string
+     */
+    function get_text_inline($text, $key = '')
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.3
+     *
+     * @param string $text Translatable string.
+     * @param string $context Context information for the translators.
+     * @param string $key  String key for overrides.
+     *
+     * @return string
+     */
+    function get_text_x_inline($text, $context, $key)
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.3
+     *
+     * @param string $text Translatable string.
+     * @param string $key  String key for overrides.
+     *
+     * @return string
+     */
+    function esc_html_inline($text, $key)
     {
     }
     #----------------------------------------------------------------------------------
@@ -6500,6 +6681,195 @@ class FS_Entity
     {
     }
 }
+class FS_Scope_Entity extends \FS_Entity
+{
+    /**
+     * @var string
+     */
+    public $public_key;
+    /**
+     * @var string
+     */
+    public $secret_key;
+    /**
+     * @param bool|stdClass $scope_entity
+     */
+    function __construct($scope_entity = \false)
+    {
+    }
+}
+class FS_AffiliateTerms extends \FS_Scope_Entity
+{
+    #region Properties
+    /**
+     * @var bool
+     */
+    public $is_active;
+    /**
+     * @var string Enum: `affiliation` or `rewards`. Defaults to `affiliation`.
+     */
+    public $type;
+    /**
+     * @var string Enum: `payout` or `credit`. Defaults to `payout`.
+     */
+    public $reward_type;
+    /**
+     * If `first`, the referral will be attributed to the first visited source containing the affiliation link that
+     * was clicked.
+     *
+     * @var string Enum: `first` or `last`. Defaults to `first`.
+     */
+    public $referral_attribution;
+    /**
+     * @var int Defaults to `30`, `0` for session cookie, and `null` for endless cookie (until cookies are cleaned).
+     */
+    public $cookie_days;
+    /**
+     * @var int
+     */
+    public $commission;
+    /**
+     * @var string Enum: `percentage` or `dollar`. Defaults to `percentage`.
+     */
+    public $commission_type;
+    /**
+     * @var null|int Defaults to `0` (affiliate only on first payment). `null` for commission for all renewals. If
+     *          greater than `0`, affiliate will get paid for all renewals for `commission_renewals_days` days after
+     *          the initial upgrade/purchase.
+     */
+    public $commission_renewals_days;
+    /**
+     * @var int Only cents and no percentage. In US cents, e.g.: 100 = $1.00. Defaults to `null`.
+     */
+    public $install_commission;
+    /**
+     * @var string Required default target link, e.g.: pricing page.
+     */
+    public $default_url;
+    /**
+     * @var string One of the following: 'all', 'new_customer', 'new_user'.
+     *             If 'all' - reward for any user type.
+     *             If 'new_customer' - reward only for new customers.
+     *             If 'new_user' - reward only for new users.
+     */
+    public $reward_customer_type;
+    /**
+     * @var int Defaults to `0` (affiliate only on directly affiliated links). `null` if an affiliate will get
+     *          paid for all customers' lifetime payments. If greater than `0`, an affiliate will get paid for all
+     *          customer payments for `future_payments_days` days after the initial payment.
+     */
+    public $future_payments_days;
+    /**
+     * @var bool If `true`, allow referrals from social sites.
+     */
+    public $is_social_allowed;
+    /**
+     * @var bool If `true`, allow conversions without HTTP referrer header at all.
+     */
+    public $is_app_allowed;
+    /**
+     * @var bool If `true`, allow referrals from any site.
+     */
+    public $is_any_site_allowed;
+    #endregion Properties
+    /**
+     * @author Leo Fajardo (@leorw)
+     *
+     * @return string
+     */
+    function get_formatted_commission()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     *
+     * @return bool
+     */
+    function has_lifetime_commission()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     *
+     * @return bool
+     */
+    function is_session_cookie()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     *
+     * @return bool
+     */
+    function has_renewals_commission()
+    {
+    }
+}
+class FS_Affiliate extends \FS_Scope_Entity
+{
+    #region Properties
+    /**
+     * @var string
+     */
+    public $paypal_email;
+    /**
+     * @var number
+     */
+    public $custom_affiliate_terms_id;
+    /**
+     * @var boolean
+     */
+    public $is_using_custom_terms;
+    /**
+     * @var string status Enum: `pending`, `rejected`, `suspended`, or `active`. Defaults to `pending`.
+     */
+    public $status;
+    /**
+     * @var string
+     */
+    public $domain;
+    #endregion Properties
+    /**
+     * @author Leo Fajardo
+     *
+     * @return bool
+     */
+    function is_active()
+    {
+    }
+    /**
+     * @author Leo Fajardo
+     *
+     * @return bool
+     */
+    function is_pending()
+    {
+    }
+    /**
+     * @author Leo Fajardo
+     *
+     * @return bool
+     */
+    function is_suspended()
+    {
+    }
+    /**
+     * @author Leo Fajardo
+     *
+     * @return bool
+     */
+    function is_rejected()
+    {
+    }
+    /**
+     * @author Leo Fajardo
+     *
+     * @return bool
+     */
+    function is_blocked()
+    {
+    }
+}
 class FS_Billing extends \FS_Entity
 {
     #region Properties
@@ -6985,23 +7355,6 @@ class FS_Plugin_Tag extends \FS_Entity
     {
     }
 }
-class FS_Scope_Entity extends \FS_Entity
-{
-    /**
-     * @var string
-     */
-    public $public_key;
-    /**
-     * @var string
-     */
-    public $secret_key;
-    /**
-     * @param bool|stdClass $scope_entity
-     */
-    function __construct($scope_entity = \false)
-    {
-    }
-}
 class FS_Plugin extends \FS_Scope_Entity
 {
     /**
@@ -7052,6 +7405,16 @@ class FS_Plugin extends \FS_Scope_Entity
      * @var bool
      */
     public $is_live;
+    /**
+     * @author Leo Fajardo (@leorw)
+     *
+     * @since 1.2.3
+     *
+     * @var string|false false if the module doesn't have an affiliate program or one of the following:
+     *                   'selected', 'customers', or 'all'.
+     */
+    public $affiliate_moderation;
+    const AFFILIATE_MODERATION_CUSTOMERS = 'customers';
     #endregion Install Specific Properties
     /**
      * @param stdClass|bool $plugin
@@ -7068,6 +7431,15 @@ class FS_Plugin extends \FS_Scope_Entity
      * @return bool
      */
     function is_addon()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 1.2.3
+     *
+     * @return bool
+     */
+    function has_affiliate_program()
     {
     }
     static function get_type()
@@ -9213,6 +9585,8 @@ class Freemius_Api_WordPress extends \Freemius_Api_Base
     /**
      * Get API request URL signed via query string.
      *
+     * @since 1.2.3 Stopped using http_build_query(). Instead, use urlencode(). In some environments the encoding of http_build_query() can generate a URL that once used with a redirect, the `&` querystring separator is escaped to `&amp;` which breaks the URL (Added by @svovaf).
+     *
      * @param string $pPath
      *
      * @throws Freemius_Exception
@@ -9363,8 +9737,6 @@ function fs_get_object_public_vars($object)
 function fs_dummy()
 {
 }
-/* Url.
-	--------------------------------------------------------------------------------------------*/
 function fs_get_url_daily_cache_killer()
 {
 }
@@ -9387,7 +9759,7 @@ function fs_get_template($path, &$params = \null)
 {
 }
 /* Scripts and styles including.
-	--------------------------------------------------------------------------------------------*/
+   --------------------------------------------------------------------------------------------*/
 /**
  * Generates an absolute URL to the given path. This function ensures that the URL will be correct whether the asset
  * is inside a plugin's folder or a theme's folder.
@@ -9420,8 +9792,6 @@ function fs_enqueue_local_script($handle, $path, $deps = array(), $ver = \false,
 function fs_img_url($path, $img_dir = \WP_FS__DIR_IMG)
 {
 }
-/* Request handlers.
-	--------------------------------------------------------------------------------------------*/
 /**
  * @param string      $key
  * @param mixed       $def
@@ -9470,8 +9840,20 @@ function fs_request_is_action_secure($action, $action_key = 'action', $nonce_key
 function fs_is_plugin_page($page_slug)
 {
 }
+/**
+ * Retrieves unvalidated referer from '_wp_http_referer' or HTTP referer.
+ *
+ * Do not use for redirects, use {@see wp_get_referer()} instead.
+ *
+ * @since 1.2.3
+ *
+ * @return string|false Referer URL on success, false on failure.
+ */
+function fs_get_raw_referer()
+{
+}
 /* Core UI.
-	--------------------------------------------------------------------------------------------*/
+   --------------------------------------------------------------------------------------------*/
 /**
  * @param number      $module_id
  * @param string      $page
@@ -9588,12 +9970,14 @@ function fs_urlencode_rfc3986($input)
  *
  * @param string $from URL
  * @param string $to   File path.
+ *
+ * @return bool Is successfully downloaded.
  */
 function fs_download_image($from, $to)
 {
 }
 /* General Utilities
-	--------------------------------------------------------------------------------------------*/
+   --------------------------------------------------------------------------------------------*/
 /**
  * Sorts an array by the value of the priority key.
  *
@@ -9619,9 +10003,113 @@ function fs_sort_by_priority($a, $b)
  *
  * @return string
  *
- * @global       $fs_text, $fs_text_overrides
+ * @global       $fs_text , $fs_text_overrides
  */
 function fs_text($key, $slug = 'freemius')
+{
+}
+/**
+ * Get a translatable text override if exists, or `false`.
+ *
+ * @author Vova Feldman (@svovaf)
+ * @since  1.2.1.7
+ *
+ * @param string $text Translatable string.
+ * @param string $key  String key for overrides.
+ * @param string $slug Module slug for overrides.
+ *
+ * @return string|false
+ */
+function fs_text_override($text, $key, $slug)
+{
+}
+/**
+ * Get a translatable text and its text domain.
+ *
+ * When the text is overridden by the module, returns the overridden text and the text domain of the module. Otherwise, returns the original text and 'freemius' as the text domain.
+ *
+ * @author Vova Feldman (@svovaf)
+ * @since  1.2.1.7
+ *
+ * @param string $text Translatable string.
+ * @param string $key  String key for overrides.
+ * @param string $slug Module slug for overrides.
+ *
+ * @return string[]
+ */
+function fs_text_and_domain($text, $key, $slug)
+{
+}
+#region Private
+/**
+ * Retrieve an inline translated text by key.
+ *
+ * @author Vova Feldman (@svovaf)
+ * @since  1.2.3
+ *
+ * @param string $text Translatable string.
+ * @param string $key  String key for overrides.
+ * @param string $slug Module slug for overrides.
+ *
+ * @return string
+ *
+ * @global       $fs_text_overrides
+ */
+function _fs_text_inline($text, $key = '', $slug = 'freemius')
+{
+}
+/**
+ * Retrieve an inline translated text by key with a context.
+ *
+ * @author Vova Feldman (@svovaf)
+ * @since  1.2.3
+ *
+ * @param string $text    Translatable string.
+ * @param string $context Context information for the translators.
+ * @param string $key     String key for overrides.
+ * @param string $slug    Module slug for overrides.
+ *
+ * @return string
+ *
+ * @global       $fs_text_overrides
+ */
+function _fs_text_x_inline($text, $context, $key = '', $slug = 'freemius')
+{
+}
+#endregion
+/**
+ * Retrieve an inline translated text by key.
+ *
+ * @author Vova Feldman (@svovaf)
+ * @since  1.2.3
+ *
+ * @param string $text Translatable string.
+ * @param string $key  String key for overrides.
+ * @param string $slug Module slug for overrides.
+ *
+ * @return string
+ *
+ * @global       $fs_text_overrides
+ */
+function fs_text_inline($text, $key = '', $slug = 'freemius')
+{
+}
+/**
+ * Retrieve an inline translated text by key with a context.
+ *
+ * @author Vova Feldman (@svovaf)
+ * @since  1.2.3
+ *
+ * @param string $text    Translatable string.
+ * @param string $context Context information for the translators.
+ * @param string $key     String key for overrides.
+ * @param string $slug    Module slug for overrides.
+ *
+ * @return string
+ *
+ * @global       $fs_text_overrides
+ */
+function fs_text_x_inline($text, $context, $key = '', $slug = 'freemius')
 {
 }
 /**
@@ -9637,6 +10125,33 @@ function fs_echo($key, $slug = 'freemius')
 {
 }
 /**
+ * Output an inline translated text.
+ *
+ * @author Vova Feldman (@svovaf)
+ * @since  1.2.3
+ *
+ * @param string $text Translatable string.
+ * @param string $key  String key for overrides.
+ * @param string $slug Module slug for overrides.
+ */
+function fs_echo_inline($text, $key = '', $slug = 'freemius')
+{
+}
+/**
+ * Output an inline translated text with a context.
+ *
+ * @author Vova Feldman (@svovaf)
+ * @since  1.2.3
+ *
+ * @param string $text    Translatable string.
+ * @param string $context Context information for the translators.
+ * @param string $key     String key for overrides.
+ * @param string $slug    Module slug for overrides.
+ */
+function fs_echo_x_inline($text, $context, $key = '', $slug = 'freemius')
+{
+}
+/**
  * @author Vova Feldman
  * @since  1.2.1.6
  *
@@ -9649,6 +10164,33 @@ function fs_esc_attr($key, $slug)
 {
 }
 /**
+ * @author Vova Feldman (@svovaf)
+ * @since  1.2.3
+ *
+ * @param string $text Translatable string.
+ * @param string $key  String key for overrides.
+ * @param string $slug Module slug for overrides.
+ *
+ * @return string
+ */
+function fs_esc_attr_inline($text, $key = '', $slug = 'freemius')
+{
+}
+/**
+ * @author Vova Feldman (@svovaf)
+ * @since  1.2.3
+ *
+ * @param string $text    Translatable string.
+ * @param string $context Context information for the translators.
+ * @param string $key     String key for overrides.
+ * @param string $slug    Module slug for overrides.
+ *
+ * @return string
+ */
+function fs_esc_attr_x_inline($text, $context, $key = '', $slug = 'freemius')
+{
+}
+/**
  * @author Vova Feldman
  * @since  1.2.1.6
  *
@@ -9656,6 +10198,17 @@ function fs_esc_attr($key, $slug)
  * @param string $slug
  */
 function fs_esc_attr_echo($key, $slug)
+{
+}
+/**
+ * @author Vova Feldman (@svovaf)
+ * @since  1.2.3
+ *
+ * @param string $text Translatable string.
+ * @param string $key  String key for overrides.
+ * @param string $slug Module slug for overrides.
+ */
+function fs_esc_attr_echo_inline($text, $key = '', $slug = 'freemius')
 {
 }
 /**
@@ -9671,6 +10224,47 @@ function fs_esc_js($key, $slug)
 {
 }
 /**
+ * @author Vova Feldman (@svovaf)
+ * @since  1.2.3
+ *
+ * @param string $text Translatable string.
+ * @param string $key  String key for overrides.
+ * @param string $slug Module slug for overrides.
+ *
+ * @return string
+ */
+function fs_esc_js_inline($text, $key = '', $slug = 'freemius')
+{
+}
+/**
+ * @author Vova Feldman (@svovaf)
+ * @since  1.2.3
+ *
+ * @param string $text    Translatable string.
+ * @param string $context Context information for the translators.
+ * @param string $key     String key for overrides.
+ * @param string $slug    Module slug for overrides.
+ *
+ * @return string
+ */
+function fs_esc_js_x_inline($text, $context, $key = '', $slug = 'freemius')
+{
+}
+/**
+ * @author Vova Feldman (@svovaf)
+ * @since  1.2.3
+ *
+ * @param string $text    Translatable string.
+ * @param string $context Context information for the translators.
+ * @param string $key     String key for overrides.
+ * @param string $slug    Module slug for overrides.
+ *
+ * @return string
+ */
+function fs_esc_js_echo_x_inline($text, $context, $key = '', $slug = 'freemius')
+{
+}
+/**
  * @author Vova Feldman
  * @since  1.2.1.6
  *
@@ -9681,6 +10275,17 @@ function fs_esc_js_echo($key, $slug)
 {
 }
 /**
+ * @author Vova Feldman (@svovaf)
+ * @since  1.2.3
+ *
+ * @param string $text Translatable string.
+ * @param string $key  String key for overrides.
+ * @param string $slug Module slug for overrides.
+ */
+function fs_esc_js_echo_inline($text, $key = '', $slug = 'freemius')
+{
+}
+/**
  * @author Vova Feldman
  * @since  1.2.1.6
  *
@@ -9688,6 +10293,17 @@ function fs_esc_js_echo($key, $slug)
  * @param string $slug
  */
 function fs_json_encode_echo($key, $slug)
+{
+}
+/**
+ * @author Vova Feldman (@svovaf)
+ * @since  1.2.3
+ *
+ * @param string $text Translatable string.
+ * @param string $key  String key for overrides.
+ * @param string $slug Module slug for overrides.
+ */
+function fs_json_encode_echo_inline($text, $key = '', $slug = 'freemius')
 {
 }
 /**
@@ -9703,6 +10319,45 @@ function fs_esc_html($key, $slug)
 {
 }
 /**
+ * @author Vova Feldman (@svovaf)
+ * @since  1.2.3
+ *
+ * @param string $text Translatable string.
+ * @param string $key  String key for overrides.
+ * @param string $slug Module slug for overrides.
+ *
+ * @return string
+ */
+function fs_esc_html_inline($text, $key = '', $slug = 'freemius')
+{
+}
+/**
+ * @author Vova Feldman (@svovaf)
+ * @since  1.2.3
+ *
+ * @param string $text    Translatable string.
+ * @param string $context Context information for the translators.
+ * @param string $key     String key for overrides.
+ * @param string $slug    Module slug for overrides.
+ *
+ * @return string
+ */
+function fs_esc_html_x_inline($text, $context, $key = '', $slug = 'freemius')
+{
+}
+/**
+ * @author Vova Feldman (@svovaf)
+ * @since  1.2.3
+ *
+ * @param string $text    Translatable string.
+ * @param string $context Context information for the translators.
+ * @param string $key     String key for overrides.
+ * @param string $slug    Module slug for overrides.
+ */
+function fs_esc_html_echo_x_inline($text, $context, $key = '', $slug = 'freemius')
+{
+}
+/**
  * @author Vova Feldman
  * @since  1.2.1.6
  *
@@ -9710,6 +10365,17 @@ function fs_esc_html($key, $slug)
  * @param string $slug
  */
 function fs_esc_html_echo($key, $slug)
+{
+}
+/**
+ * @author Vova Feldman (@svovaf)
+ * @since  1.2.3
+ *
+ * @param string $text Translatable string.
+ * @param string $key  String key for overrides.
+ * @param string $slug Module slug for overrides.
+ */
+function fs_esc_html_echo_inline($text, $key = '', $slug = 'freemius')
 {
 }
 /**
@@ -9732,6 +10398,7 @@ function fs_redirect($location, $exit = \true, $status = 302)
  * Retrieve a translated text by key.
  *
  * @deprecated Use `fs_text()` instead since methods starting with `__` trigger warnings in Php 7.
+ * @todo Remove this method in the future.
  *
  * @author     Vova Feldman (@svovaf)
  * @since      1.1.4
@@ -9750,6 +10417,8 @@ function __fs($key, $slug = 'freemius')
  * Output a translated text by key.
  *
  * @deprecated Use `fs_echo()` instead for consistency with `fs_text()`.
+ *
+ * @todo Remove this method in the future.
  *
  * @author     Vova Feldman (@svovaf)
  * @since      1.1.4
@@ -9866,60 +10535,6 @@ function _fs_text($text)
 {
 }
 /**
- * Retrieve the translation of $text and escapes it for safe use in an attribute.
- *
- * @since 1.2.1.6
- *
- * @param string $text
- * 
- * @return string
- */
-function _fs_esc_attr($text)
-{
-}
-/**
- * Retrieve the translation of $text and escapes it for safe use in HTML output.
- *
- * @since 1.2.1.6
- *
- * @param string $text
- * 
- * @return string
- */
-function _fs_esc_html($text)
-{
-}
-/**
- * Display translated text.
- *
- * @since 1.2.0
- *
- * @param string $text
- */
-function _fs_echo($text)
-{
-}
-/**
- * Display translated text that has been escaped for safe use in an attribute.
- *
- * @since 1.2.1.6
- *
- * @param string $text
- */
-function _fs_esc_attr_echo($text)
-{
-}
-/**
- * Display translated text that has been escaped for safe use in HTML output.
- *
- * @since 1.2.1.6
- *
- * @param string $text
- */
-function _fs_esc_html_echo($text)
-{
-}
-/**
  * Retrieve translated string with gettext context.
  *
  * Quite a few times, there will be collisions with similar translatable text
@@ -9936,105 +10551,6 @@ function _fs_esc_html_echo($text)
  * @return string
  */
 function _fs_x($text, $context)
-{
-}
-/**
- * Display translated string with gettext context.
- *
- * @since 1.2.1.6
- *
- * @param string $text
- * @param string $context
- */
-function _fs_ex($text, $context)
-{
-}
-/**
- * Translate string with gettext context, and escapes it for safe use in an attribute.
- *
- * @since 1.2.1.6
- *
- * @param string $text
- * @param string $context
- *
- * @return string
- */
-function _fs_esc_attr_x($text, $context)
-{
-}
-/**
- * Translate string with gettext context, and escapes it for safe use in HTML output.
- *
- * @since 2.9.0
- *
- * @param string $text
- * @param string $context
- * 
- * @return string
- */
-function _fs_esc_html_x($text, $context)
-{
-}
-/**
- * Translates and retrieves the singular or plural form based on the supplied number.
- *
- * @since 1.2.1.6
- *
- * @param string $single
- * @param string $plural
- * @param int    $number
- * 
- * @return string
- */
-function _fs_n($single, $plural, $number)
-{
-}
-/**
- * Translates and retrieves the singular or plural form based on the supplied number, with gettext context.
- *
- * @since 1.2.1.6
- *
- * @param string $single
- * @param string $plural
- * @param int    $number
- * @param string $context
- * 
- * @return string
- */
-function _fs_nx($single, $plural, $number, $context)
-{
-}
-/**
- * Registers plural strings in POT file, but does not translate them.
- *
- * Used when you want to keep structures with translatable plural
- * strings and use them later when the number is known.
- *
- * @since 1.2.1.6
- *
- * @param string $singular
- * @param string $plural
- * 
- * @return array
- */
-function _fs_n_noop($singular, $plural)
-{
-}
-/**
- * Registers plural strings with gettext context in POT file, but does not translate them.
- *
- * Used when you want to keep structures with translatable plural
- * strings and use them later when the number is known.
- *
- * @since 1.2.1.6
- *
- * @param string $singular
- * @param string $plural
- * @param string $context
- * 
- * @return array
- */
-function _fs_nx_noop($singular, $plural, $context)
 {
 }
 /**
