@@ -293,6 +293,15 @@ abstract class Freemius_Abstract
      * @return string
      */
     abstract function get_upgrade_url($period = \WP_FS__PERIOD_ANNUALLY);
+    /**
+     * Check if Freemius was first added in a plugin update.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.5
+     *
+     * @return bool
+     */
+    abstract function is_plugin_update();
     #region Marketing ------------------------------------------------------------------
     /**
      * Check if current user purchased any other plugins before.
@@ -332,7 +341,7 @@ abstract class Freemius_Abstract
     abstract function is_business();
     #endregion ------------------------------------------------------------------
 }
-// "final class" only supported since PHP 5.
+// "final class"
 class Freemius extends \Freemius_Abstract
 {
     /**
@@ -340,7 +349,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @var string
      */
-    public $version = '1.1.4';
+    public $version = '1.1.5';
     #region Plugin Info
     /**
      * @since 1.0.1
@@ -517,6 +526,16 @@ class Freemius extends \Freemius_Abstract
      * @since  1.0.9
      */
     private function _version_updates_handler()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.5
+     *
+     * @param string $sdk_prev_version
+     * @param string $sdk_version
+     */
+    function _data_migration($sdk_prev_version, $sdk_version)
     {
     }
     /**
@@ -710,8 +729,7 @@ class Freemius extends \Freemius_Abstract
     #endregion ------------------------------------------------------------------
     #region Connectivity Issues ------------------------------------------------------------------
     /**
-     * Check if Freemius should be turned on for the current plugin install + version combination. The API query
-     * will be only invoked once per plugin version (cached locally).
+     * Check if Freemius should be turned on for the current plugin install.
      *
      * @author Vova Feldman (@svovaf)
      * @since  1.0.9
@@ -727,9 +745,11 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.9
      *
+     * @param bool $flush
+     *
      * @return bool
      */
-    private function has_api_connectivity()
+    private function has_api_connectivity($flush = \false)
     {
     }
     /**
@@ -1047,6 +1067,17 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Check if currently in plugin activation.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.4
+     *
+     * @return bool
+     */
+    function is_plugin_activation()
+    {
+    }
+    /**
      *
      * NOTE: admin_menu action executed before admin_init.
      *
@@ -1054,6 +1085,15 @@ class Freemius extends \Freemius_Abstract
      * @since  1.0.7
      */
     function _admin_init_action()
+    {
+    }
+    /**
+     * Enqueue connect requires scripts and styles.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.4
+     */
+    function _enqueue_connect_essentials()
     {
     }
     /**
@@ -1115,10 +1155,29 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.5
+     *
+     * @return bool
+     */
+    private function is_plugin_new_install()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.5
+     *
+     * @return bool
+     */
+    function is_plugin_update()
+    {
+    }
+    /**
      * Plugin activated hook.
      *
      * @author Vova Feldman (@svovaf)
      * @since  1.0.1
+     *
      * @uses   FS_Api
      */
     function _activate_plugin_event_hook()
@@ -2191,7 +2250,7 @@ class Freemius extends \Freemius_Abstract
      * @param int           $priority
      * @param bool          $show_submenu
      */
-    function add_submenu_item($menu_title, $render_function, $page_title = \false, $capability = 'manage_options', $menu_slug = \false, $before_render_function = \false, $priority = 10, $show_submenu = \true)
+    function add_submenu_item($menu_title, $render_function, $page_title = \false, $capability = 'manage_options', $menu_slug = \false, $before_render_function = \false, $priority = \WP_FS__DEFAULT_PRIORITY, $show_submenu = \true)
     {
     }
     /**
@@ -2205,7 +2264,7 @@ class Freemius extends \Freemius_Abstract
      * @param int    $priority
      *
      */
-    function add_submenu_link_item($menu_title, $url, $menu_slug = \false, $capability = 'read', $priority = 10)
+    function add_submenu_link_item($menu_title, $url, $menu_slug = \false, $capability = 'read', $priority = \WP_FS__DEFAULT_PRIORITY)
     {
     }
     #endregion ------------------------------------------------------------------
@@ -2239,7 +2298,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @uses   add_action()
      */
-    function add_action($tag, $function_to_add, $priority = 10, $accepted_args = 1)
+    function add_action($tag, $function_to_add, $priority = \WP_FS__DEFAULT_PRIORITY, $accepted_args = 1)
     {
     }
     /**
@@ -2271,7 +2330,19 @@ class Freemius extends \Freemius_Abstract
      *
      * @uses   add_filter()
      */
-    function add_filter($tag, $function_to_add, $priority = 10, $accepted_args = 1)
+    function add_filter($tag, $function_to_add, $priority = \WP_FS__DEFAULT_PRIORITY, $accepted_args = 1)
+    {
+    }
+    /**
+     * Check if has filter.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.4
+     *
+     * @param string        $tag
+     * @param callable|bool $function_to_check Optional. The callback to check for. Default false.
+     */
+    function has_filter($tag, $function_to_check = \false)
     {
     }
     /* Account Page
@@ -3063,7 +3134,7 @@ class Freemius extends \Freemius_Abstract
      * @param int  $priority
      * @param bool $key
      */
-    function add_plugin_action_link($label, $url, $external = \false, $priority = 10, $key = \false)
+    function add_plugin_action_link($label, $url, $external = \false, $priority = \WP_FS__DEFAULT_PRIORITY, $key = \false)
     {
     }
     /**
@@ -3387,10 +3458,11 @@ class FS_Api
      * @since  1.0.9
      *
      * @param null|string $unique_anonymous_id
+     * @param bool        $is_update False if new plugin installation.
      *
      * @return object
      */
-    function ping($unique_anonymous_id = \null)
+    function ping($unique_anonymous_id = \null, $is_update = \false)
     {
     }
     /**
@@ -5571,30 +5643,6 @@ class Freemius_Api extends \Freemius_Api_Base
     {
     }
 }
-class Test_Plugin_Addon
-{
-    function __construct()
-    {
-    }
-    function admin_menu()
-    {
-    }
-    function render_settings()
-    {
-    }
-}
-class Test_Plugin
-{
-    function __construct()
-    {
-    }
-    function admin_menu()
-    {
-    }
-    function render_settings()
-    {
-    }
-}
 /**
  * Get object's public variables.
  *
@@ -5858,11 +5906,5 @@ function fs_dynamic_init($plugin)
 {
 }
 function fs_dump_log()
-{
-}
-function test_plugin_addon()
-{
-}
-function is_parent_plugin_activated()
 {
 }
