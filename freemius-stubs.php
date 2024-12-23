@@ -858,6 +858,13 @@ class Freemius extends \Freemius_Abstract
      * @var boolean|null
      */
     private $_use_external_pricing = \null;
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.4.2
+     *
+     * @var string|null
+     */
+    private $_pricing_js_path = \null;
     #endregion
     /* Ctor
     ------------------------------------------------------------------------------------------------------------------*/
@@ -2136,9 +2143,9 @@ class Freemius extends \Freemius_Abstract
      * @author Leo Fajardo (@leorw)
      * @since 2.3.2
      *
-     * @param bool $is_enabled
+     * @param bool|null $is_enabled
      */
-    private function update_extensions_tracking_flag($is_enabled)
+    function update_extensions_tracking_flag($is_enabled)
     {
     }
     /**
@@ -4953,7 +4960,7 @@ class Freemius extends \Freemius_Abstract
      *      @var string $next_page
      * }
      */
-    private function activate_license($license_key, $sites = array(), $is_marketing_allowed = \null, $blog_id = \null, $plugin_id = \null, $license_owner_id = \null, $is_extensions_tracking_allowed = \true)
+    private function activate_license($license_key, $sites = array(), $is_marketing_allowed = \null, $blog_id = \null, $plugin_id = \null, $license_owner_id = \null, $is_extensions_tracking_allowed = \null)
     {
     }
     /**
@@ -6098,13 +6105,6 @@ class Freemius extends \Freemius_Abstract
      * @return bool
      */
     function is_beta()
-    {
-    }
-    /**
-     * @author Leo Fajardo (@leorw)
-     * @since 2.3.0
-     */
-    private function sync_user_beta_mode()
     {
     }
     /**
@@ -9312,7 +9312,7 @@ class FS_Logger
     function get_file()
     {
     }
-    private function _log(&$message, $type = 'log', $wrapper)
+    private function _log(&$message, $type, $wrapper = \false)
     {
     }
     function log($message, $wrapper = \false)
@@ -11730,6 +11730,14 @@ class FS_Site extends \FS_Scope_Entity
      */
     public $is_uninstalled = \false;
     /**
+     * @author Edgar Melkonyan
+     *
+     * @since 2.4.2
+     *
+     * @var bool
+     */
+    public $is_beta;
+    /**
      * @param stdClass|bool $site
      */
     function __construct($site = \false)
@@ -11790,6 +11798,14 @@ class FS_Site extends \FS_Scope_Entity
      * @return bool
      */
     function is_tracking_prohibited()
+    {
+    }
+    /**
+     * @author Edgar Melkonyan
+     *
+     * @return bool
+     */
+    function is_beta()
     {
     }
 }
@@ -11933,13 +11949,6 @@ class FS_User extends \FS_Scope_Entity
      */
     public $is_verified;
     /**
-     * @author Leo Fajardo (@leorw)
-     * @since 2.3.0
-     *
-     * @var bool
-     */
-    public $is_beta;
-    /**
      * @var string|null
      */
     public $customer_id;
@@ -11958,15 +11967,6 @@ class FS_User extends \FS_Scope_Entity
     {
     }
     function is_verified()
-    {
-    }
-    /**
-     * @author Leo Fajardo (@leorw)
-     * @since 2.3.0
-     *
-     * @return bool
-     */
-    function is_beta()
     {
     }
     static function get_type()
@@ -15280,7 +15280,7 @@ function fs_init($slug, $plugin_id, $public_key, $is_live = \true, $is_premium =
 {
 }
 /**
- * @param array <string,string> $module Plugin or Theme details.
+ * @param array <string,string|bool|array> $module Plugin or Theme details.
  *
  * @return Freemius
  * @throws Freemius_Exception
