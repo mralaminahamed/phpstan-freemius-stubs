@@ -1,34 +1,49 @@
-# Freemius (WordPress SDK) Stubs
+# Freemius WordPress SDK Stubs
 
-[![Packagist stats](https://img.shields.io/packagist/dt/mralaminahamed/freemius-stubs.svg)](https://packagist.org/packages/mralaminahamed/freemius-stubs/stats)
-[![Packagist](https://img.shields.io/packagist/v/mralaminahamed/freemius-stubs.svg?color=4CC61E&style=popout)](https://packagist.org/packages/mralaminahamed/freemius-stubs)
-[![Tweet](https://img.shields.io/badge/Tweet-share-d5d5d5?style=social&logo=twitter)](https://twitter.com/intent/tweet?text=https%3A%2F%2Fgithub.com%2Fmralaminahamed%2Fphpstan-freemius-stubs&url=I%20use%20mralaminahamed%2Fphpstan-freemius-stubs%20for%20IDE%20completion%20and%20static%20analysis)
+[![Latest Version](https://img.shields.io/packagist/v/mralaminahamed/freemius-stubs.svg?color=4CC61E&style=flat-square)](https://packagist.org/packages/mralaminahamed/freemius-stubs)
+[![Downloads](https://img.shields.io/packagist/dt/mralaminahamed/freemius-stubs.svg?style=flat-square)](https://packagist.org/packages/mralaminahamed/freemius-stubs/stats)
+[![License](https://img.shields.io/packagist/l/mralaminahamed/freemius-stubs.svg?style=flat-square)](./LICENSE)
+[![PHP Version](https://img.shields.io/packagist/php-v/mralaminahamed/freemius-stubs.svg?style=flat-square)](./composer.json)
+[![Tweet](https://img.shields.io/badge/Tweet-share-1da1f2?style=flat-square&logo=twitter)](https://twitter.com/intent/tweet?text=Check%20out%20Freemius%20WordPress%20SDK%20Stubs%20for%20IDE%20completion%20and%20static%20analysis%20https%3A%2F%2Fgithub.com%2Fmralaminahamed%2Fphpstan-freemius-stubs)
 
-This package provides stub declarations for the [Freemius WordPress SDK plugin](https://github.com/freemius/wordpress-sdk)
-functions, classes and interfaces.
-These stubs can help plugin and theme developers leverage IDE completion
-and static analysis tools like [PHPStan](https://github.com/phpstan/phpstan).
+PHP stub declarations for the [Freemius WordPress SDK](https://github.com/freemius/wordpress-sdk) to enhance IDE completion and static analysis capabilities. Generated using [php-stubs/generator](https://github.com/php-stubs/generator) directly from the source code.
 
-The stubs are generated directly from the [source](https://github.com/freemius/wordpress-sdk)
-using [php-stubs/generator](https://github.com/php-stubs/generator).
+## 🚀 Features
 
-## Requirements
+- Complete function, class, and interface declarations
+- Constant definitions for proper static analysis
+- IDE autocompletion support
+- PHPStan integration
+- Regular updates with latest Freemius SDK versions
 
-- PHP >=7.1
+## 📋 Requirements
 
-## Installation
+- PHP >= 7.1
+- Composer for dependency management
 
-Require this package as a development dependency with [Composer](https://getcomposer.org).
+## 📦 Installation
+
+### Via Composer (Recommended)
 
 ```bash
+# Install as a development dependency
 composer require --dev mralaminahamed/freemius-stubs
+
+# Or specify a version
+composer require --dev mralaminahamed/freemius-stubs:^2.0
 ```
 
-Alternatively you may download `freemius-stubs.php` directly.
+### Manual Installation
 
-## Usage in PHPStan
+Download the stub files directly:
+- [freemius-stubs.php](https://raw.githubusercontent.com/mralaminahamed/phpstan-freemius-stubs/main/freemius-stubs.php)
+- [freemius-constants-stubs.php](https://raw.githubusercontent.com/mralaminahamed/phpstan-freemius-stubs/main/freemius-constants-stubs.php)
 
-Include stubs in PHPStan configuration file.
+## 🔧 Configuration
+
+### PHPStan Integration
+
+Add the stubs to your `phpstan.neon` configuration:
 
 ```yaml
 parameters:
@@ -36,3 +51,104 @@ parameters:
         - vendor/mralaminahamed/freemius-stubs/freemius-constants-stubs.php
         - vendor/mralaminahamed/freemius-stubs/freemius-stubs.php
 ```
+
+### IDE Configuration
+
+Most modern IDEs will automatically detect the stubs when installed via Composer. For manual installation, add the stub files to your IDE's include path.
+
+#### PhpStorm
+1. Go to `Settings` → `PHP` → `Include Path`
+2. Add the directory containing the stub files
+
+#### VS Code
+Add to your `settings.json`:
+```json
+{
+    "php.stubs": [
+        "vendor/mralaminahamed/freemius-stubs/freemius-stubs.php",
+        "vendor/mralaminahamed/freemius-stubs/freemius-constants-stubs.php"
+    ]
+}
+```
+
+## 🔍 Usage Example
+
+```php
+<?php
+
+// Your code will now have full IDE support
+$fs = Freemius::instance();
+
+// Constants are properly defined
+if (WP_FS__SDK_VERSION) {
+    // Your implementation
+}
+
+// Interfaces and classes are available
+class MyIntegration implements Freemius_Api_Interface {
+    // Your implementation
+}
+```
+
+## 🛠 Development
+
+### Building Stubs
+
+```bash
+# Clone the repository
+git clone https://github.com/mralaminahamed/phpstan-freemius-stubs.git
+cd phpstan-freemius-stubs
+
+# Install dependencies
+composer install
+
+# Generate stubs
+composer generate
+
+# Release new version
+composer release
+```
+
+### Running Tests
+
+```bash
+# Run all checks
+composer check
+
+# Individual checks
+composer cs      # Coding standards
+composer analyze # Static analysis
+composer test    # Unit tests
+```
+
+## 📚 Documentation
+
+- [Freemius SDK Documentation](https://freemius.com/help/documentation/wordpress-sdk/)
+- [PHPStan Documentation](https://phpstan.org/user-guide/getting-started)
+- [PHP Stubs Generator Documentation](https://github.com/php-stubs/generator)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- [Freemius](https://freemius.com) for the WordPress SDK
+- [php-stubs/generator](https://github.com/php-stubs/generator) for the stub generation tools
+- All [contributors](https://github.com/mralaminahamed/phpstan-freemius-stubs/graphs/contributors) to this project
+
+## 💬 Support
+
+For bug reports and feature requests, please use the [GitHub Issues](https://github.com/mralaminahamed/phpstan-freemius-stubs/issues).
+
+For questions and discussions, please use the [GitHub Discussions](https://github.com/mralaminahamed/phpstan-freemius-stubs/discussions).
+
+---
