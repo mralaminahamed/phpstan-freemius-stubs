@@ -565,6 +565,11 @@ class Freemius extends \Freemius_Abstract
      */
     private $_enable_anonymous = \true;
     /**
+     * @since 2.9.1
+     * @var string|null Hints the SDK whether the plugin supports parallel activation mode, preventing the auto-deactivation of the free version when the premium version is activated, and vice versa.
+     */
+    private $_premium_plugin_basename_from_parallel_activation;
+    /**
      * @since 1.1.7.5
      * @var bool Hints the SDK if plugin should run in anonymous mode (only adds feedback form).
      */
@@ -1094,6 +1099,17 @@ class Freemius extends \Freemius_Abstract
      * @since  2.3.1
      */
     private function register_after_settings_parse_hooks()
+    {
+    }
+    /**
+     * Determines if a plugin is running in parallel activation mode.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since 2.9.1
+     *
+     * @return bool
+     */
+    private function is_parallel_activation()
     {
     }
     /**
@@ -2608,6 +2624,17 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Instead of running blocking install sync event, execute non blocking scheduled cron job.
+     *
+     * @param int $except_blog_id Since 2.0.0 when running in a multisite network environment, the cron execution is consolidated. This param allows excluding specified blog ID from being the cron job executor.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  2.9.1
+     */
+    private function maybe_schedule_install_sync_cron($except_blog_id = 0)
+    {
+    }
+    /**
      * @author Vova Feldman (@svovaf)
      * @since  1.1.7.3
      *
@@ -2680,17 +2707,6 @@ class Freemius extends \Freemius_Abstract
      * @return int
      */
     private function get_install_sync_cron_blog_id()
-    {
-    }
-    /**
-     * Instead of running blocking install sync event, execute non blocking scheduled wp-cron.
-     *
-     * @author Vova Feldman (@svovaf)
-     * @since  1.1.7.3
-     *
-     * @param int $except_blog_id Since 2.0.0 when running in a multisite network environment, the cron execution is consolidated. This param allows excluding excluded specified blog ID from being the cron executor.
-     */
-    private function schedule_install_sync($except_blog_id = 0)
     {
     }
     /**
@@ -12324,6 +12340,17 @@ class FS_Site extends \FS_Scope_Entity
      * @return bool
      */
     static function is_localhost_by_address($url)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.9.1
+     *
+     * @param string $host
+     *
+     * @return bool
+     */
+    static function is_playground_wp_environment_by_host($host)
     {
     }
     function is_localhost()
