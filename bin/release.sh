@@ -48,7 +48,7 @@ process_version() {
         git add .
         git commit -m "Generate stubs for Freemius WordPress SDK ${version}"
         git checkout "main"
-        git pull origin "main"
+        git pull origin "main" --force
         git merge --no-ff "${feature_branch}" -m "Merge feature/freemius-${version}"
         git tag -a "v${version}" -m "Release version ${version}"
         git push origin "main" "v${version}"
