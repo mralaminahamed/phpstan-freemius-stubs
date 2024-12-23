@@ -10329,6 +10329,16 @@ class FS_Plugin_Updater
     {
     }
     /**
+     * @since 2.5.3 If the current WordPress version is a patch of the tested version (e.g., 6.1.2 is a patch of 6.1), then override the tested version with the patch so developers won't need to release a new version just to bump the latest supported WP version.
+     *
+     * @param string|null $tested_up_to
+     *
+     * @return string|null
+     */
+    private static function get_tested_wp_version($tested_up_to)
+    {
+    }
+    /**
      * @author Vova Feldman (@svovaf)
      * @since  1.2.1.7
      *
@@ -11750,6 +11760,10 @@ class FS_Plugin_Tag extends \FS_Entity
      * @var string
      */
     public $requires_platform_version;
+    /**
+     * @var string
+     */
+    public $requires_programming_language_version;
     /**
      * @var string
      */
