@@ -41,6 +41,7 @@
 /**
  * Domain / URL / Address
  */
+\define('WP_FS__ROOT_DOMAIN_PRODUCTION', 'freemius.com');
 \define('WP_FS__DOMAIN_PRODUCTION', 'wp.freemius.com');
 \define('WP_FS__ADDRESS_PRODUCTION', 'https://' . \WP_FS__DOMAIN_PRODUCTION);
 \define('WP_FS__DOMAIN_LOCALHOST', 'wp.freemius');
@@ -65,6 +66,13 @@
 \define('WP_FS__API_CACHE_OPTION_NAME', \WP_FS___OPTION_PREFIX . 'api_cache');
 \define('WP_FS__OPTIONS_OPTION_NAME', \WP_FS___OPTION_PREFIX . 'options');
 /**
+ * Module types
+ *
+ * @since 1.2.2
+ */
+\define('WP_FS__MODULE_TYPE_PLUGIN', 'plugin');
+\define('WP_FS__MODULE_TYPE_THEME', 'theme');
+/**
  * Billing Frequencies
  */
 \define('WP_FS__PERIOD_ANNUALLY', 'annual');
@@ -87,11 +95,10 @@
 \define('WP_FS__DEFAULT_PRIORITY', 10);
 \define('WP_FS__LOWEST_PRIORITY', 999999999);
 \define('WP_FS__SECURITY_PARAMS_PREFIX', 's_');
-\define('FS_SDK__USER_AGENT', 'fs-php-' . \Freemius_Api_Base::VERSION);
-\define('FS_SDK__HAS_CURL', !\FS_SDK__SIMULATE_NO_CURL && \function_exists('curl_version'));
-\define('FS_API__PROTOCOL', \version_compare($curl_version['version'], '7.37', '>=') ? 'https' : 'http');
-\define('FS_API__ADDRESS', '://api.freemius.com');
-\define('FS_API__SANDBOX_ADDRESS', '://sandbox-api.freemius.com');
 \define('FS_API__VERSION', '1');
 \define('FS_SDK__PATH', \dirname(__FILE__));
 \define('FS_SDK__EXCEPTIONS_PATH', \FS_SDK__PATH . '/Exceptions/');
+\define('FS_SDK__USER_AGENT', 'fs-php-' . \Freemius_Api_Base::VERSION);
+\define('FS_API__PROTOCOL', \version_compare($curl_version['version'], '7.37', '>=') ? 'https' : 'http');
+\define('FS_API__ADDRESS', '://api.freemius.com');
+\define('FS_API__SANDBOX_ADDRESS', '://sandbox-api.freemius.com');

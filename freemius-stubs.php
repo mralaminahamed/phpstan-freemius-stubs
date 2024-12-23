@@ -21,7 +21,13 @@ abstract class Freemius_Abstract
     #region Identity
     #----------------------------------------------------------------------------------
     /**
-     * Check if user registered with Freemius by connecting his account.
+     * Check if user has connected his account (opted-in).
+     *
+     * Note:
+     *      If the user opted-in and opted-out on a later stage,
+     *      this will still return true. If you want to check if the
+     *      user is currently opted-in, use:
+     *          `$fs->is_registered() && $fs->is_tracking_allowed()`
      *
      * @since 1.0.1
      * @return bool
@@ -99,6 +105,30 @@ abstract class Freemius_Abstract
      * @return bool|object
      */
     abstract function allow_tracking();
+    #endregion
+    #----------------------------------------------------------------------------------
+    #region Module Type
+    #----------------------------------------------------------------------------------
+    /**
+     * Checks if the plugin's type is "plugin". The other type is "theme".
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  1.2.2
+     *
+     * @return bool
+     */
+    abstract function is_plugin();
+    /**
+     * Checks if the module type is "theme". The other type is "plugin".
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  1.2.2
+     *
+     * @return bool
+     */
+    function is_theme()
+    {
+    }
     #endregion
     #----------------------------------------------------------------------------------
     #region Permissions
@@ -389,6 +419,15 @@ abstract class Freemius_Abstract
     function is_freemium()
     {
     }
+    /**
+     * Check if module has only one plan.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.7
+     *
+     * @return bool
+     */
+    abstract function is_single_plan();
     #endregion
     /**
      * Check if running payments in sandbox mode.
@@ -542,6 +581,12 @@ class Freemius extends \Freemius_Abstract
      * @var string
      */
     private $_plugin_name;
+    /**
+     * @since 1.2.2
+     *
+     * @var string
+     */
+    private $_module_type;
     #endregion Plugin Info
     /**
      * @since 1.0.9
@@ -620,6 +665,11 @@ class Freemius extends \Freemius_Abstract
      * @var FS_Key_Value_Storage
      */
     private $_storage;
+    /**
+     * @since 1.2.2.7
+     * @var FS_Cache_Manager
+     */
+    private $_cache;
     /**
      * @since 1.0.0
      *
@@ -700,6 +750,12 @@ class Freemius extends \Freemius_Abstract
      */
     private static $_accounts;
     /**
+     * @since 1.2.2
+     *
+     * @var number
+     */
+    private $_module_id;
+    /**
      * @var Freemius[]
      */
     private static $_instances = array();
@@ -728,10 +784,68 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.0
      *
-     * @param string $slug
-     * @param bool   $is_init Since 1.2.1 Is initiation sequence.
+     * @param number      $module_id
+     * @param string|bool $slug
+     * @param bool        $is_init Since 1.2.1 Is initiation sequence.
      */
-    private function __construct($slug, $is_init = \false)
+    private function __construct($module_id, $slug = \false, $is_init = \false)
+    {
+    }
+    /**
+     * Checks whether this module has a settings menu.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  1.2.2
+     *
+     * @return bool
+     */
+    function has_settings_menu()
+    {
+    }
+    /**
+     * Check if the context module is free wp.org theme.
+     *
+     * This method is helpful because:
+     *      1. wp.org themes are limited to a single submenu item,
+     *         and sub-submenu items are most likely not allowed (never verified).
+     *      2. wp.org themes are not allowed to redirect the user
+     *         after the theme activation, therefore, the agreed UX
+     *         is showing the opt-in as a modal dialog box after
+     *         activation (approved by @otto42, @emiluzelac, @greenshady, @grapplerulrich).
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2.7
+     *
+     * @return bool
+     */
+    function is_free_wp_org_theme()
+    {
+    }
+    /**
+     * Checks whether this a submenu item is visible.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2.6
+     * @since  1.2.2.7 Even if the menu item was specified to be hidden, when it is the context page, then show the submenu item so the user will have the right context page.
+     *
+     * @param string $slug
+     *
+     * @return bool
+     */
+    function is_submenu_item_visible($slug)
+    {
+    }
+    /**
+     * Check if a Freemius page should be accessible via the UI.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2.7
+     *
+     * @param string $slug
+     *
+     * @return bool
+     */
+    function is_page_visible($slug)
     {
     }
     /**
@@ -749,6 +863,16 @@ class Freemius extends \Freemius_Abstract
      * @param string $sdk_version
      */
     function _data_migration($sdk_prev_version, $sdk_version)
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2.7
+     *
+     * @param string $plugin_prev_version
+     * @param string $plugin_version
+     */
+    function _after_version_update($plugin_prev_version, $plugin_version)
     {
     }
     /**
@@ -832,13 +956,37 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.6
      *
-     * @param bool $is_init Is initiation sequence.
+     * @param  bool $is_init Is initiation sequence.
      *
      * @return string
-     *
-     * @uses   fs_find_caller_plugin_file
      */
     private function _find_caller_plugin_file($is_init = \false)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     *
+     * @param number $module_id
+     * @param string $slug
+     *
+     * @since  1.2.2
+     */
+    private function store_id_slug_type_path_map($module_id, $slug)
+    {
+    }
+    /**
+     * Identifies the caller type: plugin or theme.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  1.2.2
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2.3 Find the earliest module in the call stack that calls to the SDK. This fix is for cases when
+     *         add-ons are relying on loading the SDK from the parent module, and also allows themes including the
+     *         SDK an internal file instead of directly from functions.php.
+     * @since  1.2.1.7 Knows how to handle cases when an add-on includes the parent module logic.
+     */
+    private function get_caller_main_file_and_type()
     {
     }
     #----------------------------------------------------------------------------------
@@ -885,30 +1033,42 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.0
      *
-     * @param string $slug
-     * @param bool   $is_init Is initiation sequence.
+     * @param  number      $module_id
+     * @param  string|bool $slug
+     * @param  bool        $is_init Is initiation sequence.
      *
-     * @return Freemius
+     * @return Freemius|false
      */
-    static function instance($slug, $is_init = \false)
+    static function instance($module_id, $slug = \false, $is_init = \false)
     {
     }
     /**
      * @author Vova Feldman (@svovaf)
      * @since  1.0.6
      *
-     * @param string|number $slug_or_id
+     * @param number $addon_id
      *
      * @return bool
      */
-    private static function has_instance($slug_or_id)
+    private static function has_instance($addon_id)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  1.2.2
+     *
+     * @param  string|number $id_or_slug
+     *
+     * @return number|false
+     */
+    private static function get_module_id($id_or_slug)
     {
     }
     /**
      * @author Vova Feldman (@svovaf)
      * @since  1.0.6
      *
-     * @param $id
+     * @param number $id
      *
      * @return false|Freemius
      */
@@ -940,11 +1100,11 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.6
      *
-     * @param $slug_or_id
+     * @param  string|number $id_or_slug
      *
-     * @return bool|Freemius
+     * @return false|Freemius
      */
-    function get_addon_instance($slug_or_id)
+    function get_addon_instance($id_or_slug)
     {
     }
     #endregion ------------------------------------------------------------------
@@ -979,6 +1139,36 @@ class Freemius extends \Freemius_Abstract
      * @return bool
      */
     function is_activation_mode($and_on = \true)
+    {
+    }
+    /**
+     * Check if current page is the opt-in/pending-activation page.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.7
+     *
+     * @return bool
+     */
+    function is_activation_page()
+    {
+    }
+    /**
+     * Check if URL path's are matching and that all querystring
+     * arguments of the $sub_url exist in the $url with the same values.
+     *
+     * WARNING:
+     *  1. This method doesn't check if the sub/domain are matching.
+     *  2. Ignore case sensitivity.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.7
+     *
+     * @param string $sub_url
+     * @param string $url     If argument is not set, check if the sub_url matching the current's page URL.
+     *
+     * @return bool
+     */
+    private function is_matching_url($sub_url, $url = '')
     {
     }
     /**
@@ -1055,7 +1245,7 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.8
      */
-    static function add_debug_page()
+    static function _add_debug_section()
     {
     }
     /**
@@ -1070,6 +1260,20 @@ class Freemius extends \Freemius_Abstract
      * @since  1.2.1.6
      */
     static function _get_debug_log()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.7
+     */
+    static function _get_db_option()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.7
+     */
+    static function _set_db_option()
     {
     }
     /**
@@ -1176,6 +1380,17 @@ class Freemius extends \Freemius_Abstract
      * @return \WP_User
      */
     static function _get_current_wp_user()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.7
+     *
+     * @param string $email
+     *
+     * @return bool
+     */
+    static function is_valid_email($email)
     {
     }
     /**
@@ -1406,11 +1621,12 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.6
      *
-     * @param string|number $slug_or_id
+     * @param string|number $id_or_slug
+     * @param bool|null     $is_premium Since 1.2.1.7 can check for specified add-on version.
      *
      * @return bool
      */
-    function is_addon_activated($slug_or_id)
+    function is_addon_activated($id_or_slug, $is_premium = \null)
     {
     }
     /**
@@ -1419,11 +1635,11 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.1.7
      *
-     * @param string $slug
+     * @param  string|number $id_or_slug
      *
      * @return bool
      */
-    function is_addon_connected($slug)
+    function is_addon_connected($id_or_slug)
     {
     }
     /**
@@ -1434,11 +1650,11 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.6
      *
-     * @param string $slug
+     * @param  string|number $id_or_slug
      *
      * @return bool
      */
-    function is_addon_installed($slug)
+    function is_addon_installed($id_or_slug)
     {
     }
     /**
@@ -1447,11 +1663,11 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.6
      *
-     * @param string $slug
+     * @param  string|number $id_or_slug
      *
      * @return string
      */
-    function get_addon_basename($slug)
+    function get_addon_basename($id_or_slug)
     {
     }
     /**
@@ -1825,6 +2041,19 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Delete site install from Database.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2.7
+     *
+     * @param string $slug
+     * @param string $module_type
+     * @param bool   $store
+     */
+    static function _delete_site_by_slug($slug, $module_type, $store = \true)
+    {
+    }
+    /**
      * Delete plugin's plans information.
      *
      * @param bool $store Flush to Database if true.
@@ -1867,6 +2096,57 @@ class Freemius extends \Freemius_Abstract
      * @return bool
      */
     function is_first_freemius_powered_version()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  1.2.2
+     *
+     * @return bool|string
+     */
+    private function get_previous_theme_slug()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  1.2.2
+     *
+     * @return string
+     */
+    private function can_activate_previous_theme()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  1.2.2
+     *
+     * @return string
+     */
+    private function activate_previous_theme()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  1.2.2
+     *
+     * @return string
+     */
+    function get_previous_theme_activation_url()
+    {
+    }
+    /**
+     * Saves the slug of the previous theme if it still exists so that it can be used by the logic in the opt-in
+     * form that decides whether to add a close button to the opt-in dialog or not. So after a premium-only theme is
+     * activated, the close button will appear and will reactivate the previous theme if clicked. If the previous
+     * theme doesn't exist, then there will be no close button.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  1.2.2
+     *
+     * @param  string        $slug_or_name Old theme's slug or name.
+     * @param  bool|WP_Theme $old_theme    WP_Theme instance of the old theme if it still exists.
+     */
+    function _activate_theme_event_hook($slug_or_name, $old_theme = \false)
     {
     }
     /**
@@ -2095,7 +2375,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return string
      */
-    private function premium_plugin_basename()
+    function premium_plugin_basename()
     {
     }
     /**
@@ -2142,10 +2422,20 @@ class Freemius extends \Freemius_Abstract
     /**
      * @author Vova Feldman (@svovaf)
      * @since  1.0.1
+     * @since  1.2.2.5 If slug not set load slug by module ID.
      *
      * @return string Plugin slug.
      */
     function get_slug()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.7
+     *
+     * @return string Plugin slug.
+     */
+    function get_target_folder_name()
     {
     }
     /**
@@ -2224,6 +2514,26 @@ class Freemius extends \Freemius_Abstract
     }
     /**
      * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.7
+     *
+     * @return string
+     */
+    function get_plugin_title()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since 1.2.2.7
+     *
+     * @param bool $lowercase
+     *
+     * @return string
+     */
+    function get_module_label($lowercase = \false)
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
      * @since  1.0.4
      *
      * @return string
@@ -2266,24 +2576,68 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * @param string $module_type
+     *
      * @return FS_Site[]
      */
-    private static function get_all_sites()
+    private static function get_all_sites($module_type = \WP_FS__MODULE_TYPE_PLUGIN)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     *
+     * @since  1.2.2
+     *
+     * @param string $option_name
+     * @param string $module_type
+     *
+     * @return mixed
+     */
+    private static function get_account_option($option_name, $module_type)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     *
+     * @since  1.2.2
+     *
+     * @param string $option_name
+     * @param mixed  $option_value
+     * @param bool   $store
+     */
+    private function set_account_option($option_name, $option_value, $store)
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     *
+     * @since  1.2.2.7
+     *
+     * @param string $module_type
+     * @param string $option_name
+     * @param mixed  $option_value
+     * @param bool   $store
+     */
+    private static function set_account_option_by_module($module_type, $option_name, $option_value, $store)
     {
     }
     /**
      * @author Vova Feldman (@svovaf)
      * @since  1.0.6
      *
+     * @param string $module_type
+     *
      * @return FS_Plugin_License[]
      */
-    private static function get_all_licenses()
+    private static function get_all_licenses($module_type = \WP_FS__MODULE_TYPE_PLUGIN)
     {
     }
     /**
+     * @param string|bool $module_type
+     *
      * @return FS_Plugin_Plan[]
      */
-    private static function get_all_plans()
+    private static function get_all_plans($module_type = \false)
     {
     }
     /**
@@ -2314,7 +2668,13 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
-     * Check if user is registered.
+     * Check if user has connected his account (opted-in).
+     *
+     * Note:
+     *      If the user opted-in and opted-out on a later stage,
+     *      this will still return true. If you want to check if the
+     *      user is currently opted-in, use:
+     *          `$fs->is_registered() && $fs->is_tracking_allowed()`
      *
      * @author Vova Feldman (@svovaf)
      * @since  1.0.1
@@ -2667,6 +3027,17 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Check if module has only one plan.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.7
+     *
+     * @return bool
+     */
+    function is_single_plan()
+    {
+    }
+    /**
      * Check if plan based on trial. If not in trial mode, should return false.
      *
      * @since  1.0.9
@@ -2777,6 +3148,24 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.8
+     *
+     * @var string
+     */
+    private static $_pagenow;
+    /**
+     * Get current page or the referer if executing a WP AJAX request.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.8
+     *
+     * @return string
+     */
+    static function get_current_page()
+    {
+    }
+    /**
      * Helper method to check if user in the plugins page.
      *
      * @author Vova Feldman (@svovaf)
@@ -2784,7 +3173,18 @@ class Freemius extends \Freemius_Abstract
      *
      * @return bool
      */
-    private function is_plugins_page()
+    static function is_plugins_page()
+    {
+    }
+    /**
+     * Helper method to check if user in the themes page.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2.6
+     *
+     * @return bool
+     */
+    static function is_themes_page()
     {
     }
     #----------------------------------------------------------------------------------
@@ -2914,6 +3314,35 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Checks if the plugin's type is "plugin". The other type is "theme".
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  1.2.2
+     *
+     * @return bool
+     */
+    function is_plugin()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  1.2.2
+     *
+     * @return string
+     */
+    function get_module_type()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  1.2.2
+     *
+     * @return string
+     */
+    function get_plugin_main_file_path()
+    {
+    }
+    /**
      * Check if module has a premium code version.
      *
      * Serviceware module might be freemium without any
@@ -2983,11 +3412,11 @@ class Freemius extends \Freemius_Abstract
      * @since  1.2.0
      *
      * @param array|string $actions Collection of AJAX actions.
-     * @param string       $slug
+     * @param number|null  $module_id
      *
      * @return bool
      */
-    static function is_ajax_action_static($actions, $slug = '')
+    static function is_ajax_action_static($actions, $module_id = \null)
     {
     }
     /**
@@ -2996,7 +3425,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return bool
      */
-    function is_cron()
+    static function is_cron()
     {
     }
     /**
@@ -3008,6 +3437,17 @@ class Freemius extends \Freemius_Abstract
      * @return bool
      */
     function is_user_in_admin()
+    {
+    }
+    /**
+     * Check if a real user is in the customizer view.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2.7
+     *
+     * @return bool
+     */
+    static function is_customizer()
     {
     }
     /**
@@ -3036,6 +3476,42 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Check if currently in a specified admin page.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2.7
+     *
+     * @param string $page
+     *
+     * @return bool
+     */
+    function is_admin_page($page)
+    {
+    }
+    /**
+     * Get module's main admin setting page URL.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2.7
+     *
+     * @return string
+     */
+    function main_menu_url()
+    {
+    }
+    /**
+     * Check if currently on the theme's setting page or
+     * on any of the Freemius added pages (via tabs).
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2.7
+     *
+     * @return bool
+     */
+    function is_theme_settings_page()
+    {
+    }
+    /**
      * Plugin's account page + sync license URL.
      *
      * @author Vova Feldman (@svovaf)
@@ -3043,10 +3519,11 @@ class Freemius extends \Freemius_Abstract
      *
      * @param bool|number $plugin_id
      * @param bool        $add_action_nonce
+     * @param array       $params
      *
      * @return string
      */
-    function _get_sync_license_url($plugin_id = \false, $add_action_nonce = \true)
+    function _get_sync_license_url($plugin_id = \false, $add_action_nonce = \true, $params = array())
     {
     }
     /**
@@ -3131,10 +3608,10 @@ class Freemius extends \Freemius_Abstract
     }
     /* Security
     		------------------------------------------------------------------------------------------------------------------*/
-    private function _encrypt($str)
+    private static function _encrypt($str)
     {
     }
-    private function _decrypt($str)
+    static function _decrypt($str)
     {
     }
     /**
@@ -3145,7 +3622,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return FS_Entity Return an encrypted clone entity.
      */
-    private function _encrypt_entity(\FS_Entity $entity)
+    private static function _encrypt_entity(\FS_Entity $entity)
     {
     }
     /**
@@ -3156,7 +3633,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return FS_Entity Return an decrypted clone entity.
      */
-    private function _decrypt_entity(\FS_Entity $entity)
+    private static function decrypt_entity(\FS_Entity $entity)
     {
     }
     /**
@@ -3244,10 +3721,13 @@ class Freemius extends \Freemius_Abstract
      * @param FS_User $user
      * @param FS_Site $site
      * @param bool    $redirect
+     * @param bool    $auto_install Since 1.2.1.7 If `true` and setting up an account with a valid license, will
+     *                              redirect (or return a URL) to the account page with a special parameter to
+     *                              trigger the auto installation processes.
      *
      * @return string If redirect is `false`, returns the next page the user should be redirected to.
      */
-    function setup_account(\FS_User $user, \FS_Site $site, $redirect = \true)
+    function setup_account(\FS_User $user, \FS_Site $site, $redirect = \true, $auto_install = \false)
     {
     }
     /**
@@ -3272,10 +3752,13 @@ class Freemius extends \Freemius_Abstract
      * @param string $install_public_key
      * @param string $install_secret_key
      * @param bool   $redirect
+     * @param bool   $auto_install Since 1.2.1.7 If `true` and setting up an account with a valid license, will
+     *                             redirect (or return a URL) to the account page with a special parameter to
+     *                             trigger the auto installation processes.
      *
      * @return string If redirect is `false`, returns the next page the user should be redirected to.
      */
-    private function install_with_new_user($user_id, $user_public_key, $user_secret_key, $install_id, $install_public_key, $install_secret_key, $redirect = \true)
+    private function install_with_new_user($user_id, $user_public_key, $user_secret_key, $install_id, $install_public_key, $install_secret_key, $redirect = \true, $auto_install = \false)
     {
     }
     /**
@@ -3326,11 +3809,31 @@ class Freemius extends \Freemius_Abstract
     private function _activate_addon_account(\Freemius $parent_fs)
     {
     }
+    /**
+     * Tries to activate parent account based on add-on's info.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2.7
+     *
+     * @param Freemius $parent_fs
+     */
+    private function activate_parent_account(\Freemius $parent_fs)
+    {
+    }
     #endregion
     #----------------------------------------------------------------------------------
     #region Admin Menu Items
     #----------------------------------------------------------------------------------
     private $_menu_items = array();
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.8
+     *
+     * @return array
+     */
+    function get_menu_items()
+    {
+    }
     /**
      * @author Vova Feldman (@svovaf)
      * @since  1.0.7
@@ -3394,6 +3897,24 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2.7
+     *
+     * @return string
+     */
+    function get_pricing_cta_label()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2.7
+     *
+     * @return bool
+     */
+    function is_pricing_page_visible()
+    {
+    }
+    /**
      * Add default Freemius menu items.
      *
      * @author Vova Feldman (@svovaf)
@@ -3421,6 +3942,17 @@ class Freemius extends \Freemius_Abstract
      * @since  1.1.4
      */
     private function order_sub_submenu_items()
+    {
+    }
+    /**
+     * Helper method to return the module's support forum URL.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2.7
+     *
+     * @return string
+     */
+    function get_support_forum_url()
     {
     }
     /**
@@ -3466,14 +3998,15 @@ class Freemius extends \Freemius_Abstract
      * @param bool   $menu_slug
      * @param string $capability
      * @param int    $priority
-     *
+     * @param bool   $show_submenu
      */
-    function add_submenu_link_item($menu_title, $url, $menu_slug = \false, $capability = 'read', $priority = \WP_FS__DEFAULT_PRIORITY)
+    function add_submenu_link_item($menu_title, $url, $menu_slug = \false, $capability = 'read', $priority = \WP_FS__DEFAULT_PRIORITY, $show_submenu = \true)
     {
     }
     #endregion ------------------------------------------------------------------
-    /* Actions / Hooks / Filters
-    		------------------------------------------------------------------------------------------------------------------*/
+    #--------------------------------------------------------------------------------
+    #region Actions / Hooks / Filters
+    #--------------------------------------------------------------------------------
     /**
      * @author Vova Feldman (@svovaf)
      * @since  1.1.7
@@ -3491,33 +4024,85 @@ class Freemius extends \Freemius_Abstract
      *
      * @param string $tag
      * @param string $slug
+     * @param bool   $is_plugin
      *
      * @return string
      */
-    static function get_action_tag_static($tag, $slug = '')
+    static function get_action_tag_static($tag, $slug = '', $is_plugin = \true)
+    {
+    }
+    /**
+     * Returns a string that can be used to generate a unique action name,
+     * option name, HTML element ID, or HTML element class.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  1.2.2
+     *
+     * @return string
+     */
+    public function get_unique_affix()
+    {
+    }
+    /**
+     * Returns a string that can be used to generate a unique action name,
+     * option name, HTML element ID, or HTML element class.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2.5
+     *
+     * @param string $slug
+     * @param bool   $is_plugin
+     *
+     * @return string
+     */
+    static function get_module_unique_affix($slug, $is_plugin = \true)
     {
     }
     /**
      * @author Vova Feldman (@svovaf)
      * @since  1.2.1
+     * @since  1.2.2.5 The AJAX action names are based on the module ID, not like the non-AJAX actions that are
+     *         based on the slug for backward compatibility.
      *
      * @param string $tag
      *
      * @return string
      */
-    private function get_ajax_action_tag($tag)
+    function get_ajax_action($tag)
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.7
+     *
+     * @param string $tag
+     *
+     * @return string
+     */
+    function get_ajax_security($tag)
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.7
+     *
+     * @param string $tag
+     */
+    function check_ajax_referer($tag)
     {
     }
     /**
      * @author Vova Feldman (@svovaf)
      * @since  1.2.1.6
+     * @since  1.2.2.5 The AJAX action names are based on the module ID, not like the non-AJAX actions that are
+     *         based on the slug for backward compatibility.
      *
-     * @param string $tag
-     * @param string $slug
+     * @param string      $tag
+     * @param number|null $module_id
      *
      * @return string
      */
-    private static function get_ajax_action_tag_static($tag, $slug = '')
+    private static function get_ajax_action_static($tag, $module_id = \null)
     {
     }
     /**
@@ -3574,16 +4159,16 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.2.1.6
      *
-     * @param string   $tag
-     * @param callable $function_to_add
-     * @param int      $priority
-     * @param string   $slug
+     * @param string      $tag
+     * @param callable    $function_to_add
+     * @param int         $priority
+     * @param number|null $module_id
      *
      * @return bool True if action added, false if no need to add the action since the AJAX call isn't matching.
      * @uses   add_action()
      *
      */
-    static function add_ajax_action_static($tag, $function_to_add, $priority = \WP_FS__DEFAULT_PRIORITY, $slug = '')
+    static function add_ajax_action_static($tag, $function_to_add, $priority = \WP_FS__DEFAULT_PRIORITY, $module_id = \null)
     {
     }
     /**
@@ -3667,6 +4252,7 @@ class Freemius extends \Freemius_Abstract
     function has_filter($tag, $function_to_check = \false)
     {
     }
+    #endregion
     /**
      * Override default i18n text phrases.
      *
@@ -3870,10 +4456,11 @@ class Freemius extends \Freemius_Abstract
      * @uses   FS_Api
      *
      * @param number|bool $plugin_id
+     * @param bool        $flush
      *
      * @return FS_Payment[]|object
      */
-    function _fetch_payments($plugin_id = \false)
+    function _fetch_payments($plugin_id = \false, $flush = \false)
     {
     }
     /**
@@ -3881,9 +4468,11 @@ class Freemius extends \Freemius_Abstract
      * @since  1.2.1.5
      * @uses   FS_Api
      *
+     * @param bool $flush
+     *
      * @return \FS_Billing|mixed
      */
-    function _fetch_billing()
+    function _fetch_billing($flush = \false)
     {
     }
     /**
@@ -3912,10 +4501,11 @@ class Freemius extends \Freemius_Abstract
      *
      * @param bool|number $plugin_id
      * @param bool        $flush Since 1.1.7.3
+     * @param int         $expiration Since 1.2.2.7
      *
      * @return object|false New plugin tag info if exist.
      */
-    private function _fetch_newer_version($plugin_id = \false, $flush = \true)
+    private function _fetch_newer_version($plugin_id = \false, $flush = \true, $expiration = \WP_FS__TIME_24_HOURS_IN_SEC)
     {
     }
     /**
@@ -3923,11 +4513,12 @@ class Freemius extends \Freemius_Abstract
      * @since  1.0.5
      *
      * @param bool|number $plugin_id
-     * @param bool        $flush Since 1.1.7.3
+     * @param bool        $flush      Since 1.1.7.3
+     * @param int         $expiration Since 1.2.2.7
      *
      * @return bool|FS_Plugin_Tag
      */
-    function get_update($plugin_id = \false, $flush = \true)
+    function get_update($plugin_id = \false, $flush = \true, $expiration = \WP_FS__TIME_24_HOURS_IN_SEC)
     {
     }
     /**
@@ -3970,6 +4561,19 @@ class Freemius extends \Freemius_Abstract
      * @return bool
      */
     function can_use_premium_code()
+    {
+    }
+    /**
+     * Checks if the current user can activate plugins or switch themes. Note that this method should only be used
+     * after the `init` action is triggered because it is using `current_user_can()` which is only functional after
+     * the context user is authenticated.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  1.2.2
+     *
+     * @return bool
+     */
+    function is_user_admin()
     {
     }
     /**
@@ -4103,11 +4707,12 @@ class Freemius extends \Freemius_Abstract
      * @since  1.0.4
      *
      * @param bool|number $addon_id
-     * @param bool        $flush Since 1.1.7.3
+     * @param bool        $flush      Since 1.1.7.3
+     * @param int         $expiration Since 1.2.2.7
      *
      * @return object|false Plugin latest tag info.
      */
-    function _fetch_latest_version($addon_id = \false, $flush = \true)
+    function _fetch_latest_version($addon_id = \false, $flush = \true, $expiration = \WP_FS__TIME_24_HOURS_IN_SEC)
     {
     }
     #----------------------------------------------------------------------------------
@@ -4195,8 +4800,9 @@ class Freemius extends \Freemius_Abstract
      *                                was initiated by the admin.
      * @param bool|number $plugin_id
      * @param bool        $flush      Since 1.1.7.3
+     * @param int         $expiration Since 1.2.2.7
      */
-    private function check_updates($background = \false, $plugin_id = \false, $flush = \true)
+    private function check_updates($background = \false, $plugin_id = \false, $flush = \true, $expiration = \WP_FS__TIME_24_HOURS_IN_SEC)
     {
     }
     /**
@@ -4338,7 +4944,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return string
      */
-    private function get_activation_url($params = array())
+    function get_activation_url($params = array())
     {
     }
     /**
@@ -4353,16 +4959,18 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
-     * Get the URL of the page that should be loaded after the user connect or skip in the opt-in screen.
+     * Get the URL of the page that should be loaded after the user connect
+     * or skip in the opt-in screen.
      *
      * @author Vova Feldman (@svovaf)
      * @since  1.1.3
      *
      * @param string $filter Filter name.
+     * @param array  $params Since 1.2.2.7
      *
      * @return string
      */
-    function get_after_activation_url($filter)
+    function get_after_activation_url($filter, $params = array())
     {
     }
     /**
@@ -4553,6 +5161,17 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Check if module is currently in a trial promotion mode.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2.7
+     *
+     * @return bool
+     */
+    function is_in_trial_promotion()
+    {
+    }
+    /**
      * Show trial promotional notice (if any trial exist).
      *
      * @author Vova Feldman (@svovaf)
@@ -4568,6 +5187,20 @@ class Freemius extends \Freemius_Abstract
      * @since  1.2.1.5
      */
     function _enqueue_common_css()
+    {
+    }
+    /**
+     * @author Leo Fajardo (leorw)
+     * @since  1.2.2
+     */
+    function _show_theme_activation_optin_dialog()
+    {
+    }
+    /**
+     * @author Leo Fajardo (leorw)
+     * @since  1.2.2
+     */
+    function _add_fs_theme_activation_dialog()
     {
     }
     /* Action Links
@@ -4701,28 +5334,15 @@ class Freemius extends \Freemius_Abstract
     private function get_complete_upgrade_instructions($plan_title = '')
     {
     }
-    /* Plugin Auto-Updates (@since 1.0.4)
-    		------------------------------------------------------------------------------------------------------------------*/
     /**
-     * @var string[]
-     */
-    private static $_auto_updated_plugins;
-    /**
-     * @todo   TEST IF IT WORKS!!!
-     *
-     * Include plugins for automatic updates based on stored settings.
-     *
-     * @see    http://wordpress.stackexchange.com/questions/131394/how-do-i-exclude-plugins-from-getting-automatically-updated/131404#131404
-     *
      * @author Vova Feldman (@svovaf)
-     * @since  1.0.4
+     * @since  1.2.1.7
      *
-     * @param bool   $update Whether to update (not used for plugins)
-     * @param object $item   The plugin's info
+     * @param string $key
      *
-     * @return bool
+     * @return string
      */
-    static function _include_plugins_in_auto_update($update, $item)
+    function get_text($key)
     {
     }
     #----------------------------------------------------------------------------------
@@ -4764,8 +5384,6 @@ class Freemius extends \Freemius_Abstract
      *
      * @author Vova Feldman (@svovaf)
      * @since  1.0.9
-     *
-     * @return bool
      */
     function set_plugin_upgrade_complete()
     {
@@ -4788,6 +5406,169 @@ class Freemius extends \Freemius_Abstract
     {
     }
     #endregion
+    #----------------------------------------------------------------------------------
+    #region Auto Activation
+    #----------------------------------------------------------------------------------
+    /**
+     * Hints the SDK if running an auto-installation.
+     *
+     * @var bool
+     */
+    private $_isAutoInstall = \false;
+    /**
+     * After upgrade callback to install and auto activate a plugin.
+     * This code will only be executed on explicit request from the user,
+     * following the practice Jetpack are using with their theme installations.
+     *
+     * @link   https://make.wordpress.org/plugins/2017/03/16/clarification-of-guideline-8-executable-code-and-installs/
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.7
+     */
+    function _install_premium_version_ajax_action()
+    {
+    }
+    /**
+     * Displays module activation dialog box after a successful upgrade
+     * where the user explicitly requested to auto download and install
+     * the premium version.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.7
+     */
+    function _add_auto_installation_dialog_box()
+    {
+    }
+    #endregion
+    #--------------------------------------------------------------------------------
+    #region Tabs Integration
+    #--------------------------------------------------------------------------------
+    #region Module's Original Tabs
+    /**
+     * Inject a JavaScript logic to capture the theme tabs HTML.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2.7
+     */
+    function _tabs_capture()
+    {
+    }
+    /**
+     * Cache theme's tabs HTML for a week. The cache will also be set as expired
+     * after version and type (free/premium) changes, in addition to the week period.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2.7
+     */
+    function _store_tabs_ajax_action()
+    {
+    }
+    /**
+     * Cache theme's settings page custom styles. The cache will also be set as expired
+     * after version and type (free/premium) changes, in addition to the week period.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2.7
+     */
+    function _store_tabs_styles()
+    {
+    }
+    /**
+     * Check if module's original settings page has any tabs.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2.7
+     *
+     * @return bool
+     */
+    private function has_tabs()
+    {
+    }
+    /**
+     * Get module's settings page HTML content, starting
+     * from the beginning of the <div class="wrap"> element,
+     * until the tabs HTML (including).
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2.7
+     *
+     * @return string
+     */
+    private function get_tabs_html()
+    {
+    }
+    /**
+     * Check if page should include tabs.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2.7
+     *
+     * @return bool
+     */
+    private function should_page_include_tabs()
+    {
+    }
+    /**
+     * Add the tabs HTML before the setting's page content and
+     * enqueue any required stylesheets.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2.7
+     *
+     * @return bool If tabs were included.
+     */
+    function _add_tabs_before_content()
+    {
+    }
+    /**
+     * Add the tabs closing HTML after the setting's page content.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2.7
+     *
+     * @return bool If tabs closing HTML was included.
+     */
+    function _add_tabs_after_content()
+    {
+    }
+    #endregion
+    /**
+     * Add in-page JavaScript to inject the Freemius tabs into
+     * the module's setting tabs section.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2.7
+     */
+    function _add_freemius_tabs()
+    {
+    }
+    #endregion
+    #--------------------------------------------------------------------------------
+    #region Customizer Integration for Themes
+    #--------------------------------------------------------------------------------
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2.7
+     *
+     * @param WP_Customize_Manager $customizer
+     */
+    function _customizer_register($customizer)
+    {
+    }
+    #endregion
+    /**
+     * If the theme has a paid version, add some custom
+     * styling to the theme's premium version (if exists)
+     * to highlight that it's the premium version of the
+     * same theme, making it easier for identification
+     * after the user upgrades and upload it to the site.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2.7
+     */
+    function _style_premium_theme()
+    {
+    }
     #----------------------------------------------------------------------------------
     #region Marketing
     #----------------------------------------------------------------------------------
@@ -4865,7 +5646,7 @@ class FS_Api
      */
     private static $_clock_diff;
     /**
-     * @var Freemius_Api
+     * @var Freemius_Api_WordPress
      */
     private $_api;
     /**
@@ -5481,6 +6262,17 @@ class FS_Plugin_Updater
     {
     }
     /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.7
+     *
+     * @param number|bool $addon_id
+     *
+     * @return object
+     */
+    private function get_latest_download_details($addon_id = \false)
+    {
+    }
+    /**
      * Checks if a given basename has a matching folder name
      * with the current context plugin.
      *
@@ -5511,6 +6303,84 @@ class FS_Plugin_Updater
     function _maybe_update_folder_name($response, $hook_extra, $result)
     {
     }
+    #----------------------------------------------------------------------------------
+    #region Auto Activation
+    #----------------------------------------------------------------------------------
+    /**
+     * Installs and active a plugin when explicitly requested that from a 3rd party service.
+     *
+     * This logic was inspired by the TGMPA GPL licensed library by Thomas Griffin.
+     *
+     * @link   http://tgmpluginactivation.com/
+     *
+     * @author Vova Feldman
+     * @since  1.2.1.7
+     *
+     * @link   https://make.wordpress.org/plugins/2017/03/16/clarification-of-guideline-8-executable-code-and-installs/
+     *
+     * @uses   WP_Filesystem
+     * @uses   WP_Error
+     * @uses   WP_Upgrader
+     * @uses   Plugin_Upgrader
+     * @uses   Plugin_Installer_Skin
+     * @uses   Plugin_Upgrader_Skin
+     *
+     * @param number|bool $plugin_id
+     *
+     * @return array
+     */
+    function install_and_activate_plugin($plugin_id = \false)
+    {
+    }
+    /**
+     * Tries to activate a plugin. If fails, returns the error.
+     *
+     * @author Vova Feldman
+     * @since  1.2.1.7
+     *
+     * @param string $file_path Path within wp-plugins/ to main plugin file.
+     *                          This determines the styling of the output messages.
+     *
+     * @return bool|WP_Error
+     */
+    protected function try_activate_plugin($file_path)
+    {
+    }
+    /**
+     * Check if a premium module version is already active.
+     *
+     * @author Vova Feldman
+     * @since  1.2.1.7
+     *
+     * @param number|bool $plugin_id
+     *
+     * @return bool
+     */
+    private function is_premium_plugin_active($plugin_id = \false)
+    {
+    }
+    /**
+     * Adjust the plugin directory name if necessary.
+     * Assumes plugin has a folder (not a single file plugin).
+     *
+     * The final destination directory of a plugin is based on the subdirectory name found in the
+     * (un)zipped source. In some cases this subdirectory name is not the same as the expected
+     * slug and the plugin will not be recognized as installed. This is fixed by adjusting
+     * the temporary unzipped source subdirectory name to the expected plugin slug.
+     *
+     * @author Vova Feldman
+     * @since  1.2.1.7
+     *
+     * @param string       $source        Path to upgrade/zip-file-name.tmp/subdirectory/.
+     * @param string       $remote_source Path to upgrade/zip-file-name.tmp.
+     * @param \WP_Upgrader $upgrader      Instance of the upgrader which installs the plugin.
+     *
+     * @return string|WP_Error
+     */
+    function _maybe_adjust_source_dir($source, $remote_source, $upgrader)
+    {
+    }
+    #endregion
 }
 /**
  * Class FS_Security
@@ -6148,6 +7018,8 @@ class FS_Plugin extends \FS_Scope_Entity
      */
     public $slug;
     /**
+     * @since 1.2.2
+     *
      * @var string 'plugin' or 'theme'
      */
     public $type;
@@ -6676,9 +7548,23 @@ class FS_Admin_Menu_Manager
 {
     #region Properties
     /**
+     * @since 1.2.2
+     *
      * @var string
      */
-    protected $_plugin_slug;
+    protected $_module_unique_affix;
+    /**
+     * @since 1.2.2
+     *
+     * @var number
+     */
+    protected $_module_id;
+    /**
+     * @since 1.2.2
+     *
+     * @var string
+     */
+    protected $_module_type;
     /**
      * @since 1.0.6
      *
@@ -6727,6 +7613,12 @@ class FS_Admin_Menu_Manager
      * @var string
      */
     private $_first_time_path;
+    /**
+     * @since 1.2.2
+     *
+     * @var bool
+     */
+    private $_menu_exists;
     #endregion Properties
     /**
      * @var FS_Logger
@@ -6738,14 +7630,16 @@ class FS_Admin_Menu_Manager
      */
     private static $_instances = array();
     /**
-     * @param string $plugin_slug
+     * @param number $module_id
+     * @param string $module_type
+     * @param string $module_unique_affix
      *
-     * @return FS_Admin_Notice_Manager
+     * @return FS_Admin_Menu_Manager
      */
-    static function instance($plugin_slug)
+    static function instance($module_id, $module_type, $module_unique_affix)
     {
     }
-    protected function __construct($plugin_slug)
+    protected function __construct($module_id, $module_type, $module_unique_affix)
     {
     }
     #endregion Singleton
@@ -6809,15 +7703,25 @@ class FS_Admin_Menu_Manager
     {
     }
     /**
+     * @author Leo Fajardo (@leorw)
+     * @since  1.2.2
+     *
+     * @return bool
+     */
+    function has_menu()
+    {
+    }
+    /**
      * @author Vova Feldman (@svovaf)
      * @since  1.1.3
      *
      * @param string $id
      * @param bool   $default
+     * @param bool   $ignore_menu_existence Since 1.2.2.7 If true, check if the submenu item visible even if there's no parent menu.
      *
      * @return bool
      */
-    function is_submenu_item_visible($id, $default = \true)
+    function is_submenu_item_visible($id, $default = \true, $ignore_menu_existence = \false)
     {
     }
     /**
@@ -6832,17 +7736,6 @@ class FS_Admin_Menu_Manager
      * @return string
      */
     function get_slug($page = '')
-    {
-    }
-    /**
-     * Check if module has a menu slug set.
-     *
-     * @author Vova Feldman (@svovaf)
-     * @since  1.2.1.6
-     *
-     * @return bool
-     */
-    function has_menu_slug()
     {
     }
     /**
@@ -6918,7 +7811,7 @@ class FS_Admin_Menu_Manager
      *
      * @return bool
      */
-    function is_activation_page()
+    function is_main_settings_page()
     {
     }
     #region Submenu Override
@@ -6977,9 +7870,22 @@ class FS_Admin_Menu_Manager
      * @author Vova Feldman (@svovaf)
      * @since  1.0.9
      *
-     * @return array[string]mixed
+     * @return false|array[string]mixed
      */
     function remove_menu_item()
+    {
+    }
+    /**
+     * Get module's main admin setting page URL.
+     *
+     * @todo This method was only tested for wp.org compliant themes with a submenu item. Need to test for plugins with top level, submenu, and CPT top level, menu items.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2.7
+     *
+     * @return string
+     */
+    function main_menu_url()
     {
     }
     /**
@@ -6988,7 +7894,7 @@ class FS_Admin_Menu_Manager
      *
      * @param callable $function
      *
-     * @return array[string]mixed
+     * @return false|array[string]mixed
      */
     function override_menu_item($function)
     {
@@ -7006,13 +7912,99 @@ class FS_Admin_Menu_Manager
     {
     }
     #endregion Top level menu Override
+    /**
+     * Add a top-level menu page.
+     *
+     * Note for WordPress.org Theme/Plugin reviewer:
+     *
+     *  This is a replication of `add_menu_page()` to avoid Theme Check warning.
+     *
+     *  Why?
+     *  ====
+     *  Freemius is an SDK for plugin and theme developers. Since the core
+     *  of the SDK is relevant both for plugins and themes, for obvious reasons,
+     *  we only develop and maintain one code base.
+     *
+     *  This method will not run for wp.org themes (only plugins) since theme
+     *  admin settings/options are now only allowed in the customizer.
+     *
+     *  If you have any questions or need clarifications, please don't hesitate
+     *  pinging me on slack, my username is @svovaf.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2
+     *
+     * @param string          $page_title The text to be displayed in the title tags of the page when the menu is
+     *                                    selected.
+     * @param string          $menu_title The text to be used for the menu.
+     * @param string          $capability The capability required for this menu to be displayed to the user.
+     * @param string          $menu_slug  The slug name to refer to this menu by (should be unique for this menu).
+     * @param callable|string $function   The function to be called to output the content for this page.
+     * @param string          $icon_url   The URL to the icon to be used for this menu.
+     *                                    * Pass a base64-encoded SVG using a data URI, which will be colored to
+     *                                    match the color scheme. This should begin with
+     *                                    'data:image/svg+xml;base64,'.
+     *                                    * Pass the name of a Dashicons helper class to use a font icon,
+     *                                    e.g. 'dashicons-chart-pie'.
+     *                                    * Pass 'none' to leave div.wp-menu-image empty so an icon can be added
+     *                                    via CSS.
+     * @param int             $position   The position in the menu order this one should appear.
+     *
+     * @return string The resulting page's hook_suffix.
+     */
+    static function add_page($page_title, $menu_title, $capability, $menu_slug, $function = '', $icon_url = '', $position = \null)
+    {
+    }
+    /**
+     * Add a submenu page.
+     *
+     * Note for WordPress.org Theme/Plugin reviewer:
+     *
+     *  This is a replication of `add_submenu_page()` to avoid Theme Check warning.
+     *
+     *  Why?
+     *  ====
+     *  Freemius is an SDK for plugin and theme developers. Since the core
+     *  of the SDK is relevant both for plugins and themes, for obvious reasons,
+     *  we only develop and maintain one code base.
+     *
+     *  This method will not run for wp.org themes (only plugins) since theme
+     *  admin settings/options are now only allowed in the customizer.
+     *
+     *  If you have any questions or need clarifications, please don't hesitate
+     *  pinging me on slack, my username is @svovaf.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2
+     *
+     * @param string          $parent_slug The slug name for the parent menu (or the file name of a standard
+     *                                     WordPress admin page).
+     * @param string          $page_title  The text to be displayed in the title tags of the page when the menu is
+     *                                     selected.
+     * @param string          $menu_title  The text to be used for the menu.
+     * @param string          $capability  The capability required for this menu to be displayed to the user.
+     * @param string          $menu_slug   The slug name to refer to this menu by (should be unique for this menu).
+     * @param callable|string $function    The function to be called to output the content for this page.
+     *
+     * @return false|string The resulting page's hook_suffix, or false if the user does not have the capability
+     *                      required.
+     */
+    static function add_subpage($parent_slug, $page_title, $menu_title, $capability, $menu_slug, $function = '')
+    {
+    }
 }
 class FS_Admin_Notice_Manager
 {
     /**
+     * @since 1.2.2
+     *
      * @var string
      */
-    protected $_slug;
+    protected $_module_unique_affix;
+    /**
+     * @var string
+     */
+    protected $_id;
     /**
      * @var string
      */
@@ -7034,15 +8026,16 @@ class FS_Admin_Notice_Manager
      */
     protected $_logger;
     /**
-     * @param string $slug
+     * @param string $id
      * @param string $title
+     * @param string $module_unique_affix
      *
      * @return FS_Admin_Notice_Manager
      */
-    static function instance($slug, $title = '')
+    static function instance($id, $title = '', $module_unique_affix = '')
     {
     }
-    protected function __construct($slug, $title = '')
+    protected function __construct($id, $title = '', $module_unique_affix = '')
     {
     }
     /**
@@ -7262,11 +8255,12 @@ class FS_Cache_Manager
      * @author Vova Feldman (@svovaf)
      * @since  1.1.6
      *
-     * @param string $key
+     * @param string   $key
+     * @param null|int $expiration Since 1.2.2.7
      *
      * @return bool
      */
-    function has_valid($key)
+    function has_valid($key, $expiration = \null)
     {
     }
     /**
@@ -7328,6 +8322,17 @@ class FS_Cache_Manager
     function purge($key)
     {
     }
+    /**
+     * Set cached item as expired.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.2.7
+     *
+     * @param string $key
+     */
+    function expire($key)
+    {
+    }
 }
 /**
  * Class FS_Key_Value_Storage
@@ -7367,9 +8372,11 @@ class FS_Key_Value_Storage implements \ArrayAccess, \Iterator, \Countable
      */
     protected $_id;
     /**
+     * @since 1.2.2
+     *
      * @var string
      */
-    protected $_slug;
+    protected $_secondary_id;
     /**
      * @var array
      */
@@ -7384,14 +8391,14 @@ class FS_Key_Value_Storage implements \ArrayAccess, \Iterator, \Countable
     protected $_logger;
     /**
      * @param string $id
-     * @param string $slug
+     * @param string $secondary_id
      *
      * @return FS_Key_Value_Storage
      */
-    static function instance($id, $slug)
+    static function instance($id, $secondary_id)
     {
     }
-    protected function __construct($id, $slug)
+    protected function __construct($id, $secondary_id)
     {
     }
     protected function get_option_manager()
@@ -7869,13 +8876,17 @@ class FS_Plan_Manager
 class FS_Plugin_Manager
 {
     /**
-     * @var string
+     * @since 1.2.2
+     *
+     * @var string|number
      */
-    protected $_slug;
+    protected $_module_id;
     /**
+     * @since 1.2.2
+     *
      * @var FS_Plugin
      */
-    protected $_plugin;
+    protected $_module;
     /**
      * @var FS_Plugin_Manager[]
      */
@@ -7885,20 +8896,39 @@ class FS_Plugin_Manager
      */
     protected $_logger;
     /**
-     * @param string $slug
+     * Option names
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  1.2.2
+     */
+    const OPTION_NAME_PLUGINS = 'plugins';
+    const OPTION_NAME_THEMES = 'themes';
+    /**
+     * @param  string|number $module_id
      *
      * @return FS_Plugin_Manager
      */
-    static function instance($slug)
+    static function instance($module_id)
     {
     }
-    protected function __construct($slug)
+    /**
+     * @param string|number $module_id
+     */
+    protected function __construct($module_id)
     {
     }
     protected function get_option_manager()
     {
     }
-    protected function get_all_plugins()
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  1.2.2
+     *
+     * @param  string|false $module_type "plugin", "theme", or "false" for all modules.
+     *
+     * @return array
+     */
+    protected function get_all_modules($module_type = \false)
     {
     }
     /**
@@ -7916,12 +8946,12 @@ class FS_Plugin_Manager
      * @author Vova Feldman (@svovaf)
      * @since  1.0.6
      *
-     * @param bool|FS_Plugin $plugin
+     * @param bool|FS_Plugin $module
      * @param bool           $flush
      *
      * @return bool|\FS_Plugin
      */
-    function store($plugin = \false, $flush = \true)
+    function store($module = \false, $flush = \true)
     {
     }
     /**
@@ -8053,13 +9083,14 @@ abstract class Freemius_Api_Base
     {
     }
     /**
-     * Base64 encoding that does not need to be urlencode()ed.
-     * Exactly the same as base64_encode except it uses
-     *   - instead of +
-     *   _ instead of /
+     * Base64 decoding that does not need to be urldecode()-ed.
+     *
+     * Exactly the same as PHP base64 encode except it uses
+     *   `-` instead of `+`
+     *   `_` instead of `/`
      *   No padded =
      *
-     * @param string $input base64UrlEncoded string
+     * @param string $input Base64UrlEncoded() string
      *
      * @return string
      */
@@ -8068,19 +9099,20 @@ abstract class Freemius_Api_Base
     }
     /**
      * Base64 encoding that does not need to be urlencode()ed.
-     * Exactly the same as base64_encode except it uses
-     *   - instead of +
-     *   _ instead of /
+     *
+     * Exactly the same as base64 encode except it uses
+     *   `-` instead of `+
+     *   `_` instead of `/`
      *
      * @param string $input string
      *
-     * @return string base64Url encoded string
+     * @return string Base64 encoded string
      */
     protected static function Base64UrlEncode($input)
     {
     }
 }
-class Freemius_Api extends \Freemius_Api_Base
+class Freemius_Api_WordPress extends \Freemius_Api_Base
 {
     private static $_logger = array();
     /**
@@ -8096,7 +9128,9 @@ class Freemius_Api extends \Freemius_Api_Base
     public static function GetUrl($pCanonizedPath = '', $pIsSandbox = \false)
     {
     }
-    #region Servers Clock Diff ------------------------------------------------------
+    #----------------------------------------------------------------------------------
+    #region Servers Clock Diff
+    #----------------------------------------------------------------------------------
     /**
      * @var int Clock diff in seconds between current server to API server.
      */
@@ -8120,7 +9154,7 @@ class Freemius_Api extends \Freemius_Api_Base
     public static function FindClockDiff()
     {
     }
-    #endregion Servers Clock Diff ------------------------------------------------------
+    #endregion
     /**
      * @var string http or https
      */
@@ -8144,16 +9178,36 @@ class Freemius_Api extends \Freemius_Api_Base
     /**
      * Sign request with the following HTTP headers:
      *      Content-MD5: MD5(HTTP Request body)
-     *      Date: Current date (i.e Sat, 14 Feb 2015 20:24:46 +0000)
+     *      Date: Current date (i.e Sat, 14 Feb 2016 20:24:46 +0000)
      *      Authorization: FS {scope_entity_id}:{scope_entity_public_key}:base64encode(sha256(string_to_sign,
      *      {scope_entity_secret_key}))
      *
      * @param string $pResourceUrl
-     * @param array  $pCurlOptions
+     * @param array  $pWPRemoteArgs
      *
      * @return array
      */
-    function SignRequest($pResourceUrl, $pCurlOptions)
+    function SignRequest($pResourceUrl, $pWPRemoteArgs)
+    {
+    }
+    /**
+     * Generate Authorization request headers:
+     *
+     *      Content-MD5: MD5(HTTP Request body)
+     *      Date: Current date (i.e Sat, 14 Feb 2016 20:24:46 +0000)
+     *      Authorization: FS {scope_entity_id}:{scope_entity_public_key}:base64encode(sha256(string_to_sign,
+     *      {scope_entity_secret_key}))
+     *
+     * @author Vova Feldman
+     *
+     * @param string $pResourceUrl
+     * @param string $pMethod
+     * @param string $pPostParams
+     *
+     * @return array
+     * @throws Freemius_Exception
+     */
+    function GenerateAuthorizationParams($pResourceUrl, $pMethod = 'GET', $pPostParams = '')
     {
     }
     /**
@@ -8169,12 +9223,14 @@ class Freemius_Api extends \Freemius_Api_Base
     {
     }
     /**
-     * @param resource $pCurlHandler
-     * @param array    $pCurlOptions
+     * @author Vova Feldman
+     *
+     * @param string $pUrl
+     * @param array  $pWPRemoteArgs
      *
      * @return mixed
      */
-    private static function ExecuteRequest(&$pCurlHandler, &$pCurlOptions)
+    private static function ExecuteRequest($pUrl, &$pWPRemoteArgs)
     {
     }
     /**
@@ -8187,7 +9243,7 @@ class Freemius_Api extends \Freemius_Api_Base
      * @param string        $pCanonizedPath
      * @param string        $pMethod
      * @param array         $pParams
-     * @param null|resource $pCurlHandler
+     * @param null|array    $pWPRemoteArgs
      * @param bool          $pIsSandbox
      * @param null|callable $pBeforeExecutionFunction
      *
@@ -8195,27 +9251,42 @@ class Freemius_Api extends \Freemius_Api_Base
      *
      * @throws \Freemius_Exception
      */
-    private static function MakeStaticRequest($pCanonizedPath, $pMethod = 'GET', $pParams = array(), $pCurlHandler = \null, $pIsSandbox = \false, $pBeforeExecutionFunction = \null)
+    private static function MakeStaticRequest($pCanonizedPath, $pMethod = 'GET', $pParams = array(), $pWPRemoteArgs = \null, $pIsSandbox = \false, $pBeforeExecutionFunction = \null)
     {
     }
     /**
      * Makes an HTTP request. This method can be overridden by subclasses if
-     * developers want to do fancier things or use something other than curl to
-     * make the request.
+     * developers want to do fancier things or use something other than wp_remote_request()
+     * to make the request.
      *
-     * @param string        $pCanonizedPath The URL to make the request to
-     * @param string        $pMethod        HTTP method
-     * @param array         $pParams        The parameters to use for the POST body
-     * @param null|resource $pCurlHandler   Initialized curl handle
+     * @param string     $pCanonizedPath The URL to make the request to
+     * @param string     $pMethod        HTTP method
+     * @param array      $pParams        The parameters to use for the POST body
+     * @param null|array $pWPRemoteArgs  wp_remote_request options.
      *
      * @return object[]|object|null
      *
      * @throws Freemius_Exception
      */
-    public function MakeRequest($pCanonizedPath, $pMethod = 'GET', $pParams = array(), $pCurlHandler = \null)
+    public function MakeRequest($pCanonizedPath, $pMethod = 'GET', $pParams = array(), $pWPRemoteArgs = \null)
     {
     }
-    #region Connectivity Test ------------------------------------------------------
+    /**
+     * Sets CURLOPT_IPRESOLVE to CURL_IPRESOLVE_V4 for cURL-Handle provided as parameter
+     *
+     * @param resource $handle A cURL handle returned by curl_init()
+     *
+     * @return resource $handle A cURL handle returned by curl_init() with CURLOPT_IPRESOLVE set to
+     *                  CURL_IPRESOLVE_V4
+     *
+     * @link https://gist.github.com/golderweb/3a2aaec2d56125cc004e
+     */
+    static function CurlResolveToIPv4($handle)
+    {
+    }
+    #----------------------------------------------------------------------------------
+    #region Connectivity Test
+    #----------------------------------------------------------------------------------
     /**
      * If successful connectivity to the API endpoint using ping.json endpoint.
      *
@@ -8238,22 +9309,24 @@ class Freemius_Api extends \Freemius_Api_Base
     public static function Ping()
     {
     }
-    #endregion Connectivity Test ------------------------------------------------------
-    #region Connectivity Exceptions ------------------------------------------------------
+    #endregion
+    #----------------------------------------------------------------------------------
+    #region Connectivity Exceptions
+    #----------------------------------------------------------------------------------
     /**
-     * @param resource $pCurlHandler
+     * @param \WP_Error $pError
      *
-     * @throws Freemius_Exception
+     * @return bool
      */
-    private static function ThrowCurlException($pCurlHandler)
+    private static function IsCurlError(\WP_Error $pError)
     {
     }
     /**
-     * @param string $pResult
+     * @param WP_Error $pError
      *
      * @throws Freemius_Exception
      */
-    private static function ThrowNoCurlException($pResult = '')
+    private static function ThrowWPRemoteException(\WP_Error $pError)
     {
     }
     /**
@@ -8272,7 +9345,7 @@ class Freemius_Api extends \Freemius_Api_Base
     private static function ThrowSquidAclException($pResult = '')
     {
     }
-    #endregion Connectivity Exceptions ------------------------------------------------------
+    #endregion
 }
 /**
  * Get object's public variables.
@@ -8315,6 +9388,29 @@ function fs_get_template($path, &$params = \null)
 }
 /* Scripts and styles including.
 	--------------------------------------------------------------------------------------------*/
+/**
+ * Generates an absolute URL to the given path. This function ensures that the URL will be correct whether the asset
+ * is inside a plugin's folder or a theme's folder.
+ *
+ * Examples:
+ * 1. "themes" folder
+ *    Path: C:/xampp/htdocs/fswp/wp-content/themes/twentytwelve/freemius/assets/css/admin/common.css
+ *    URL: http://fswp:8080/wp-content/themes/twentytwelve/freemius/assets/css/admin/common.css
+ *
+ * 2. "plugins" folder
+ *    Path: C:/xampp/htdocs/fswp/wp-content/plugins/rating-widget-premium/freemius/assets/css/admin/common.css
+ *    URL: http://fswp:8080/wp-content/plugins/rating-widget-premium/freemius/assets/css/admin/common.css
+ *
+ * @author Leo Fajardo (@leorw)
+ * @since  1.2.2
+ *
+ * @param  string $asset_abs_path Asset's absolute path.
+ *
+ * @return string Asset's URL.
+ */
+function fs_asset_url($asset_abs_path)
+{
+}
 function fs_enqueue_local_style($handle, $path, $deps = array(), $ver = \false, $media = 'all')
 {
 }
@@ -8327,12 +9423,15 @@ function fs_img_url($path, $img_dir = \WP_FS__DIR_IMG)
 /* Request handlers.
 	--------------------------------------------------------------------------------------------*/
 /**
- * @param string $key
- * @param mixed  $def
+ * @param string      $key
+ * @param mixed       $def
+ * @param string|bool $type Since 1.2.1.7 - when set to 'get' will look for the value passed via querystring, when
+ *                          set to 'post' will look for the value passed via the POST request's body, otherwise,
+ *                          will check if the parameter was passed in any of the two.
  *
  * @return mixed
  */
-function fs_request_get($key, $def = \false)
+function fs_request_get($key, $def = \false, $type = \false)
 {
 }
 function fs_request_has($key)
@@ -8368,13 +9467,13 @@ function fs_request_is_action($action, $action_key = 'action')
 function fs_request_is_action_secure($action, $action_key = 'action', $nonce_key = 'nonce')
 {
 }
-function fs_is_plugin_page($menu_slug)
+function fs_is_plugin_page($page_slug)
 {
 }
 /* Core UI.
 	--------------------------------------------------------------------------------------------*/
 /**
- * @param string      $slug
+ * @param number      $module_id
  * @param string      $page
  * @param string      $action
  * @param string      $title
@@ -8386,14 +9485,14 @@ function fs_is_plugin_page($menu_slug)
  *
  * @uses fs_ui_get_action_button()
  */
-function fs_ui_action_button($slug, $page, $action, $title, $params = array(), $is_primary = \true, $icon_class = \false, $confirmation = \false, $method = 'GET')
+function fs_ui_action_button($module_id, $page, $action, $title, $params = array(), $is_primary = \true, $icon_class = \false, $confirmation = \false, $method = 'GET')
 {
 }
 /**
  * @author Vova Feldman (@svovaf)
  * @since  1.1.7
  *
- * @param string      $slug
+ * @param number      $module_id
  * @param string      $page
  * @param string      $action
  * @param string      $title
@@ -8405,10 +9504,10 @@ function fs_ui_action_button($slug, $page, $action, $title, $params = array(), $
  *
  * @return string
  */
-function fs_ui_get_action_button($slug, $page, $action, $title, $params = array(), $is_primary = \true, $icon_class = \false, $confirmation = \false, $method = 'GET')
+function fs_ui_get_action_button($module_id, $page, $action, $title, $params = array(), $is_primary = \true, $icon_class = \false, $confirmation = \false, $method = 'GET')
 {
 }
-function fs_ui_action_link($slug, $page, $action, $title, $params = array())
+function fs_ui_action_link($module_id, $page, $action, $title, $params = array())
 {
 }
 /**
@@ -8482,6 +9581,14 @@ function fs_urlencode_rfc3986($input)
 {
 }
 #endregion Url Canonization ------------------------------------------------------------------
+/**
+ * @author Vova Feldman (@svovaf)
+ *
+ * @since  1.2.2 Changed to usage of WP_Filesystem_Direct.
+ *
+ * @param string $from URL
+ * @param string $to   File path.
+ */
 function fs_download_image($from, $to)
 {
 }
@@ -8501,12 +9608,37 @@ function fs_download_image($from, $to)
 function fs_sort_by_priority($a, $b)
 {
 }
-#--------------------------------------------------------------------------------
-#region Localization
-#--------------------------------------------------------------------------------
+/**
+ * Retrieve a translated text by key.
+ *
+ * @author Vova Feldman (@svovaf)
+ * @since  1.2.1.7
+ *
+ * @param string $key
+ * @param string $slug
+ *
+ * @return string
+ *
+ * @global       $fs_text, $fs_text_overrides
+ */
+function fs_text($key, $slug = 'freemius')
+{
+}
+/**
+ * Output a translated text by key.
+ *
+ * @author Vova Feldman (@svovaf)
+ * @since  1.2.1.7
+ *
+ * @param string $key
+ * @param string $slug
+ */
+function fs_echo($key, $slug = 'freemius')
+{
+}
 /**
  * @author Vova Feldman
- * @since 1.2.1.6
+ * @since  1.2.1.6
  *
  * @param string $key
  * @param string $slug
@@ -8518,7 +9650,7 @@ function fs_esc_attr($key, $slug)
 }
 /**
  * @author Vova Feldman
- * @since 1.2.1.6
+ * @since  1.2.1.6
  *
  * @param string $key
  * @param string $slug
@@ -8528,7 +9660,7 @@ function fs_esc_attr_echo($key, $slug)
 }
 /**
  * @author Vova Feldman
- * @since 1.2.1.6
+ * @since  1.2.1.6
  *
  * @param string $key
  * @param string $slug
@@ -8540,7 +9672,7 @@ function fs_esc_js($key, $slug)
 }
 /**
  * @author Vova Feldman
- * @since 1.2.1.6
+ * @since  1.2.1.6
  *
  * @param string $key
  * @param string $slug
@@ -8550,7 +9682,7 @@ function fs_esc_js_echo($key, $slug)
 }
 /**
  * @author Vova Feldman
- * @since 1.2.1.6
+ * @since  1.2.1.6
  *
  * @param string $key
  * @param string $slug
@@ -8560,7 +9692,7 @@ function fs_json_encode_echo($key, $slug)
 }
 /**
  * @author Vova Feldman
- * @since 1.2.1.6
+ * @since  1.2.1.6
  *
  * @param string $key
  * @param string $slug
@@ -8572,7 +9704,7 @@ function fs_esc_html($key, $slug)
 }
 /**
  * @author Vova Feldman
- * @since 1.2.1.6
+ * @since  1.2.1.6
  *
  * @param string $key
  * @param string $slug
@@ -8599,24 +9731,28 @@ function fs_redirect($location, $exit = \true, $status = 302)
 /**
  * Retrieve a translated text by key.
  *
- * @author Vova Feldman (@svovaf)
- * @since  1.1.4
+ * @deprecated Use `fs_text()` instead since methods starting with `__` trigger warnings in Php 7.
+ *
+ * @author     Vova Feldman (@svovaf)
+ * @since      1.1.4
  *
  * @param string $key
  * @param string $slug
  *
  * @return string
  *
- * @global       $fs_text , $fs_text_overrides
+ * @global       $fs_text, $fs_text_overrides
  */
 function __fs($key, $slug = 'freemius')
 {
 }
 /**
- * Display a translated text by key.
+ * Output a translated text by key.
  *
- * @author Vova Feldman (@svovaf)
- * @since  1.1.4
+ * @deprecated Use `fs_echo()` instead for consistency with `fs_text()`.
+ *
+ * @author     Vova Feldman (@svovaf)
+ * @since      1.1.4
  *
  * @param string $key
  * @param string $slug
@@ -8706,15 +9842,15 @@ function fs_fallback_to_newest_active_sdk()
  * @author Vova Feldman (@svovaf)
  * @since  1.0.9
  *
- * @param string $slug  Plugin slug
- * @param string $tag   The name of the filter hook.
- * @param mixed  $value The value on which the filters hooked to `$tag` are applied on.
+ * @param string $module_unique_affix Module's unique affix.
+ * @param string $tag                 The name of the filter hook.
+ * @param mixed  $value               The value on which the filters hooked to `$tag` are applied on.
  *
  * @return mixed The filtered value after all hooked functions are applied to it.
  *
  * @uses   apply_filters()
  */
-function fs_apply_filter($slug, $tag, $value)
+function fs_apply_filter($module_unique_affix, $tag, $value)
 {
 }
 /**
@@ -8918,11 +10054,11 @@ function fs_find_direct_caller_plugin_file($file)
  * Quick shortcut to get Freemius for specified plugin.
  * Used by various templates.
  *
- * @param string $slug
+ * @param number $module_id
  *
  * @return Freemius
  */
-function freemius($slug)
+function freemius($module_id)
 {
 }
 /**
@@ -8940,7 +10076,7 @@ function fs_init($slug, $plugin_id, $public_key, $is_live = \true, $is_premium =
 {
 }
 /**
- * @param array<string,string> $module Plugin or Theme details.
+ * @param array <string,string> $module Plugin or Theme details.
  *
  * @return Freemius
  * @throws Freemius_Exception
