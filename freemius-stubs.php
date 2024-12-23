@@ -315,7 +315,7 @@ abstract class Freemius_Abstract
     #region Plans
     #----------------------------------------------------------------------------------
     /**
-     * Check if plugin using the free plan.
+     * Check if the user is on the free plan of the product.
      *
      * @since 1.0.4
      *
@@ -878,10 +878,12 @@ class Freemius extends \Freemius_Abstract
      * @since  1.2.2.7 Even if the menu item was specified to be hidden, when it is the context page, then show the submenu item so the user will have the right context page.
      *
      * @param string $slug
+     * @param bool   $ignore_free_wp_org_theme_context This is used to decide if the associated tab should be shown
+     *                                                 or hidden.
      *
      * @return bool
      */
-    function is_submenu_item_visible($slug)
+    function is_submenu_item_visible($slug, $ignore_free_wp_org_theme_context = \false)
     {
     }
     /**
@@ -914,7 +916,7 @@ class Freemius extends \Freemius_Abstract
      * @param string $sdk_prev_version
      * @param string $sdk_version
      */
-    function _data_migration($sdk_prev_version, $sdk_version)
+    function _sdk_version_update($sdk_prev_version, $sdk_version)
     {
     }
     /**
@@ -1209,6 +1211,13 @@ class Freemius extends \Freemius_Abstract
      * @since  1.1.2
      */
     function _submit_uninstall_reason_action()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.0.2
+     */
+    function _delete_theme_update_data_action()
     {
     }
     #endregion
@@ -1578,11 +1587,12 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.1.7.4
      *
-     * @param int|null $blog_id Since 2.0.0.
+     * @param int|null $blog_id      Since 2.0.0.
+     * @param bool     $is_gdpr_test Since 2.0.2. Perform only the GDPR test.
      *
      * @return object|false
      */
-    private function ping($blog_id = \null)
+    private function ping($blog_id = \null, $is_gdpr_test = \false)
     {
     }
     /**
@@ -1639,6 +1649,15 @@ class Freemius extends \Freemius_Abstract
      * @return \WP_User
      */
     static function _get_current_wp_user()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  2.1.0
+     *
+     * @return int
+     */
+    static function get_current_wp_user_id()
     {
     }
     /**
@@ -2745,8 +2764,6 @@ class Freemius extends \Freemius_Abstract
     /**
      * @author Leo Fajardo (@leorw)
      * @since  1.2.2
-     *
-     * @return string
      */
     private function activate_previous_theme()
     {
@@ -2880,7 +2897,7 @@ class Freemius extends \Freemius_Abstract
      * @param array|null $sites            Since 2.0.0. Specific sites.
      * @param bool       $skip_all_network Since 2.0.0. If true, skip connection for all sites.
      */
-    private function skip_connection($sites = \null, $skip_all_network = \false)
+    function skip_connection($sites = \null, $skip_all_network = \false)
     {
     }
     /**
@@ -3761,7 +3778,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return bool
      */
-    private function has_any_license()
+    function has_any_license()
     {
     }
     /**
@@ -4155,6 +4172,13 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.0.2
+     */
+    function _add_premium_version_upgrade_selection_dialog_box()
+    {
+    }
+    /**
      * Displays the opt-out dialog box when the user clicks on the "Opt Out" link on the "Plugins"
      * page.
      *
@@ -4171,6 +4195,13 @@ class Freemius extends \Freemius_Abstract
      * @since  1.2.0
      */
     function _add_license_activation()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.0.2
+     */
+    function _add_premium_version_upgrade_selection()
     {
     }
     /**
@@ -4241,6 +4272,15 @@ class Freemius extends \Freemius_Abstract
      * @return bool
      */
     static function is_plugins_page()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.0.2
+     *
+     * @return bool
+     */
+    static function is_updates_page()
     {
     }
     /**
@@ -4750,6 +4790,22 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Gets a map of module IDs that the given user has opted-in to.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  2.1.0
+     *
+     * @param number $fs_user_id
+     *
+     * @return array {
+     * @key number $plugin_id
+     * @value bool Always true.
+     * }
+     */
+    private static function get_user_opted_in_module_ids_map($fs_user_id)
+    {
+    }
+    /**
      * @author Leo Fajardo (@leorw)
      *
      * @return null|array {
@@ -5218,17 +5274,18 @@ class Freemius extends \Freemius_Abstract
      * @param string|bool $first
      * @param string|bool $last
      * @param string|bool $license_key
-     * @param bool        $is_uninstall       If "true", this means that the module is currently being uninstalled.
-     *                                        In this case, the user and site info will be sent to the server but no
-     *                                        data will be saved to the WP installation's database.
+     * @param bool        $is_uninstall         If "true", this means that the module is currently being uninstalled.
+     *                                          In this case, the user and site info will be sent to the server but no
+     *                                          data will be saved to the WP installation's database.
      * @param number|bool $trial_plan_id
-     * @param bool        $is_disconnected    Whether or not to opt in without tracking.
-     * @param array       $sites              If network-level opt-in, an array of containing details of sites.
+     * @param bool        $is_disconnected      Whether or not to opt in without tracking.
+     * @param null|bool   $is_marketing_allowed
+     * @param array       $sites                If network-level opt-in, an array of containing details of sites.
      *
      * @return string|object
      * @use    WP_Error
      */
-    function opt_in($email = \false, $first = \false, $last = \false, $license_key = \false, $is_uninstall = \false, $trial_plan_id = \false, $is_disconnected = \false, $sites = array())
+    function opt_in($email = \false, $first = \false, $last = \false, $license_key = \false, $is_uninstall = \false, $trial_plan_id = \false, $is_disconnected = \false, $is_marketing_allowed = \null, $sites = array())
     {
     }
     /**
@@ -5294,20 +5351,21 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.1.7.4
      *
-     * @param number $user_id
-     * @param string $user_public_key
-     * @param string $user_secret_key
-     * @param number $install_id
-     * @param string $install_public_key
-     * @param string $install_secret_key
-     * @param bool   $redirect
-     * @param bool   $auto_install Since 1.2.1.7 If `true` and setting up an account with a valid license, will
-     *                             redirect (or return a URL) to the account page with a special parameter to
-     *                             trigger the auto installation processes.
+     * @param number    $user_id
+     * @param string    $user_public_key
+     * @param string    $user_secret_key
+     * @param bool|null $is_marketing_allowed
+     * @param number    $install_id
+     * @param string    $install_public_key
+     * @param string    $install_secret_key
+     * @param bool      $redirect
+     * @param bool      $auto_install Since 1.2.1.7 If `true` and setting up an account with a valid license, will
+     *                                redirect (or return a URL) to the account page with a special parameter to
+     *                                trigger the auto installation processes.
      *
      * @return string If redirect is `false`, returns the next page the user should be redirected to.
      */
-    private function install_with_new_user($user_id, $user_public_key, $user_secret_key, $install_id, $install_public_key, $install_secret_key, $redirect = \true, $auto_install = \false)
+    private function install_with_new_user($user_id, $user_public_key, $user_secret_key, $is_marketing_allowed, $install_id, $install_public_key, $install_secret_key, $redirect = \true, $auto_install = \false)
     {
     }
     /**
@@ -5316,17 +5374,18 @@ class Freemius extends \Freemius_Abstract
      * @author Leo Fajardo (@leorw)
      * @since  2.0.0
      *
-     * @param number $user_id
-     * @param string $user_public_key
-     * @param string $user_secret_key
-     * @param array  $site_ids
-     * @param bool   $license_key
-     * @param bool   $trial_plan_id
-     * @param bool   $redirect
+     * @param number    $user_id
+     * @param string    $user_public_key
+     * @param string    $user_secret_key
+     * @param bool|null $is_marketing_allowed
+     * @param array     $site_ids
+     * @param bool      $license_key
+     * @param bool      $trial_plan_id
+     * @param bool      $redirect
      *
      * @return string If redirect is `false`, returns the next page the user should be redirected to.
      */
-    private function install_many_pending_with_user($user_id, $user_public_key, $user_secret_key, $site_ids, $license_key = \false, $trial_plan_id = \false, $redirect = \true)
+    private function install_many_pending_with_user($user_id, $user_public_key, $user_secret_key, $is_marketing_allowed, $site_ids, $license_key = \false, $trial_plan_id = \false, $redirect = \true)
     {
     }
     /**
@@ -5335,18 +5394,19 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  2.0.0
      *
-     * @param number   $user_id
-     * @param string   $user_public_key
-     * @param string   $user_secret_key
-     * @param object[] $installs
-     * @param bool     $redirect
-     * @param bool     $auto_install Since 1.2.1.7 If `true` and setting up an account with a valid license, will
-     *                               redirect (or return a URL) to the account page with a special parameter to
-     *                               trigger the auto installation processes.
+     * @param number    $user_id
+     * @param string    $user_public_key
+     * @param string    $user_secret_key
+     * @param bool|null $is_marketing_allowed
+     * @param object[]  $installs
+     * @param bool      $redirect
+     * @param bool      $auto_install Since 1.2.1.7 If `true` and setting up an account with a valid license, will
+     *                                redirect (or return a URL) to the account page with a special parameter to
+     *                                trigger the auto installation processes.
      *
      * @return string If redirect is `false`, returns the next page the user should be redirected to.
      */
-    private function install_many_with_new_user($user_id, $user_public_key, $user_secret_key, array $installs, $redirect = \true, $auto_install = \false)
+    private function install_many_with_new_user($user_id, $user_public_key, $user_secret_key, $is_marketing_allowed, array $installs, $redirect = \true, $auto_install = \false)
     {
     }
     /**
@@ -6942,6 +7002,13 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.0.2
+     */
+    function _add_premium_version_upgrade_selection_action()
+    {
+    }
+    /**
      * Adds "Opt in" or "Opt out" link to the main "Plugins" page link actions collection.
      *
      * @author Leo Fajardo (@leorw)
@@ -7024,6 +7091,30 @@ class Freemius extends \Freemius_Abstract
      * @return string
      */
     private function get_complete_upgrade_instructions($plan_title = '')
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.1.0
+     *
+     * @param string $url
+     * @param array  $request
+     */
+    private static function enrich_request_for_debug(&$url, &$request)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.1.0
+     *
+     * @param string      $url
+     * @param array       $request
+     * @param int         $success_cache_expiration
+     * @param int         $failure_cache_expiration
+     *
+     * @return WP_Error|array
+     */
+    private static function safe_remote_post(&$url, $request, $success_cache_expiration = 0, $failure_cache_expiration = 0)
     {
     }
     /**
@@ -7353,6 +7444,117 @@ class Freemius extends \Freemius_Abstract
     function fetch_remote_icon_url()
     {
     }
+    #--------------------------------------------------------------------------------
+    #region GDPR
+    #--------------------------------------------------------------------------------
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.1.0
+     *
+     * @return bool
+     */
+    function fetch_and_store_current_user_gdpr_anonymously()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.1.0
+     *
+     * @param array $user_plugins
+     *
+     * @return string
+     */
+    private function get_gdpr_admin_notice_string($user_plugins)
+    {
+    }
+    /**
+     * This method is called for opted-in users to fetch the is_marketing_allowed flag of the user for all the
+     * plugins and themes they've opted in to.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since 2.1.0
+     *
+     * @param string      $user_email
+     * @param string      $license_key
+     * @param array       $plugin_ids
+     * @param string|null $license_key
+     *
+     * @return array|false
+     */
+    private function fetch_user_marketing_flag_status_by_plugins($user_email, $license_key, $plugin_ids)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.1.0
+     */
+    function _maybe_show_gdpr_admin_notice()
+    {
+    }
+    /**
+     * Prevents the GDPR opt-in admin notice from being added if the user has already chosen to allow or not allow
+     * marketing.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  2.1.0
+     */
+    private function disable_opt_in_notice_and_lock_user()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.1.0
+     */
+    function _add_gdpr_optin_js()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.1.0
+     */
+    function enqueue_gdpr_optin_notice_style()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.1.0
+     */
+    function _maybe_add_gdpr_optin_ajax_handler()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.1.0
+     */
+    function _fetch_is_marketing_required_flag_value_ajax_action()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.1.0
+     */
+    private function add_gdpr_optin_ajax_handler_and_style()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.1.0
+     */
+    function _gdpr_optin_ajax_action()
+    {
+    }
+    /**
+     * Checks if the GDPR admin notice should be handled. By default, this logic is off, unless the integrator adds the special 'handle_gdpr_admin_notice' filter.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.1.0
+     *
+     * @return bool
+     */
+    private function should_handle_gdpr_admin_notice()
+    {
+    }
+    #endregion
     #----------------------------------------------------------------------------------
     #region Marketing
     #----------------------------------------------------------------------------------
@@ -7447,13 +7649,22 @@ class FS_Admin_Notices
      * @param string $id
      * @param string $title
      * @param string $module_unique_affix
+     * @param bool   $is_network_and_blog_admins Whether or not the message should be shown both on network and
+     *                                           blog admin pages.
      *
      * @return FS_Admin_Notices
      */
-    static function instance($id, $title = '', $module_unique_affix = '')
+    static function instance($id, $title = '', $module_unique_affix = '', $is_network_and_blog_admins = \false)
     {
     }
-    protected function __construct($id, $title = '', $module_unique_affix = '')
+    /**
+     * @param string $id
+     * @param string $title
+     * @param string $module_unique_affix
+     * @param bool   $is_network_and_blog_admins Whether or not the message should be shown both on network and
+     *                                           blog admin pages.
+     */
+    protected function __construct($id, $title = '', $module_unique_affix = '', $is_network_and_blog_admins = \false)
     {
     }
     /**
@@ -7505,13 +7716,17 @@ class FS_Admin_Notices
      * @author Vova Feldman (@svovaf)
      * @since  1.0.7
      *
-     * @param string   $message
-     * @param string   $id Message ID
-     * @param string   $title
-     * @param string   $type
-     * @param int|null $network_level_or_blog_id
+     * @param string      $message
+     * @param string      $id Message ID
+     * @param string      $title
+     * @param string      $type
+     * @param int|null    $network_level_or_blog_id
+     * @param number|null $wp_user_id
+     * @param string|null $plugin_title
+     * @param bool        $is_network_and_blog_admins Whether or not the message should be shown both on network and
+     *                                                blog admin pages.
      */
-    function add_sticky($message, $id, $title = '', $type = 'success', $network_level_or_blog_id = \null)
+    function add_sticky($message, $id, $title = '', $type = 'success', $network_level_or_blog_id = \null, $wp_user_id = \null, $plugin_title = \null, $is_network_and_blog_admins = \false)
     {
     }
     /**
@@ -8411,6 +8626,17 @@ class FS_Plugin_Updater
     {
     }
     /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.0.2
+     *
+     * @param array $prepared_themes
+     *
+     * @return array
+     */
+    function change_theme_update_info_html($prepared_themes)
+    {
+    }
+    /**
      * Since WP version 3.6, a new security feature was added that denies access to repository with a local ip.
      * During development mode we want to be able updating plugin versions via our localhost repository. This
      * filter white-list all domains including "api.freemius".
@@ -8478,6 +8704,13 @@ class FS_Plugin_Updater
      * @param \FS_Plugin_Tag $new_version
      */
     function set_update_data(\FS_Plugin_Tag $new_version)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.0.2
+     */
+    function delete_update_data()
     {
     }
     /**
@@ -8938,6 +9171,92 @@ class FS_Storage
     }
     #endregion
 }
+/**
+ * Class FS_User_Lock
+ */
+class FS_User_Lock
+{
+    /**
+     * @var int
+     */
+    private $_wp_user_id;
+    /**
+     * @var int
+     */
+    private $_thread_id;
+    #--------------------------------------------------------------------------------
+    #region Singleton
+    #--------------------------------------------------------------------------------
+    /**
+     * @var FS_User_Lock
+     */
+    private static $_instance;
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  2.1.0
+     *
+     * @return FS_User_Lock
+     */
+    static function instance()
+    {
+    }
+    #endregion
+    private function __construct()
+    {
+    }
+    /**
+     * Try to acquire lock. If the lock is already set or is being acquired by another locker, don't do anything.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.1.0
+     *
+     * @param int $expiration
+     *
+     * @return bool TRUE if successfully acquired lock.
+     */
+    function try_lock($expiration = 0)
+    {
+    }
+    /**
+     * Acquire lock regardless if it's already acquired by another locker or not.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.1.0
+     *
+     * @param int $expiration
+     */
+    function lock($expiration = 0)
+    {
+    }
+    /**
+     * Checks if lock is currently acquired.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.1.0
+     *
+     * @return bool
+     */
+    function is_locked()
+    {
+    }
+    /**
+     * Unlock the lock.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.1.0
+     */
+    function unlock()
+    {
+    }
+    /**
+     * Checks if lock is currently acquired by the current locker.
+     *
+     * @return bool
+     */
+    private function has_lock()
+    {
+    }
+}
 class FS_Entity
 {
     /**
@@ -9335,6 +9654,10 @@ class FS_Payment extends \FS_Entity
      * @var float Actual Tax / VAT in $$$
      */
     public $vat;
+    /**
+     * @var int Payment source.
+     */
+    public $source = 0;
     #endregion Properties
     /**
      * @param object|bool $payment
@@ -9352,6 +9675,17 @@ class FS_Payment extends \FS_Entity
      * @return bool
      */
     function is_refund()
+    {
+    }
+    /**
+     * Checks if the payment was migrated from another platform.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.0.2
+     *
+     * @return bool
+     */
+    function is_migrated()
     {
     }
 }
@@ -10923,14 +11257,24 @@ class FS_Admin_Notice_Manager
      * @param string $id
      * @param string $title
      * @param string $module_unique_affix
+     * @param bool   $is_network_and_blog_admins           Whether or not the message should be shown both on
+     *                                                     network and blog admin pages.
      * @param bool   $network_level_or_blog_id Since 2.0.0
      *
      * @return \FS_Admin_Notice_Manager
      */
-    static function instance($id, $title = '', $module_unique_affix = '', $network_level_or_blog_id = \false)
+    static function instance($id, $title = '', $module_unique_affix = '', $is_network_and_blog_admins = \false, $network_level_or_blog_id = \false)
     {
     }
-    protected function __construct($id, $title = '', $module_unique_affix = '', $network_level_or_blog_id = \false)
+    /**
+     * @param string $id
+     * @param string $title
+     * @param string $module_unique_affix
+     * @param bool   $is_network_and_blog_admins Whether or not the message should be shown both on network and
+     *                                             blog admin pages.
+     * @param bool|int $network_level_or_blog_id
+     */
+    protected function __construct($id, $title = '', $module_unique_affix = '', $is_network_and_blog_admins = \false, $network_level_or_blog_id = \false)
     {
     }
     /**
@@ -10987,16 +11331,20 @@ class FS_Admin_Notice_Manager
      * @author Vova Feldman (@svovaf)
      * @since  1.0.4
      *
-     * @param string $message
-     * @param string $title
-     * @param string $type
-     * @param bool   $is_sticky
-     * @param string $id Message ID
-     * @param bool   $store_if_sticky
+     * @param string      $message
+     * @param string      $title
+     * @param string      $type
+     * @param bool        $is_sticky
+     * @param string      $id Message ID
+     * @param bool        $store_if_sticky
+     * @param number|null $wp_user_id
+     * @param string|null $plugin_title
+     * @param bool        $is_network_and_blog_admins Whether or not the message should be shown both on network
+     *                                                and blog admin pages.
      *
      * @uses   add_action()
      */
-    function add($message, $title = '', $type = 'success', $is_sticky = \false, $id = '', $store_if_sticky = \true)
+    function add($message, $title = '', $type = 'success', $is_sticky = \false, $id = '', $store_if_sticky = \true, $wp_user_id = \null, $plugin_title = \null, $is_network_and_blog_admins = \false)
     {
     }
     /**
@@ -11027,12 +11375,16 @@ class FS_Admin_Notice_Manager
      * @author Vova Feldman (@svovaf)
      * @since  1.0.7
      *
-     * @param string $message
-     * @param string $id Message ID
-     * @param string $title
-     * @param string $type
+     * @param string      $message
+     * @param string      $id Message ID
+     * @param string      $title
+     * @param string      $type
+     * @param number|null $wp_user_id
+     * @param string|null $plugin_title
+     * @param bool        $is_network_and_blog_admins Whether or not the message should be shown both on network
+     *                                                and blog admin pages.
      */
-    function add_sticky($message, $id, $title = '', $type = 'success')
+    function add_sticky($message, $id, $title = '', $type = 'success', $wp_user_id = \null, $plugin_title = \null, $is_network_and_blog_admins = \false)
     {
     }
     /**
@@ -11242,6 +11594,150 @@ class FS_Cache_Manager
     {
     }
     #endregion
+}
+class FS_GDPR_Manager
+{
+    /**
+     * @var FS_Option_Manager
+     */
+    private $_storage;
+    /**
+     * @var array {
+     * @type bool $required           Are GDPR rules apply on the current context admin.
+     * @type bool $show_opt_in_notice Should the marketing and offers opt-in message be shown to the admin or not. If not set, defaults to `true`.
+     * @type int  $notice_shown_at    Last time the special GDPR opt-in message was shown to the current admin.
+     * }
+     */
+    private $_data;
+    /**
+     * @var int
+     */
+    private $_wp_user_id;
+    /**
+     * @var string
+     */
+    private $_option_name;
+    /**
+     * @var FS_Admin_Notices
+     */
+    private $_notices;
+    #--------------------------------------------------------------------------------
+    #region Singleton
+    #--------------------------------------------------------------------------------
+    /**
+     * @var FS_GDPR_Manager
+     */
+    private static $_instance;
+    /**
+     * @return FS_GDPR_Manager
+     */
+    public static function instance()
+    {
+    }
+    #endregion
+    private function __construct()
+    {
+    }
+    /**
+     * Update a GDPR option for the current admin and store it.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.1.0
+     *
+     * @param string $name
+     * @param mixed  $value
+     */
+    private function update_option($name, $value)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.1.0
+     *
+     * @return bool|null
+     */
+    public function is_required()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.1.0
+     *
+     * @param bool $is_required
+     */
+    public function store_is_required($is_required)
+    {
+    }
+    /**
+     * Checks if the GDPR opt-in sticky notice is currently shown.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.1.0
+     *
+     * @return bool
+     */
+    public function is_opt_in_notice_shown()
+    {
+    }
+    /**
+     * Remove the GDPR opt-in sticky notice.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.1.0
+     */
+    public function remove_opt_in_notice()
+    {
+    }
+    /**
+     * Prevents the opt-in message from being added/shown.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  2.1.0
+     */
+    public function disable_opt_in_notice()
+    {
+    }
+    /**
+     * Checks if a GDPR opt-in message needs to be shown to the current admin.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.1.0
+     *
+     * @return bool
+     */
+    public function should_show_opt_in_notice()
+    {
+    }
+    /**
+     * Get the last time the GDPR opt-in notice was shown.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.1.0
+     *
+     * @return false|int
+     */
+    public function last_time_notice_was_shown()
+    {
+    }
+    /**
+     * Update the timestamp of the last time the GDPR opt-in message was shown to now.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.1.0
+     */
+    public function notice_was_just_shown()
+    {
+    }
+    /**
+     * @param string      $message
+     * @param string|null $plugin_title
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.1.0
+     */
+    public function add_opt_in_sticky_notice($message, $plugin_title = \null)
+    {
+    }
 }
 /**
  * Class FS_Key_Value_Storage
