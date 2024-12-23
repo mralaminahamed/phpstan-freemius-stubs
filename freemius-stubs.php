@@ -6218,17 +6218,6 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
-     * Tries to activate account based on POST params.
-     *
-     * @author     Vova Feldman (@svovaf)
-     * @since      1.0.2
-     *
-     * @deprecated Not in use, outdated.
-     */
-    function _activate_account()
-    {
-    }
-    /**
      * @author Vova Feldman (@svovaf)
      * @since  1.0.7
      *
@@ -15757,14 +15746,49 @@ function fs_img_url($path, $img_dir = \WP_FS__DIR_IMG)
 {
 }
 /**
+ * A helper function to fetch GET/POST user input with an optional default value when the input is not set.
+ * This function does not do sanitization. It is up to the caller to properly sanitize and validate the input.
+ *
+ * The return of this function is always unslashed.
+ *
+ * @since 2.5.10
+ *
+ * @param string      $key
+ * @param mixed       $def
+ * @param string|bool $type When set to 'get', it will look for the value passed via query string. When
+ *                          set to 'post', it will look for the value passed via the POST request's body. Otherwise,
+ *                          it will check if the parameter was passed using any of the mentioned two methods.
+ *
+ * @return mixed
+ */
+function fs_request_get_raw($key, $def = \false, $type = \false)
+{
+}
+/**
+ * Sanitizes input recursively (if an array).
+ *
+ * @param mixed $input
+ *
+ * @return mixed
+ * @uses  sanitize_text_field()
+ * @since 2.5.10
+ */
+function fs_sanitize_input($input)
+{
+}
+/**
  * A helper method to fetch GET/POST user input with an optional default value when the input is not set.
+ *
  * @author Vova Feldman (@svovaf)
+ *
+ * @note The return value is always sanitized with sanitize_text_field().
  *
  * @param string      $key
  * @param mixed       $def
  * @param string|bool $type Since 1.2.1.7 - when set to 'get' will look for the value passed via querystring, when
  *                          set to 'post' will look for the value passed via the POST request's body, otherwise,
  *                          will check if the parameter was passed in any of the two.
+ *
  *
  * @return mixed
  */
@@ -16532,6 +16556,45 @@ function fs_newest_sdk_plugin_first()
  * @global $fs_active_plugins
  */
 function fs_fallback_to_newest_active_sdk()
+{
+}
+/**
+ * Get the allowed KSES list for sanitizing HTML output on the template files.
+ *
+ * @return array
+ */
+function fs_html_get_allowed_kses_list()
+{
+}
+/**
+ * Gets an HTML class attribute value.
+ *
+ * @param string|string[] $classes
+ *
+ * @return string
+ */
+function fs_html_get_classname($classes)
+{
+}
+/**
+ * Gets a properly escaped HTML attributes string from an associative array.
+ *
+ * @param array<string, string> $attributes A key/value pair array of attributes.
+ *
+ * @return string
+ */
+function fs_html_get_attributes($attributes)
+{
+}
+/**
+ * Get sanitized HTML for template files.
+ *
+ * @param string $raw_html
+ *
+ * @return string
+ * @since 2.5.10
+ */
+function fs_html_get_sanitized_html($raw_html)
 {
 }
 /**
