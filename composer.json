@@ -1,38 +1,92 @@
 {
     "name": "mralaminahamed/freemius-stubs",
-    "description": "freemius wordpress-sdk function and class declaration stubs for static analysis.",
+    "description": "Freemius WordPress SDK function and class declaration stubs for static analysis.",
+    "type": "library",
     "keywords": [
         "freemius",
         "wordpress",
         "static analysis",
-        "phpstan"
+        "phpstan",
+        "stubs",
+        "wordpress-sdk"
     ],
     "homepage": "https://github.com/mralaminahamed/phpstan-freemius-stubs",
     "license": "MIT",
+    "authors": [
+        {
+            "name": "Mr Alamin Ahamed",
+            "homepage": "https://github.com/mralaminahamed"
+        }
+    ],
     "require": {
+        "php": ">=7.1",
         "php-stubs/wordpress-stubs": "^5.3 || ^6.0"
     },
     "require-dev": {
-        "php": "~7.1 || ~8.0",
         "php-stubs/generator": "^0.8.0",
-        "phpstan/phpstan": "^1.10"
+        "phpstan/phpstan": "^1.10",
+        "squizlabs/php_codesniffer": "^3.7",
+        "phpunit/phpunit": "^7.5 || ^8.5 || ^9.5"
     },
     "suggest": {
         "szepeviktor/phpstan-wordpress": "WordPress extensions for PHPStan",
         "symfony/polyfill-php73": "Symfony polyfill backporting some PHP 7.3+ features to lower PHP versions"
     },
     "minimum-stability": "stable",
+    "prefer-stable": true,
+    "autoload-dev": {
+        "psr-4": {
+            "FreemiusStubs\\Tests\\": "tests/"
+        }
+    },
     "config": {
         "allow-plugins": {
             "php-stubs/generator": true
+        },
+        "sort-packages": true,
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "platform": {
+            "php": "7.1.0"
         }
     },
     "scripts": {
-        "post-install-cmd": "@composer --working-dir=source/ update --no-interaction",
-        "post-update-cmd" : "@composer --working-dir=source/ update --no-interaction",
-        "cleanup": "git status --short --ignored | sed -n -e 's#^!! ##p' | xargs -r rm -vrf"
+        "post-install-cmd": [
+            "@composer --working-dir=source/ update --no-interaction"
+        ],
+        "post-update-cmd": [
+            "@composer --working-dir=source/ update --no-interaction"
+        ],
+        "analyze": "phpstan analyze",
+        "check": [
+            "@cs",
+            "@test",
+            "@analyze"
+        ],
+        "cleanup": [
+            "git clean -xdf --exclude='.idea' --exclude='.vscode'",
+            "git status --short --ignored | sed -n -e 's#^!! ##p' | xargs -r rm -vrf"
+        ],
+        "cs": "phpcs",
+        "cs-fix": "phpcbf",
+        "generate": "bash bin/generate.sh",
+        "release": "bash bin/release.sh",
+        "test": "phpunit",
+        "test-coverage": "phpunit --coverage-html coverage"
     },
     "scripts-descriptions": {
-        "cleanup": "Remove all ignored files."
+        "analyze": "Run static analysis using PHPStan",
+        "check": "Run all checks (coding standards, tests, and static analysis)",
+        "cleanup": "Remove all ignored and generated files",
+        "cs": "Check coding standards",
+        "cs-fix": "Fix coding standards automatically",
+        "generate": "Generate Freemius stubs",
+        "release": "Generate and release new version of stubs",
+        "test": "Run unit tests",
+        "test-coverage": "Run unit tests with code coverage report"
+    },
+    "support": {
+        "issues": "https://github.com/mralaminahamed/phpstan-freemius-stubs/issues",
+        "source": "https://github.com/mralaminahamed/phpstan-freemius-stubs"
     }
 }

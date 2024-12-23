@@ -1,131 +1,100 @@
 #!/usr/bin/env bash
+#
+# Release Freemius stubs
+# Author: phpstan-freemius-stubs maintainers
+# Version: 2.0.0
 
-# Script to generate Freemius stubs for all versions and manage git releases
-set -euo pipefail
+# Load shared library
+# shellcheck source=lib/shared.sh
+source "$(dirname "${BASH_SOURCE[0]}")/../lib/shared.sh"
 
-# Constants
-PACKAGE_URL="https://packagist.org/packages/freemius/wordpress-sdk.json"
-OUTPUT_FILE="freemius_versions.txt"
-MAIN_BRANCH="main"
-
-# Functions
-log() {
-    echo "[$(date +'%Y-%m-%d %H:%M:%S')] $1"
-}
-
-error() {
-    log "ERROR: $1" >&2
-    exit 1
-}
-
-cleanup_source() {
-    log "Cleaning up source/ directory..."
-    find source/ -mindepth 1 ! -name 'composer.json' ! -name '.gitignore' -exec rm -rf {} +
-}
-
+# Update composer version
 update_composer_version() {
-    local version=$1
+    local version="$1"
+    local composer_file="${SOURCE_DIR}/composer.json"
+
+    log_message "info" "Updating composer.json to version ${version}"
     printf -v SED_EXP 's#\\("freemius/wordpress-sdk"\\): "[0-9]\\+\\.[0-9]\\+\\.[0-9]\\+"#\\1: "%s"#' "${version}"
-    sed -i -e "$SED_EXP" source/composer.json
+    sed -i -e "$SED_EXP" "${composer_file}"
 }
 
+# Process single version
 process_version() {
-    local version=$1
+    local version="$1"
+    local current_branch feature_branch exit_code=0
 
-    log "Processing version ${version}..."
+    log_message "info" "Processing version ${version}..."
 
-    # Check if tag already exists
+    # Check if tag exists
     if git rev-parse "refs/tags/v${version}" >/dev/null 2>&1; then
-        log "Tag exists for version ${version}! Skipping..."
+        log_message "info" "Tag exists for version ${version}! Skipping..."
         return 0
     fi
 
     # Store current branch
-    local current_branch=$(git rev-parse --abbrev-ref HEAD)
+    current_branch=$(git rev-parse --abbrev-ref HEAD)
+    feature_branch="feature/freemius-${version}"
 
-    # Create and checkout feature branch
-    local feature_branch="feature/freemius-${version}"
-    log "Creating feature branch: ${feature_branch}"
+    # Create feature branch
     git checkout -b "${feature_branch}"
 
-    # Clean up source directory
-    cleanup_source
-
-    # Process version
     {
-        # Update composer.json version
+        cleanup_source
         update_composer_version "${version}"
-
-        # Install dependencies
-        log "Installing Freemius SDK version ${version}..."
         composer --working-dir=source/ require "freemius/wordpress-sdk:${version}"
+        "${SCRIPT_DIR}/generate.sh"
 
-        # Generate stubs
-        log "Generating stubs..."
-        ./bin/generate.sh
-
-        # Stage changes
-        log "Staging changes..."
+        # Git operations
         git add .
-
-        # Commit changes
-        log "Committing changes..."
         git commit -m "Generate stubs for Freemius WordPress SDK ${version}"
-
-        # Switch to main branch and merge
-        log "Switching to ${MAIN_BRANCH} and merging changes..."
-        git checkout "${MAIN_BRANCH}"
-        git pull origin "${MAIN_BRANCH}"
+        git checkout "main"
+        git pull origin "main"
         git merge --no-ff "${feature_branch}" -m "Merge feature/freemius-${version}"
-
-        # Create and push tag
-        log "Creating and pushing tag v${version}..."
         git tag -a "v${version}" -m "Release version ${version}"
-        git push origin "${MAIN_BRANCH}" "v${version}"
-
-        # Clean up feature branch
-        log "Cleaning up feature branch..."
+        git push origin "main" "v${version}"
         git branch -D "${feature_branch}"
 
-        # Clean up downloaded files
         cleanup_source
-
-        return 0
+    } || {
+        exit_code=$?
+        log_message "error" "Failed to process version ${version}"
+        git checkout "${current_branch}"
+        git branch -D "${feature_branch}" 2>/dev/null || true
     }
 
-    # If we get here, something failed
-    local exit_code=$?
-    log "Failed to process version ${version}"
-    # Cleanup and return to original branch on failure
-    git checkout "${current_branch}"
-    git branch -D "${feature_branch}" 2>/dev/null || true
-    return ${exit_code}
+    return "${exit_code}"
 }
 
+# Main execution
 main() {
-    # Ensure we're in a git repository
-    if ! git rev-parse --git-dir > /dev/null 2>&1; then
-        error "Not in a git repository"
+    log_message "info" "Starting release process..."
+    local failed_versions=()
+
+    if ! validate_environment; then
+        log_message "error" "Environment validation failed"
+        exit 1
     fi
 
-    # Fetch package information from Packagist
-    log "Fetching package information..."
-    PKG_JSON=$(wget -q -O- "${PACKAGE_URL}" || error "Failed to fetch package information")
+    if ! fetch_versions; then
+        exit 1
+    fi
 
-    # Prepare output file
-    > "${OUTPUT_FILE}"
+    while IFS= read -r version; do
+        if ! process_version "${version}"; then
+            failed_versions+=("${version}")
+        fi
+    done < "${VERSIONS_FILE}"
 
-    # Extract and filter versions
-    log "Extracting versions..."
-    jq -r '.package.versions | keys[]' <<<"${PKG_JSON}" | grep -v "dev-" | sort -V > "${OUTPUT_FILE}"
+    if ((${#failed_versions[@]} > 0)); then
+        log_message "error" "Failed versions: ${failed_versions[*]}"
+        exit 1
+    fi
 
-    # Process each version
-    while IFS= read -r VERSION; do
-        process_version "${VERSION}"
-    done < "${OUTPUT_FILE}"
-
-    log "All versions processed successfully"
+    log_message "success" "Release process completed successfully"
 }
 
-# Execute main function
+# Error handling
+trap 'log_message "error" "An error occurred in $(basename "$0") at line $LINENO"' ERR
+
+# Execute main
 main "$@"

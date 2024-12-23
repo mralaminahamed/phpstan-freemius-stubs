@@ -1,36 +1,101 @@
 #!/usr/bin/env bash
 #
-# Generate Freemius (WordPress SDK) stubs from the source directory.
-#
+# Generate Freemius stubs
+# Author: phpstan-freemius-stubs maintainers
+# Version: 2.0.0
 
-HEADER=$'/**\n * Generated stub declarations for freemius.\n * @see https://freemius.com\n * @see https://github.com/mralaminahamed/phpstan-freemius-stubs\n */'
+# Load shared library
+# shellcheck source=lib/shared.sh
+source "$(dirname "${BASH_SOURCE[0]}")/../lib/shared.sh"
 
-FILE="freemius-stubs.php"
-FILE_CONSTANTS="freemius-constants-stubs.php"
+# Generate main stubs
+generate_main_stubs() {
+    log_message "info" "Generating main stubs..."
 
-set -e
+    "${GENERATE_STUBS_BIN}" \
+        --include-inaccessible-class-nodes \
+        --force \
+        --finder="${PROJECT_ROOT}/configs/finder.php" \
+        --header="${HEADER}" \
+        --functions \
+        --classes \
+        --interfaces \
+        --traits \
+        --out="${STUBS_FILE}"
 
-test -f "$FILE" || touch "$FILE"
-test -f "$FILE_CONSTANTS" || touch "$FILE_CONSTANTS"
-test -d "source/vendor/freemius/wordpress-sdk"
+    if [[ ! -s "${STUBS_FILE}" ]]; then
+        log_message "error" "Generated main stubs file is empty"
+        return 1
+    fi
+}
 
-# Exclude globals, constants.
-"$(dirname "$0")/vendor/bin/generate-stubs" \
-    --include-inaccessible-class-nodes \
-    --force \
-    --finder=finder.php \
-    --header="$HEADER" \
-    --functions \
-    --classes \
-    --interfaces \
-    --traits \
-    --out="$FILE"
+# Generate constants stubs
+generate_constants_stubs() {
+    log_message "info" "Generating constants stubs..."
 
-# Exclude functions, classes, interfaces, traits and globals.
-"$(dirname "$0")/vendor/bin/generate-stubs" \
-    --include-inaccessible-class-nodes \
-    --force \
-    --finder=finder-constants.php \
-    --header="$HEADER" \
-    --constants \
-    --out="$FILE_CONSTANTS"
+    "${GENERATE_STUBS_BIN}" \
+        --include-inaccessible-class-nodes \
+        --force \
+        --finder="${PROJECT_ROOT}/configs/finder-constants.php" \
+        --header="${HEADER}" \
+        --constants \
+        --out="${CONSTANTS_FILE}"
+
+    if [[ ! -s "${CONSTANTS_FILE}" ]]; then
+        log_message "error" "Generated constants stubs file is empty"
+        return 1
+    fi
+}
+
+# Verify generated files
+verify_stubs() {
+    log_message "info" "Verifying generated stubs..."
+    local status=0
+
+    # Verify main stubs file
+    if ! php -l "${STUBS_FILE}" > /dev/null 2>&1; then
+        log_message "error" "Syntax validation failed for main stubs file"
+        status=1
+    fi
+
+    # Verify constants file
+    if ! php -l "${CONSTANTS_FILE}" > /dev/null 2>&1; then
+        log_message "error" "Syntax validation failed for constants stubs file"
+        status=1
+    fi
+
+    return "${status}"
+}
+
+# Main execution
+main() {
+    log_message "info" "Starting stubs generation..."
+
+    if ! validate_environment; then
+        log_message "error" "Environment validation failed"
+        exit 1
+    fi
+
+    : > "${STUBS_FILE}" || exit 1
+    : > "${CONSTANTS_FILE}" || exit 1
+
+    if ! generate_main_stubs; then
+        exit 1
+    fi
+
+    if ! generate_constants_stubs; then
+        exit 1
+    fi
+
+    if ! verify_stubs; then
+        exit 1
+    fi
+
+    log_message "success" "Stubs generation completed successfully"
+}
+
+# Error handling
+trap 'log_message "error" "An error occurred in $(basename "$0") at line $LINENO"' ERR
+
+# Execute main
+main "$@"

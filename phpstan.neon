@@ -4,7 +4,7 @@ parameters:
     scanFiles:
         - freemius-constants-stubs.php
     bootstrapFiles:
-        - bootstrap.php
+        - configs/bootstrap.php
     level: 5
     ignoreErrors:
         - '#but return statement is missing\.$#'

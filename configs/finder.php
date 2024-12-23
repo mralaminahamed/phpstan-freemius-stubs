@@ -1,14 +1,16 @@
 <?php
 
-return \StubsGenerator\Finder::create()
+use StubsGenerator\Finder;
+
+return Finder::create()
     ->in( array(
-        'source/vendor/freemius/wordpress-sdk/includes',
+        'source/vendor/freemius/wordpress-sdk/freemius',
     ) )
     ->notPath('customizer')
     ->notPath('debug')
     ->append(
-        \StubsGenerator\Finder::create()
-            ->in(['source/vendor/freemius/wordpress-sdk'])
+        Finder::create()
+            ->in(['source/vendor/freemius/wordpress-sdk/freemius'])
             ->files()
             ->depth('< 1')
             ->path('start.php')
