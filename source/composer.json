@@ -1,7 +1,7 @@
 {
     "require": {
         "php": ">=5.6",
-        "freemius/wordpress-sdk": "1.1.8.1"
+        "freemius/wordpress-sdk": "1.1.1"
     },
     "minimum-stability": "stable"
 }

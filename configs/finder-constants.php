@@ -1,20 +1,22 @@
 <?php
 
-return \StubsGenerator\Finder::create()
+use StubsGenerator\Finder;
+
+return Finder::create()
     ->in( array(
-        'source/vendor/freemius/wordpress-sdk/freemius/includes',
-        'source/vendor/freemius/wordpress-sdk/freemius/templates'
+        'source/vendor/freemius/wordpress-sdk/',
+        'source/vendor/freemius/wordpress-sdk/'
     ) )
     ->append(
-        \StubsGenerator\Finder::create()
-            ->in(['source/vendor/freemius/wordpress-sdk/freemius'])
+        Finder::create()
+            ->in(['source/vendor/freemius/wordpress-sdk/'])
             ->files()
             ->depth('< 1')
             ->path('config.php')
     )
     ->append(
-        \StubsGenerator\Finder::create()
-            ->in(['source/vendor/freemius/wordpress-sdk/freemius'])
+        Finder::create()
+            ->in(['source/vendor/freemius/wordpress-sdk/'])
             ->files()
             ->depth('< 1')
             ->path('start.php')
