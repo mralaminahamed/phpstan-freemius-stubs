@@ -828,6 +828,13 @@ class Freemius extends \Freemius_Abstract
      * @var bool
      */
     private $is_whitelabeled;
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.4.0
+     *
+     * @var bool
+     */
+    private $_is_bundle_license_auto_activation_enabled = \false;
     #region Uninstall Reasons IDs
     const REASON_NO_LONGER_NEEDED = 1;
     const REASON_FOUND_A_BETTER_PLUGIN = 2;
@@ -844,6 +851,13 @@ class Freemius extends \Freemius_Abstract
     const REASON_NOT_WHAT_I_WAS_LOOKING_FOR = 13;
     const REASON_DIDNT_WORK_AS_EXPECTED = 14;
     const REASON_TEMPORARY_DEACTIVATION = 15;
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.3.1
+     *
+     * @var boolean|null
+     */
+    private $_use_external_pricing = \null;
     #endregion
     /* Ctor
     ------------------------------------------------------------------------------------------------------------------*/
@@ -3065,12 +3079,46 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Tries to activate a bundle license for all supported products if the current product is activated with a bundle license. This is called after activating an available license (not via the license activation dialog but by clicking on a license activation button) for a product via its "Account" page.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since 2.4.0
+     *
+     * @param FS_Plugin_License $license
+     * @param array             $sites
+     * @param int               $blog_id
+     */
+    private function maybe_activate_bundle_license(\FS_Plugin_License $license = \null, $sites = array(), $blog_id = 0)
+    {
+    }
+    /**
+     * Try to activate a bundle license for all the bundle products installed on the site.
+     *  (1) If a child product install already has a license, the bundle license won't be activated.
+     *  (2) On multi-site networks, if the attempt to activate the bundle license is triggered from the network admin, the bundle license activation will only work for non-delegated sites and only if none of them is associated with a license. Even if one of the sites has the product installed with a license key, skip the bundle license activation for the product.
+     *  (3) On multi-site networks, if the attempt to activate the bundle license is triggered from a site-level admin, only activate the license if the product is site-level activated or delegated, and the product installation is not yet associated with a license.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since 2.4.0
+     *
+     * @param FS_Plugin_License $license
+     * @param array             $sites
+     * @param int               $current_blog_id
+     */
+    private function activate_bundle_license($license, $sites = array(), $current_blog_id = 0)
+    {
+    }
+    /**
+     * Returns a parent license that can be activated for the context product.
+     *
      * @author Leo Fajardo (@leorw)
      * @since 2.3.0
      *
+     * @param string|null $license_key
+     * @param bool        $flush
+     *
      * @return FS_Plugin_License
      */
-    private function get_addon_active_parent_license()
+    function get_active_parent_license($license_key = \null, $flush = \true)
     {
     }
     /**
@@ -3933,6 +3981,15 @@ class Freemius extends \Freemius_Abstract
      * @return bool
      */
     function is_tracking_allowed()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.4.0
+     *
+     * @return bool
+     */
+    function is_bundle_license_auto_activation_enabled()
     {
     }
     /**
@@ -4813,6 +4870,21 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.3.2.14
+     */
+    function starting_migration()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.3.2.14
+     */
+    function is_migration()
+    {
+    }
+    /**
+     *
      * A helper method to activate migrated licenses. If the product is network activated and integrated, the method will network activate the license.
      *
      * @author Vova Feldman (@svovaf)
@@ -4821,6 +4893,8 @@ class Freemius extends \Freemius_Abstract
      * @param string      $license_key
      * @param null|bool   $is_marketing_allowed
      * @param null|number $plugin_id
+     * @param array       $sites
+     * @param int         $blog_id
      *
      * @return array {
      *      @var bool   $success
@@ -4830,7 +4904,25 @@ class Freemius extends \Freemius_Abstract
      *
      * @uses Freemius::activate_license()
      */
-    function activate_migrated_license($license_key, $is_marketing_allowed = \null, $plugin_id = \null)
+    function activate_migrated_license($license_key, $is_marketing_allowed = \null, $plugin_id = \null, $sites = array(), $blog_id = \null)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.3.1
+     *
+     * @return string
+     */
+    function get_pricing_js_path()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.3.1
+     *
+     * @return bool
+     */
+    function should_use_external_pricing()
     {
     }
     /**
@@ -6240,10 +6332,11 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.6
      *
-     * @param Freemius      $parent_fs
-     * @param bool|int|null $network_level_or_blog_id True for network level opt-in and integer for opt-in for specified blog in the network.
+     * @param Freemius          $parent_fs
+     * @param bool|int|null     $network_level_or_blog_id True for network level opt-in and integer for opt-in for specified blog in the network.
+     * @param FS_Plugin_License $bundle_license           Since 2.4.0. If provided, this license will be activated for the add-on.
      */
-    private function _activate_addon_account(\Freemius $parent_fs, $network_level_or_blog_id = \null)
+    private function _activate_addon_account(\Freemius $parent_fs, $network_level_or_blog_id = \null, \FS_Plugin_License $bundle_license = \null)
     {
     }
     /**
@@ -7078,8 +7171,10 @@ class Freemius extends \Freemius_Abstract
      *
      * @author Vova Feldman (@svovaf)
      * @since  1.2.1
+     *
+     * @param bool $check_expiration
      */
-    function has_active_valid_license()
+    function has_active_valid_license($check_expiration = \true)
     {
     }
     /**
@@ -7103,10 +7198,11 @@ class Freemius extends \Freemius_Abstract
      * @since  2.1.3
      *
      * @param FS_Plugin_License $license
+     * @param bool              $check_expiration
      *
      * @return bool
      */
-    private static function is_active_valid_license($license)
+    private static function is_active_valid_license($license, $check_expiration = \true)
     {
     }
     /**
@@ -7130,6 +7226,17 @@ class Freemius extends \Freemius_Abstract
      * @return bool
      */
     function has_features_enabled_license()
+    {
+    }
+    /**
+     * Checks if the product is activated with a bundle license.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  2.4.0
+     *
+     * @return bool
+     */
+    function is_activated_with_bundle_license()
     {
     }
     /**
@@ -7682,6 +7789,20 @@ class Freemius extends \Freemius_Abstract
     function _pricing_page_render()
     {
     }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.3.1
+     */
+    function _maybe_add_pricing_ajax_handler()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.3.1
+     */
+    function _fs_pricing_ajax_action_handler()
+    {
+    }
     #----------------------------------------------------------------------------------
     #region Contact Us
     #----------------------------------------------------------------------------------
@@ -7810,6 +7931,15 @@ class Freemius extends \Freemius_Abstract
      * @return FS_Api
      */
     function get_api_site_or_plugin_scope()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.2.3.1
+     *
+     * @param object $result
+     */
+    private function maybe_modify_api_curl_error_message($result)
     {
     }
     /**
@@ -10861,6 +10991,13 @@ class FS_Plugin_License extends \FS_Entity
      * @var number
      */
     public $parent_license_id;
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.4.0
+     *
+     * @var array
+     */
+    public $products;
     /**
      * @var number
      */
