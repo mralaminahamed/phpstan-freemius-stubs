@@ -301,7 +301,18 @@ abstract class Freemius_Abstract
      *
      * @return bool
      */
-    abstract function is_plugin_update();
+    function is_plugin_update()
+    {
+    }
+    /**
+     * Check if Freemius was part of the plugin when the user installed it first.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.5
+     *
+     * @return bool
+     */
+    abstract function is_plugin_new_install();
     #region Marketing ------------------------------------------------------------------
     /**
      * Check if current user purchased any other plugins before.
@@ -349,7 +360,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @var string
      */
-    public $version = '1.1.5';
+    public $version = \WP_FS__SDK_VERSION;
     #region Plugin Info
     /**
      * @since 1.0.1
@@ -435,6 +446,11 @@ class Freemius extends \Freemius_Abstract
      * @var bool Hints the SDK if the plugin is has add-ons.
      */
     private $_has_addons;
+    /**
+     * @since 1.1.6
+     * @var string[]bool.
+     */
+    private $_permissions;
     /**
      * @var FS_Key_Value_Storage
      */
@@ -590,6 +606,8 @@ class Freemius extends \Freemius_Abstract
      * @since  1.0.6
      *
      * @return string
+     *
+     * @uses   fs_find_caller_plugin_file
      */
     private function _find_caller_plugin_file()
     {
@@ -844,6 +862,13 @@ class Freemius extends \Freemius_Abstract
     function init($id, $public_key, $is_live = \true, $is_premium = \true)
     {
     }
+    /**
+     * @param string[] $options
+     * @param string   $key
+     * @param mixed    $default
+     *
+     * @return bool
+     */
     private function _get_option(&$options, $key, $default = \false)
     {
     }
@@ -1155,21 +1180,14 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Check if Freemius was added on new plugin installation.
+     *
      * @author Vova Feldman (@svovaf)
      * @since  1.1.5
      *
      * @return bool
      */
-    private function is_plugin_new_install()
-    {
-    }
-    /**
-     * @author Vova Feldman (@svovaf)
-     * @since  1.1.5
-     *
-     * @return bool
-     */
-    function is_plugin_update()
+    function is_plugin_new_install()
     {
     }
     /**
@@ -1201,6 +1219,13 @@ class Freemius extends \Freemius_Abstract
      * @since  1.0.1
      */
     function _deactivate_plugin_hook()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.6
+     */
+    private function remove_sdk_reference()
     {
     }
     /**
@@ -2341,8 +2366,25 @@ class Freemius extends \Freemius_Abstract
      *
      * @param string        $tag
      * @param callable|bool $function_to_check Optional. The callback to check for. Default false.
+     *
+     * @return false|int
+     *
+     * @uses   has_filter()
      */
     function has_filter($tag, $function_to_check = \false)
+    {
+    }
+    /**
+     * Override default i18n text phrases.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.6
+     *
+     * @param string[] string $key_value
+     *
+     * @uses   fs_override_i18n()
+     */
+    function override_i18n($key_value)
     {
     }
     /* Account Page
@@ -3005,10 +3047,10 @@ class Freemius extends \Freemius_Abstract
      *
      * @uses   remove_all_actions()
      */
-    function _hide_admin_notices()
+    private static function _hide_admin_notices()
     {
     }
-    function _clean_admin_content_section_hook()
+    static function _clean_admin_content_section_hook()
     {
     }
     /**
@@ -3017,7 +3059,7 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.3
      */
-    function _clean_admin_content_section()
+    static function _clean_admin_content_section()
     {
     }
     /* CSS & JavaScript
@@ -3266,6 +3308,21 @@ class Freemius extends \Freemius_Abstract
     {
     }
     #endregion ------------------------------------------------------------------
+    #region Permissions ------------------------------------------------------------------
+    /**
+     * Check if specific permission requested.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.6
+     *
+     * @param string $permission
+     *
+     * @return bool
+     */
+    function is_permission_requested($permission)
+    {
+    }
+    #endregion Permissions ------------------------------------------------------------------
     #region Marketing ------------------------------------------------------------------
     /**
      * Check if current user purchased any other plugins before.
@@ -5684,12 +5741,6 @@ function fs_require_once_template($path, &$params = \null)
 function fs_get_template($path, &$params = \null)
 {
 }
-function __fs($key)
-{
-}
-function _efs($key)
-{
-}
 /* Scripts and styles including.
 	--------------------------------------------------------------------------------------------*/
 function fs_enqueue_local_style($handle, $path, $deps = array(), $ver = \false, $media = 'all')
@@ -5698,7 +5749,7 @@ function fs_enqueue_local_style($handle, $path, $deps = array(), $ver = \false, 
 function fs_enqueue_local_script($handle, $path, $deps = array(), $ver = \false, $in_footer = 'all')
 {
 }
-function fs_img_url($path)
+function fs_img_url($path, $img_dir = \WP_FS__DIR_IMG)
 {
 }
 /* Request handlers.
@@ -5752,60 +5803,28 @@ function fs_ui_action_button($slug, $page, $action, $title, $params = array(), $
 function fs_ui_action_link($slug, $page, $action, $title, $params = array())
 {
 }
-/* Core Redirect (copied from BuddyPress).
-	--------------------------------------------------------------------------------------------*/
-/**
- * Redirects to another page, with a workaround for the IIS Set-Cookie bug.
- *
- * @link  http://support.microsoft.com/kb/q176113/
- * @since 1.5.1
- * @uses  apply_filters() Calls 'wp_redirect' hook on $location and $status.
- *
- * @param string $location The path to redirect to
- * @param int    $status   Status code to use
- *
- * @return bool False if $location is not set
- */
-function fs_redirect($location, $status = 302)
-{
-}
-/**
- * Sanitizes a URL for use in a redirect.
- *
- * @since 2.3
- *
- * @param string $location
- *
- * @return string redirect-sanitized URL
- */
-function fs_sanitize_redirect($location)
-{
-}
-/**
- * Removes any NULL characters in $string.
- *
- * @since 1.0.0
- *
- * @param string $string
- *
- * @return string
- */
-function fs_kses_no_null($string)
-{
-}
-/**
- * Normalize a filesystem path.
- *
- * Replaces backslashes with forward slashes for Windows systems, and ensures
- * no duplicate slashes exist.
- *
- * @param string $path Path to normalize.
- *
- * @return string Normalized path.
- */
-function fs_normalize_path($path)
-{
-}
+/*function fs_error_handler($errno, $errstr, $errfile, $errline)
+	{
+		if (false === strpos($errfile, 'freemius/'))
+		{
+			// @todo Dump Freemius errors to local log.
+		}
+
+//		switch ($errno) {
+//			case E_USER_ERROR:
+//				break;
+//			case E_WARNING:
+//			case E_USER_WARNING:
+//				break;
+//			case E_NOTICE:
+//			case E_USER_NOTICE:
+//				break;
+//			default:
+//				break;
+//		}
+	}
+
+	set_error_handler('fs_error_handler');*/
 function fs_nonce_url($actionurl, $action = -1, $name = '_wpnonce')
 {
 }
@@ -5863,6 +5882,137 @@ function fs_urlencode_rfc3986($input)
 }
 #endregion Url Canonization ------------------------------------------------------------------
 function fs_download_image($from, $to)
+{
+}
+/**
+ * Redirects to another page, with a workaround for the IIS Set-Cookie bug.
+ *
+ * @link  http://support.microsoft.com/kb/q176113/
+ * @since 1.5.1
+ * @uses  apply_filters() Calls 'wp_redirect' hook on $location and $status.
+ *
+ * @param string $location The path to redirect to
+ * @param int    $status   Status code to use
+ *
+ * @return bool False if $location is not set
+ */
+function fs_redirect($location, $status = 302)
+{
+}
+/**
+ * Sanitizes a URL for use in a redirect.
+ *
+ * @since 2.3
+ *
+ * @param string $location
+ *
+ * @return string redirect-sanitized URL
+ */
+function fs_sanitize_redirect($location)
+{
+}
+/**
+ * Removes any NULL characters in $string.
+ *
+ * @since 1.0.0
+ *
+ * @param string $string
+ *
+ * @return string
+ */
+function fs_kses_no_null($string)
+{
+}
+/**
+ * Retrieve a translated text by key.
+ *
+ * @author Vova Feldman (@svovaf)
+ * @since  1.1.4
+ *
+ * @param string $key
+ * @param string $slug
+ *
+ * @return string
+ *
+ * @global       $fs_text , $fs_text_overrides
+ */
+function __fs($key, $slug = 'freemius')
+{
+}
+/**
+ * Display a translated text by key.
+ *
+ * @author Vova Feldman (@svovaf)
+ * @since  1.1.4
+ *
+ * @param string $key
+ * @param string $slug
+ */
+function _efs($key, $slug = 'freemius')
+{
+}
+/**
+ * Override default i18n text phrases.
+ *
+ * @author Vova Feldman (@svovaf)
+ * @since  1.1.6
+ *
+ * @param string[] $key_value
+ * @param string   $slug
+ *
+ * @global         $fs_text_overrides
+ */
+function fs_override_i18n(array $key_value, $slug = 'freemius')
+{
+}
+/**
+ * Leverage backtrace to find caller plugin file path.
+ *
+ * @author Vova Feldman (@svovaf)
+ * @since  1.0.6
+ *
+ * @return string
+ */
+function fs_find_caller_plugin_file()
+{
+}
+/**
+ * Update SDK newest version reference.
+ *
+ * @author Vova Feldman (@svovaf)
+ * @since  1.1.6
+ *
+ * @param string      $sdk_relative_path
+ * @param string|bool $plugin_file
+ *
+ * @global            $fs_active_plugins
+ */
+function fs_update_sdk_newest_version($sdk_relative_path, $plugin_file = \false)
+{
+}
+/**
+ * Reorder the plugins load order so the plugin with the newest Freemius SDK is loaded first.
+ *
+ * @author Vova Feldman (@svovaf)
+ * @since  1.1.6
+ *
+ * @return bool Was plugin order changed. Return false if plugin was loaded first anyways.
+ *
+ * @global $fs_active_plugins
+ */
+function fs_newest_sdk_plugin_first()
+{
+}
+/**
+ * Go over all Freemius SDKs in the system and find and "remember"
+ * the newest SDK which is associated with an active plugin.
+ *
+ * @author Vova Feldman (@svovaf)
+ * @since  1.1.6
+ *
+ * @global $fs_active_plugins
+ */
+function fs_fallback_to_newest_active_sdk()
 {
 }
 /**
