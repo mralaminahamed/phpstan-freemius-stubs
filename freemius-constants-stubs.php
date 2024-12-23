@@ -18,7 +18,7 @@
 \define('FS_SDK__SIMULATE_NO_API_CONNECTIVITY_CLOUDFLARE', \true);
 \define('FS_SDK__SIMULATE_NO_API_CONNECTIVITY_SQUID_ACL', \true);
 // VVV default public network IP.
-\define('WP_FS__VVV_DEFAULT_PUBLIC_IP', '192.168.50.4');
+\define('WP_FS__VVV_DEFAULT_PUBLIC_IP', '192.168.50.1');
 /**
  * If true and running with secret key, the opt-in process
  * will skip the email activation process which is invoked
@@ -89,6 +89,7 @@
 \define('WP_FS__ECHO_DEBUG_SDK', !empty($_GET['fs_dbg_echo']));
 \define('WP_FS__LOG_DATETIME_FORMAT', 'Y-n-d H:i:s');
 \define('WP_FS__SCRIPT_START_TIME', \time());
+\define('WP_FS__DEFAULT_PRIORITY', 10);
 \define('WP_FS__LOWEST_PRIORITY', 999999999);
 \define('WP_FS__SECURITY_PARAMS_PREFIX', 's_');
 \define('FS_SDK__USER_AGENT', 'fs-php-' . \Freemius_Api_Base::VERSION);
@@ -112,5 +113,3 @@
 \define('FS_API__VERSION', '1');
 \define('FS_SDK__PATH', \dirname(__FILE__));
 \define('FS_SDK__EXCEPTIONS_PATH', \FS_SDK__PATH . '/Exceptions/');
-\define('WP_TPA__SLUG', 'test-plugin-addon');
-\define('WP_TP__SLUG', 'test-plugin');
