@@ -64,6 +64,7 @@
 \define('WP_FS___OPTION_PREFIX', 'fs' . (\WP_FS__IS_PRODUCTION_MODE ? '' : '_dbg') . '_');
 \define('WP_FS__ACCOUNTS_OPTION_NAME', \WP_FS___OPTION_PREFIX . 'accounts');
 \define('WP_FS__API_CACHE_OPTION_NAME', \WP_FS___OPTION_PREFIX . 'api_cache');
+\define('WP_FS__GDPR_OPTION_NAME', \WP_FS___OPTION_PREFIX . 'gdpr');
 \define('WP_FS__OPTIONS_OPTION_NAME', \WP_FS___OPTION_PREFIX . 'options');
 /**
  * Module types
@@ -86,7 +87,8 @@
 \define('WP_FS__PLAN_TRIAL', 'trial');
 \define('WP_FS__TIME_5_MIN_IN_SEC', 300);
 \define('WP_FS__TIME_10_MIN_IN_SEC', 600);
-\define('WP_FS__TIME_24_HOURS_IN_SEC', 86400);
+\define('WP_FS__TIME_12_HOURS_IN_SEC', 43200);
+\define('WP_FS__TIME_24_HOURS_IN_SEC', \WP_FS__TIME_12_HOURS_IN_SEC * 2);
 \define('WP_FS__TIME_WEEK_IN_SEC', 7 * \WP_FS__TIME_24_HOURS_IN_SEC);
 \define('WP_FS__DEBUG_SDK', \is_numeric($debug_mode) ? 0 < $debug_mode : \WP_FS__DEV_MODE);
 \define('WP_FS__ECHO_DEBUG_SDK', \WP_FS__DEV_MODE && !empty($_GET['fs_dbg_echo']));
@@ -99,6 +101,7 @@
 \define('WP_FS__IS_BLOG_ADMIN', \is_blog_admin() || \defined('DOING_AJAX') && \DOING_AJAX && isset($_REQUEST['_fs_blog_admin']));
 // Set to true to show network level settings even if delegated to site admins.
 \define('WP_FS__SHOW_NETWORK_EVEN_WHEN_DELEGATED', \false);
+\define('WP_FS__DEMO_MODE', \false);
 \define('WP_FS__SECURITY_PARAMS_PREFIX', 's_');
 \define('FS_API__VERSION', '1');
 \define('FS_SDK__PATH', \dirname(__FILE__));
