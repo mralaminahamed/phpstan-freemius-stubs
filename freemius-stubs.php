@@ -1489,6 +1489,14 @@ class Freemius extends \Freemius_Abstract
     private static function _load_required_static()
     {
     }
+    /**
+     * @author Leo Fajardo (@leorw)
+     *
+     * @since 2.1.3
+     */
+    private static function migrate_options_to_network()
+    {
+    }
     #----------------------------------------------------------------------------------
     #region Localization
     #----------------------------------------------------------------------------------
@@ -6245,6 +6253,31 @@ class Freemius extends \Freemius_Abstract
      * @since  1.2.1
      */
     function has_active_valid_license()
+    {
+    }
+    /**
+     * Check if a given license is active & valid (not expired).
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.1.3
+     *
+     * @param FS_Plugin_License $license
+     *
+     * @return bool
+     */
+    private static function is_active_valid_license($license)
+    {
+    }
+    /**
+     * Checks if there's any site that is associated with an active & valid license.
+     * This logic is used to determine if the admin can download the premium code base from a network level admin.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.1.3
+     *
+     * @return bool
+     */
+    function has_any_active_valid_license()
     {
     }
     /**
