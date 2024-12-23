@@ -575,6 +575,20 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Leverage backtrace to find caller plugin file path.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.0.6
+     *
+     * @return string
+     *
+     * @uses   fs_find_caller_plugin_file
+     */
+    private function _find_caller_plugin_file()
+    {
+    }
+    #region Deactivation Feedback Form ------------------------------------------------------------------
+    /**
      * Displays a confirmation and feedback dialog box when the user clicks on the "Deactivate" link on the plugins
      * page.
      *
@@ -605,19 +619,7 @@ class Freemius extends \Freemius_Abstract
     function _submit_uninstall_reason_action()
     {
     }
-    /**
-     * Leverage backtrace to find caller plugin file path.
-     *
-     * @author Vova Feldman (@svovaf)
-     * @since  1.0.6
-     *
-     * @return string
-     *
-     * @uses   fs_find_caller_plugin_file
-     */
-    private function _find_caller_plugin_file()
-    {
-    }
+    #endregion Deactivation Feedback Form ------------------------------------------------------------------
     #region Instance ------------------------------------------------------------------
     /**
      * Main singleton instance.
@@ -718,6 +720,17 @@ class Freemius extends \Freemius_Abstract
     function is_activation_mode()
     {
     }
+    /**
+     * Get collection of all active plugins.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.0.9
+     *
+     * @return array[string]array
+     */
+    private function get_active_plugins()
+    {
+    }
     private static $_statics_loaded = \false;
     /**
      * Load static resources.
@@ -734,6 +747,13 @@ class Freemius extends \Freemius_Abstract
      * @since  1.0.8
      */
     static function add_debug_page()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7.3
+     */
+    static function _toggle_debug_mode()
     {
     }
     /**
@@ -767,16 +787,27 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7.3
+     *
+     * @param bool $flush_if_no_connectivity
+     *
+     * @return bool
+     */
+    private function should_run_connectivity_test($flush_if_no_connectivity = \false)
+    {
+    }
+    /**
      * Check if there's any connectivity issue to Freemius API.
      *
      * @author Vova Feldman (@svovaf)
      * @since  1.0.9
      *
-     * @param bool $flush
+     * @param bool $flush_if_no_connectivity
      *
      * @return bool
      */
-    function has_api_connectivity($flush = \false)
+    function has_api_connectivity($flush_if_no_connectivity = \false)
     {
     }
     /**
@@ -799,17 +830,6 @@ class Freemius extends \Freemius_Abstract
      * @param mixed $api_result
      */
     function _add_connectivity_issue_message($api_result)
-    {
-    }
-    /**
-     * Get collection of all active plugins.
-     *
-     * @author Vova Feldman (@svovaf)
-     * @since  1.0.9
-     *
-     * @return array[string]array
-     */
-    private function get_active_plugins()
     {
     }
     /**
@@ -872,22 +892,6 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
-     * @param string[] $options
-     * @param string   $key
-     * @param mixed    $default
-     *
-     * @return bool
-     */
-    private function _get_option(&$options, $key, $default = \false)
-    {
-    }
-    private function _get_bool_option(&$options, $key, $default = \false)
-    {
-    }
-    private function _get_numeric_option(&$options, $key, $default = \false)
-    {
-    }
-    /**
      * Dynamic initiator, originally created to support initiation
      * with parent_id for add-ons.
      *
@@ -902,6 +906,46 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Parse plugin's settings (as defined by the plugin dev).
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7.3
+     *
+     * @param array $plugin_info
+     *
+     * @throws \Freemius_Exception
+     */
+    private function parse_settings(&$plugin_info)
+    {
+    }
+    /**
+     * @param string[] $options
+     * @param string   $key
+     * @param mixed    $default
+     *
+     * @return bool
+     */
+    private function get_option(&$options, $key, $default = \false)
+    {
+    }
+    private function get_bool_option(&$options, $key, $default = \false)
+    {
+    }
+    private function get_numeric_option(&$options, $key, $default = \false)
+    {
+    }
+    /**
+     * Gate keeper.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7.3
+     *
+     * @return bool
+     */
+    private function should_stop_execution()
+    {
+    }
+    /**
      * Handles plugin's code type change (free <--> premium).
      *
      * @author Vova Feldman (@svovaf)
@@ -913,21 +957,6 @@ class Freemius extends \Freemius_Abstract
     #endregion Initialization ------------------------------------------------------------------
     #region Add-ons -------------------------------------------------------------------------
     /**
-     * Generate add-on plugin information.
-     *
-     * @author Vova Feldman (@svovaf)
-     * @since  1.0.6
-     *
-     * @param array       $data
-     * @param string      $action
-     * @param object|null $args
-     *
-     * @return array|null
-     */
-    function _get_addon_info_filter($data, $action = '', $args = \null)
-    {
-    }
-    /**
      * Check if add-on installed and activated on site.
      *
      * @author Vova Feldman (@svovaf)
@@ -938,6 +967,19 @@ class Freemius extends \Freemius_Abstract
      * @return bool
      */
     function is_addon_activated($slug_or_id)
+    {
+    }
+    /**
+     * Check if add-on was connected to install
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7
+     *
+     * @param string $slug
+     *
+     * @return bool
+     */
+    function is_addon_connected($slug)
     {
     }
     /**
@@ -1010,6 +1052,16 @@ class Freemius extends \Freemius_Abstract
     function is_addon()
     {
     }
+    /**
+     * Deactivate add-on if it's premium only and the user does't have a valid license.
+     *
+     * @param bool $is_after_trial_cancel
+     *
+     * @return bool If add-on was deactivated.
+     */
+    private function deactivate_premium_only_addon_without_license($is_after_trial_cancel = \false)
+    {
+    }
     #endregion ------------------------------------------------------------------
     #region Sandbox ------------------------------------------------------------------
     /**
@@ -1078,17 +1130,163 @@ class Freemius extends \Freemius_Abstract
     function is_org_repo_compliant()
     {
     }
+    #region Daily Sync Cron ------------------------------------------------------------------
     /**
-     * Background sync every 24 hours.
-     *
      * @author Vova Feldman (@svovaf)
-     * @since  1.0.4
-     *
-     * @return bool If function actually executed the sync in this iteration.
+     * @since  1.1.7.3
      */
-    private function _background_sync()
+    private function run_manual_sync()
     {
     }
+    /**
+     * Data sync cron job. Replaces the background sync non blocking HTTP request
+     * that doesn't halt page loading.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7.3
+     */
+    function _sync_cron()
+    {
+    }
+    /**
+     * Check if sync was executed in the last $period of seconds.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7.3
+     *
+     * @param int $period In seconds
+     *
+     * @return bool
+     */
+    private function is_sync_executed($period = \WP_FS__TIME_24_HOURS_IN_SEC)
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7.3
+     *
+     * @return bool
+     */
+    private function is_sync_cron_on()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7.3
+     *
+     * @param int  $start_at        Defaults to now.
+     * @param bool $randomize_start If true, schedule first job randomly during the next 12 hours. Otherwise,
+     *                              schedule job to start right away.
+     */
+    private function schedule_sync_cron($start_at = \WP_FS__SCRIPT_START_TIME, $randomize_start = \true)
+    {
+    }
+    /**
+     * Add the actual sync function to the cron job hook.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7.3
+     */
+    private function hook_callback_to_sync_cron()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7.3
+     */
+    private function clear_sync_cron()
+    {
+    }
+    /**
+     * Unix timestamp for next sync cron execution or false if not scheduled.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7.3
+     *
+     * @return int|false
+     */
+    function next_sync_cron()
+    {
+    }
+    /**
+     * Unix timestamp for previous sync cron execution or false if never executed.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7.3
+     *
+     * @return int|false
+     */
+    function last_sync_cron()
+    {
+    }
+    #endregion Daily Sync Cron ------------------------------------------------------------------
+    #region Async Install Sync ------------------------------------------------------------------
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7.3
+     *
+     * @return bool
+     */
+    private function is_install_sync_scheduled()
+    {
+    }
+    /**
+     * Instead of running blocking install sync event, execute non blocking scheduled wp-cron.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7.3
+     */
+    private function schedule_install_sync()
+    {
+    }
+    /**
+     * Unix timestamp for previous install sync cron execution or false if never executed.
+     *
+     * @todo There's some very strange bug that $this->_storage->install_sync_timestamp value is not being updated. But for sure the sync event is working.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7.3
+     *
+     * @return int|false
+     */
+    function last_install_sync()
+    {
+    }
+    /**
+     * Unix timestamp for next install sync cron execution or false if not scheduled.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7.3
+     *
+     * @return int|false
+     */
+    function next_install_sync()
+    {
+    }
+    /**
+     * Add the actual install sync function to the cron job hook.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7.3
+     */
+    private function hook_callback_to_install_sync()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7.3
+     */
+    private function clear_install_sync_cron()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7.3
+     */
+    public function _run_sync_install()
+    {
+    }
+    #endregion Async Install Sync ------------------------------------------------------------------
     /**
      * Show a notice that activation is currently pending.
      *
@@ -1128,6 +1326,15 @@ class Freemius extends \Freemius_Abstract
      * @since  1.1.4
      */
     function _enqueue_connect_essentials()
+    {
+    }
+    /**
+     * Add connect / opt-in pointer.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.4
+     */
+    function _add_connect_pointer_script()
     {
     }
     /**
@@ -1251,6 +1458,15 @@ class Freemius extends \Freemius_Abstract
      * @since  1.1.3
      */
     private function reset_anonymous_mode()
+    {
+    }
+    /**
+     * Clears the anonymous mode and redirects to the opt-in screen.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7
+     */
+    function connect_again()
     {
     }
     /**
@@ -1565,8 +1781,12 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Get plugin add-ons.
+     *
      * @author Vova Feldman (@svovaf)
      * @since  1.0.6
+     *
+     * @since  1.1.7.3 If not yet loaded, fetch data from the API.
      *
      * @return FS_Plugin[]|false
      */
@@ -1672,6 +1892,17 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Check if currently in a trial with payment method (credit card or paypal).
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7
+     *
+     * @return bool
+     */
+    function is_paid_trial()
+    {
+    }
+    /**
      * Check if trial already utilized.
      *
      * @since 1.0.9
@@ -1718,6 +1949,17 @@ class Freemius extends \Freemius_Abstract
      * @return bool
      */
     function _has_premium_license()
+    {
+    }
+    /**
+     * Check if user has any licenses associated with the plugin (including expired or blocking).
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7.3
+     *
+     * @return bool
+     */
+    private function has_any_license()
     {
     }
     /**
@@ -1879,20 +2121,21 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.2
      *
-     * @uses   pricing_url
+     * @uses   pricing_url()
      *
      * @param string $period Billing cycle
+     * @param bool   $is_trial
      *
      * @return string
      */
-    function get_upgrade_url($period = \WP_FS__PERIOD_ANNUALLY)
+    function get_upgrade_url($period = \WP_FS__PERIOD_ANNUALLY, $is_trial = \false)
     {
     }
     /**
      * @author Vova Feldman (@svovaf)
      * @since  1.0.9
      *
-     * @uses   get_upgrade_url
+     * @uses   get_upgrade_url()
      *
      * @return string
      */
@@ -1905,27 +2148,44 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.4
      *
-     * @param string $period Billing cycle
+     * @param string $billing_cycle Billing cycle
+     *
+     * @param bool   $is_trial
      *
      * @return string
      */
-    function pricing_url($period = \WP_FS__PERIOD_ANNUALLY)
+    function pricing_url($billing_cycle = \WP_FS__PERIOD_ANNUALLY, $is_trial = \false)
     {
     }
     /**
      * Checkout page URL.
      *
-     * @author Vova Feldman (@svovaf)
-     * @since  1.0.6
+     * @author   Vova Feldman (@svovaf)
+     * @since    1.0.6
      *
-     * @param string      $period Billing cycle
-     * @param bool|string $plan_name
-     * @param bool|number $plan_id
-     * @param bool|int    $licenses
+     * @param string $billing_cycle Billing cycle
+     * @param bool   $is_trial
+     * @param array  $extra         (optional) Extra parameters, override other query params.
      *
      * @return string
      */
-    function checkout_url($period = \WP_FS__PERIOD_ANNUALLY, $plan_name = \false, $plan_id = \false, $licenses = \false)
+    function checkout_url($billing_cycle = \WP_FS__PERIOD_ANNUALLY, $is_trial = \false, $extra = array())
+    {
+    }
+    /**
+     * Add-on checkout URL.
+     *
+     * @author   Vova Feldman (@svovaf)
+     * @since    1.1.7
+     *
+     * @param number $addon_id
+     * @param number $pricing_id
+     * @param string $billing_cycle
+     * @param bool   $is_trial
+     *
+     * @return string
+     */
+    function addon_checkout_url($addon_id, $pricing_id, $billing_cycle = \WP_FS__PERIOD_ANNUALLY, $is_trial = \false)
     {
     }
     #endregion
@@ -1936,9 +2196,11 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.5
      *
+     * @since  1.1.7.3 Base logic only on the parameter provided by the developer in the init function.
+     *
      * @return bool
      */
-    function _has_addons()
+    function has_addons()
     {
     }
     /**
@@ -1985,6 +2247,26 @@ class Freemius extends \Freemius_Abstract
      * @link   http://wordpress.stackexchange.com/questions/70676/how-to-check-if-i-am-in-admin-ajax
      */
     function is_ajax()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7
+     *
+     * @return bool
+     */
+    function is_cron()
+    {
+    }
+    /**
+     * Check if a real user is visiting the admin dashboard.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7
+     *
+     * @return bool
+     */
+    function is_user_in_admin()
     {
     }
     /**
@@ -2279,6 +2561,20 @@ class Freemius extends \Freemius_Abstract
     private function order_sub_submenu_items()
     {
     }
+    /**
+     * Displays the Support Forum link when enabled.
+     *
+     * Can be filtered like so:
+     *
+     *  function _fs_show_support_menu( $is_visible, $menu_id ) {
+     *      if ( 'support' === $menu_id ) {
+     *            return _fs->is_registered();
+     *        }
+     *        return $is_visible;
+     *    }
+     *    _fs()->add_filter('is_submenu_visible', '_fs_show_support_menu', 10, 2);
+     *
+     */
     function _add_default_submenu_items()
     {
     }
@@ -2315,6 +2611,17 @@ class Freemius extends \Freemius_Abstract
     #endregion ------------------------------------------------------------------
     /* Actions / Hooks / Filters
     		------------------------------------------------------------------------------------------------------------------*/
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7
+     *
+     * @param string $tag
+     *
+     * @return string
+     */
+    private function get_action_tag($tag)
+    {
+    }
     /**
      * Do action, specific for the current context plugin.
      *
@@ -2627,10 +2934,11 @@ class Freemius extends \Freemius_Abstract
      * @since  1.0.4
      *
      * @param bool|number $plugin_id
+     * @param bool        $flush Since 1.1.7.3
      *
      * @return object|false New plugin tag info if exist.
      */
-    private function _fetch_newer_version($plugin_id = \false)
+    private function _fetch_newer_version($plugin_id = \false, $flush = \true)
     {
     }
     /**
@@ -2638,10 +2946,11 @@ class Freemius extends \Freemius_Abstract
      * @since  1.0.5
      *
      * @param bool|number $plugin_id
+     * @param bool        $flush Since 1.1.7.3
      *
      * @return bool|FS_Plugin_Tag
      */
-    function get_update($plugin_id = \false)
+    function get_update($plugin_id = \false, $flush = \true)
     {
     }
     /**
@@ -2662,6 +2971,17 @@ class Freemius extends \Freemius_Abstract
      * @return bool
      */
     function has_features_enabled_license()
+    {
+    }
+    /**
+     * Check if user is a trial or have feature enabled license.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7
+     *
+     * @return bool
+     */
+    function can_use_premium_code()
     {
     }
     /**
@@ -2784,10 +3104,11 @@ class Freemius extends \Freemius_Abstract
      * @since  1.0.4
      *
      * @param bool|number $addon_id
+     * @param bool        $flush Since 1.1.7.3
      *
      * @return object|false Plugin latest tag info.
      */
-    function _fetch_latest_version($addon_id = \false)
+    function _fetch_latest_version($addon_id = \false, $flush = \true)
     {
     }
     #region Download Plugin ------------------------------------------------------------------
@@ -2875,18 +3196,22 @@ class Freemius extends \Freemius_Abstract
      * @param bool        $background Hints the method if it's a background updates check. If false, it means that
      *                                was initiated by the admin.
      * @param bool|number $plugin_id
+     * @param bool        $flush      Since 1.1.7.3
      */
-    private function _check_updates($background = \false, $plugin_id = \false)
+    private function _check_updates($background = \false, $plugin_id = \false, $flush = \true)
     {
     }
     /**
      * @author Vova Feldman (@svovaf)
      * @since  1.0.4
      *
-     * @uses   FS_Api
+     * @param bool $flush Since 1.1.7.3 by default add 24 hour cache.
      *
+     * @return FS_Plugin[]
+     *
+     * @uses   FS_Api
      */
-    private function _sync_addons()
+    private function _sync_addons($flush = \false)
     {
     }
     /**
@@ -3552,15 +3877,15 @@ class FS_Api
     /**
      * Ping API for connectivity test, and return result object.
      *
-     * @author Vova Feldman (@svovaf)
-     * @since  1.0.9
+     * @author   Vova Feldman (@svovaf)
+     * @since    1.0.9
      *
      * @param null|string $unique_anonymous_id
-     * @param bool        $is_update False if new plugin installation.
+     * @param array       $params
      *
      * @return object
      */
-    function ping($unique_anonymous_id = \null, $is_update = \false)
+    function ping($unique_anonymous_id = \null, $params = array())
     {
     }
     /**
@@ -3641,6 +3966,12 @@ class FS_Logger
     function is_echo_on()
     {
     }
+    function get_id()
+    {
+    }
+    function get_file()
+    {
+    }
     private function _log(&$message, $type = 'log', $wrapper)
     {
     }
@@ -3662,13 +3993,16 @@ class FS_Logger
     function departure($message = '', $wrapper = \false)
     {
     }
-    private static function _format($log, $show_type = \true)
+    private static function format($log, $show_type = \true)
     {
     }
-    private static function _format_html($log)
+    private static function format_html($log)
     {
     }
     static function dump()
+    {
+    }
+    static function get_log()
     {
     }
 }
@@ -3686,6 +4020,11 @@ class FS_Plugin_Updater
      * @since 1.0.4
      */
     private $_logger;
+    /**
+     * @var bool
+     * @since 1.1.7
+     */
+    private $_update_checked = \false;
     function __construct(\Freemius $freemius)
     {
     }
@@ -3762,11 +4101,11 @@ class FS_Plugin_Updater
      * @since  1.0.5
      *
      * @param string $action
-     * @param array  $args
+     * @param object $args
      *
      * @return bool|mixed
      */
-    private function _fetch_plugin_info_from_repository($action, $args)
+    static function _fetch_plugin_info_from_repository($action, $args)
     {
     }
     /**
@@ -4039,13 +4378,38 @@ class FS_Plugin_Plan extends \FS_Entity
 {
     #region Properties
     /**
+     * @var number
+     */
+    public $plugin_id;
+    /**
+     * @var string
+     */
+    public $name;
+    /**
      * @var string
      */
     public $title;
     /**
      * @var string
      */
-    public $name;
+    public $description;
+    /**
+     * @var bool Defaults to true. If true, allow unlimited localhost installs with the same license.
+     */
+    public $is_free_localhost;
+    /**
+     * @var bool Defaults to true. If false, don't block features after license expiry - only block updates and
+     *      support.
+     */
+    public $is_block_features;
+    /**
+     * @var int
+     */
+    public $license_type;
+    /**
+     * @var bool
+     */
+    public $is_https_support;
     /**
      * @var int Trial days.
      */
@@ -4054,6 +4418,34 @@ class FS_Plugin_Plan extends \FS_Entity
      * @var string If true, require payment for trial.
      */
     public $is_require_subscription;
+    /**
+     * @var string Knowledge Base URL.
+     */
+    public $support_kb;
+    /**
+     * @var string Support Forum URL.
+     */
+    public $support_forum;
+    /**
+     * @var string Support email address.
+     */
+    public $support_email;
+    /**
+     * @var string Support phone.
+     */
+    public $support_phone;
+    /**
+     * @var string Support skype username.
+     */
+    public $support_skype;
+    /**
+     * @var bool Is personal success manager supported with the plan.
+     */
+    public $is_success_manager;
+    /**
+     * @var bool Is featured plan.
+     */
+    public $is_featured;
     #endregion Properties
     /**
      * @param object|bool $plan
@@ -4177,12 +4569,54 @@ class FS_Plugin extends \FS_Scope_Entity
     {
     }
 }
+class FS_Pricing extends \FS_Entity
+{
+    #region Properties
+    /**
+     * @var number
+     */
+    public $plan_id;
+    /**
+     * @var int
+     */
+    public $licenses;
+    /**
+     * @var null|float
+     */
+    public $monthly_price;
+    /**
+     * @var null|float
+     */
+    public $annual_price;
+    /**
+     * @var null|float
+     */
+    public $lifetime_price;
+    #endregion Properties
+    /**
+     * @param object|bool $pricing
+     */
+    function __construct($pricing = \false)
+    {
+    }
+    static function get_type()
+    {
+    }
+}
 class FS_Site extends \FS_Scope_Entity
 {
     /**
      * @var string
      */
     public $slug;
+    /**
+     * @var number
+     */
+    public $site_id;
+    /**
+     * @var number
+     */
+    public $plugin_id;
     /**
      * @var number
      */
@@ -4369,6 +4803,13 @@ class FS_Subscription extends \FS_Entity
     function is_first_payment_pending()
     {
     }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7
+     */
+    function has_trial()
+    {
+    }
 }
 class FS_User extends \FS_Scope_Entity
 {
@@ -4411,6 +4852,102 @@ class FS_User extends \FS_Scope_Entity
     {
     }
     static function get_type()
+    {
+    }
+}
+/**
+ * Class FS_Plugin_Info_Dialog
+ *
+ * @author Vova Feldman (@svovaf)
+ * @since  1.1.7
+ */
+class FS_Plugin_Info_Dialog
+{
+    /**
+     * @since 1.1.7
+     *
+     * @var FS_Logger
+     */
+    private $_logger;
+    /**
+     * @since 1.1.7
+     *
+     * @var Freemius
+     */
+    private $_fs;
+    function __construct(\Freemius $fs)
+    {
+    }
+    /**
+     * Generate add-on plugin information.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.0.6
+     *
+     * @param array       $data
+     * @param string      $action
+     * @param object|null $args
+     *
+     * @return array|null
+     */
+    function _get_addon_info_filter($data, $action = '', $args = \null)
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7
+     *
+     * @param FS_Plugin_Plan $plan
+     *
+     * @return string
+     */
+    private function get_billing_cycle(\FS_Plugin_Plan $plan)
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7
+     *
+     * @param \FS_Plugin_Plan $plan
+     * @param \FS_Pricing     $pricing
+     *
+     * @return float|null|string
+     */
+    private function get_price_tag(\FS_Plugin_Plan $plan, \FS_Pricing $pricing)
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7
+     *
+     * @param object              $api
+     * @param FS_Plugin_Plan|null $plan
+     *
+     * @return string
+     */
+    private function get_plugin_cta($api, $plan = \null)
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7
+     *
+     * @param FS_Plugin_Plan $plan
+     *
+     * @return string
+     */
+    private function get_trial_period($plan)
+    {
+    }
+    /**
+     * Display plugin information in dialog box form.
+     *
+     * Based on core install_plugin_information() function.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.0.6
+     */
+    function install_plugin_information()
     {
     }
 }
@@ -5020,6 +5557,19 @@ class FS_Cache_Manager
      * @param int    $expiration
      */
     function set($key, $value, $expiration = \WP_FS__TIME_24_HOURS_IN_SEC)
+    {
+    }
+    /**
+     * Get cached record expiration, or false if not cached or expired.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.7.3
+     *
+     * @param string $key
+     *
+     * @return bool|int
+     */
+    function get_record_expiration($key)
     {
     }
     /**
@@ -5756,10 +6306,7 @@ abstract class Freemius_Api_Base
 }
 class Freemius_Api extends \Freemius_Api_Base
 {
-    /**
-     * Default options for curl.
-     */
-    public static $CURL_OPTS = array(\CURLOPT_CONNECTTIMEOUT => 10, \CURLOPT_RETURNTRANSFER => \true, \CURLOPT_TIMEOUT => 60, \CURLOPT_USERAGENT => \FS_SDK__USER_AGENT);
+    private static $_logger = array();
     /**
      * @param string      $pScope   'app', 'developer', 'user' or 'install'.
      * @param number      $pID      Element's id.
@@ -5843,6 +6390,21 @@ class Freemius_Api extends \Freemius_Api_Base
      * @return string
      */
     function GetSignedUrl($pPath)
+    {
+    }
+    /**
+     * @param resource $pCurlHandler
+     * @param array    $pCurlOptions
+     *
+     * @return mixed
+     */
+    private static function ExecuteRequest(&$pCurlHandler, &$pCurlOptions)
+    {
+    }
+    /**
+     * @return array
+     */
+    static function GetLogger()
     {
     }
     /**
@@ -6022,7 +6584,39 @@ function fs_is_plugin_page($menu_slug)
 }
 /* Core UI.
 	--------------------------------------------------------------------------------------------*/
-function fs_ui_action_button($slug, $page, $action, $title, $params = array(), $is_primary = \true)
+/**
+ * @param string      $slug
+ * @param string      $page
+ * @param string      $action
+ * @param string      $title
+ * @param array       $params
+ * @param bool        $is_primary
+ * @param string|bool $icon_class   Optional class for an icon (since 1.1.7).
+ * @param string|bool $confirmation Optional confirmation message before submit (since 1.1.7).
+ * @param string      $method       Since 1.1.7
+ *
+ * @uses fs_ui_get_action_button()
+ */
+function fs_ui_action_button($slug, $page, $action, $title, $params = array(), $is_primary = \true, $icon_class = \false, $confirmation = \false, $method = 'GET')
+{
+}
+/**
+ * @author Vova Feldman (@svovaf)
+ * @since  1.1.7
+ *
+ * @param string      $slug
+ * @param string      $page
+ * @param string      $action
+ * @param string      $title
+ * @param array       $params
+ * @param bool        $is_primary
+ * @param string|bool $icon_class   Optional class for an icon.
+ * @param string|bool $confirmation Optional confirmation message before submit.
+ * @param string      $method
+ *
+ * @return string
+ */
+function fs_ui_get_action_button($slug, $page, $action, $title, $params = array(), $is_primary = \true, $icon_class = \false, $confirmation = \false, $method = 'GET')
 {
 }
 function fs_ui_action_link($slug, $page, $action, $title, $params = array())
@@ -6107,6 +6701,22 @@ function fs_urlencode_rfc3986($input)
 }
 #endregion Url Canonization ------------------------------------------------------------------
 function fs_download_image($from, $to)
+{
+}
+/* General Utilities
+	--------------------------------------------------------------------------------------------*/
+/**
+ * Sorts an array by the value of the priority key.
+ *
+ * @author Daniel Iser (@danieliser)
+ * @since  1.1.7
+ *
+ * @param $a
+ * @param $b
+ *
+ * @return int
+ */
+function fs_sort_by_priority($a, $b)
 {
 }
 /**
@@ -6202,7 +6812,7 @@ function fs_get_ip()
 {
 }
 /**
- * Leverage backtrace to find caller plugin file path.
+ * Leverage backtrace to find caller plugin main file path.
  *
  * @author Vova Feldman (@svovaf)
  * @since  1.0.6
@@ -6270,11 +6880,16 @@ function fs_apply_filter($slug, $tag, $value)
 {
 }
 /**
- * Display plugin information in dialog box form.
+ * Find the plugin main file path based on any give file inside the plugin's folder.
  *
- * @since 2.7.0
+ * @author Vova Feldman (@svovaf)
+ * @since  1.1.7.1
+ *
+ * @param string $file Absolute path to a file inside a plugin's folder.
+ *
+ * @return string
  */
-function fs_install_plugin_information()
+function fs_find_direct_caller_plugin_file($file)
 {
 }
 /**
