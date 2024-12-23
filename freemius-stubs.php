@@ -340,7 +340,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @var string
      */
-    public $version = '1.1.3';
+    public $version = '1.1.4';
     #region Plugin Info
     /**
      * @since 1.0.1
@@ -2152,6 +2152,27 @@ class Freemius extends \Freemius_Abstract
      * @since  1.0.0
      */
     private function add_submenu_items()
+    {
+    }
+    /**
+     * Moved the actual submenu item additions to a separated function,
+     * in order to support sub-submenu items when the plugin's settings
+     * only have a submenu and not top-level menu item.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.4
+     */
+    private function embed_submenu_items()
+    {
+    }
+    /**
+     * Re-order the submenu items so all Freemius added new submenu items
+     * are added right after the plugin's settings submenu item.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.4
+     */
+    private function order_sub_submenu_items()
     {
     }
     function _add_default_submenu_items()
@@ -4349,6 +4370,9 @@ class FS_Admin_Menu_Manager
     {
     }
     /**
+     * Calculates admin settings menu slug.
+     * If plugin's menu slug is a file (e.g. CPT), uses plugin's slug as the menu slug.
+     *
      * @author Vova Feldman (@svovaf)
      * @since  1.1.3
      *
@@ -4483,6 +4507,18 @@ class FS_Admin_Menu_Manager
      * @return array[string]mixed
      */
     function remove_menu_item()
+    {
+    }
+    /**
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.4
+     *
+     * @param callable $function
+     *
+     * @return array[string]mixed
+     */
+    function override_menu_item($function)
     {
     }
     #endregion Top level menu Override
