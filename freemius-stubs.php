@@ -432,6 +432,11 @@ class Freemius extends \Freemius_Abstract
      */
     private $_enable_anonymous;
     /**
+     * @since 1.1.7.5
+     * @var bool Hints the SDK if plugin should run in anonymous mode (only adds feedback form).
+     */
+    private $_anonymous_mode;
+    /**
      * @since 1.0.8
      * @var bool Hints the SDK if the plugin has any paid plans.
      */
@@ -799,7 +804,7 @@ class Freemius extends \Freemius_Abstract
     }
     /**
      * @author Vova Feldman (@svovaf)
-     * @since  1.7.4
+     * @since  1.1.7.4
      *
      * @return object|false
      */
@@ -821,7 +826,7 @@ class Freemius extends \Freemius_Abstract
     }
     /**
      * @author Vova Feldman (@svovaf)
-     * @since  1.7.4
+     * @since  1.1.7.4
      *
      * @param object $pong
      * @param bool   $is_connected
@@ -842,7 +847,7 @@ class Freemius extends \Freemius_Abstract
     }
     /**
      * @author Vova Feldman (@svovaf)
-     * @since  1.7.4
+     * @since  1.1.7.4
      *
      * @return \WP_User
      */
@@ -876,7 +881,7 @@ class Freemius extends \Freemius_Abstract
      * Handle connectivity test retry approved by the user.
      *
      * @author Vova Feldman (@svovaf)
-     * @since  1.7.4
+     * @since  1.1.7.4
      */
     function _retry_connectivity_test()
     {
@@ -3638,7 +3643,7 @@ class Freemius extends \Freemius_Abstract
      * Get the URL of the page that should be loaded right after the plugin activation.
      *
      * @author Vova Feldman (@svovaf)
-     * @since  1.7.4
+     * @since  1.1.7.4
      *
      * @return string
      */
