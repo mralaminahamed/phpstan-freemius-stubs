@@ -14158,15 +14158,19 @@ class FS_Key_Value_Storage implements \ArrayAccess, \Iterator, \Countable
     function __get($k)
     {
     }
+    #[\ReturnTypeWillChange]
     function offsetSet($k, $v)
     {
     }
+    #[\ReturnTypeWillChange]
     function offsetExists($k)
     {
     }
+    #[\ReturnTypeWillChange]
     function offsetUnset($k)
     {
     }
+    #[\ReturnTypeWillChange]
     function offsetGet($k)
     {
     }
@@ -14177,6 +14181,7 @@ class FS_Key_Value_Storage implements \ArrayAccess, \Iterator, \Countable
      * @link http://php.net/manual/en/iterator.current.php
      * @return mixed Can return any type.
      */
+    #[\ReturnTypeWillChange]
     public function current()
     {
     }
@@ -14187,6 +14192,7 @@ class FS_Key_Value_Storage implements \ArrayAccess, \Iterator, \Countable
      * @link http://php.net/manual/en/iterator.next.php
      * @return void Any returned value is ignored.
      */
+    #[\ReturnTypeWillChange]
     public function next()
     {
     }
@@ -14197,6 +14203,7 @@ class FS_Key_Value_Storage implements \ArrayAccess, \Iterator, \Countable
      * @link http://php.net/manual/en/iterator.key.php
      * @return mixed scalar on success, or null on failure.
      */
+    #[\ReturnTypeWillChange]
     public function key()
     {
     }
@@ -14208,6 +14215,7 @@ class FS_Key_Value_Storage implements \ArrayAccess, \Iterator, \Countable
      * @return boolean The return value will be casted to boolean and then evaluated.
      *       Returns true on success or false on failure.
      */
+    #[\ReturnTypeWillChange]
     public function valid()
     {
     }
@@ -14218,6 +14226,7 @@ class FS_Key_Value_Storage implements \ArrayAccess, \Iterator, \Countable
      * @link http://php.net/manual/en/iterator.rewind.php
      * @return void Any returned value is ignored.
      */
+    #[\ReturnTypeWillChange]
     public function rewind()
     {
     }
@@ -14231,6 +14240,7 @@ class FS_Key_Value_Storage implements \ArrayAccess, \Iterator, \Countable
      *       <p>
      *       The return value is cast to an integer.
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
     }
