@@ -1262,14 +1262,15 @@ class Freemius extends \Freemius_Abstract
     /**
      * Leverage backtrace to find caller plugin file path.
      *
-     * @author Vova Feldman (@svovaf)
-     * @since  1.0.6
-     *
-     * @param  bool $is_init Is initiation sequence.
+     * @param bool   $is_init   Is initiation sequence.
+     * @param string $main_file Since 2.5.0 expects the module's main file path to potentially purge the cached path.
      *
      * @return string
+     * @since  1.0.6
+     *
+     * @author Vova Feldman (@svovaf)
      */
-    private function _find_caller_plugin_file($is_init = \false)
+    private function _find_caller_plugin_file($is_init = \false, $main_file = '')
     {
     }
     /**
@@ -1312,6 +1313,8 @@ class Freemius extends \Freemius_Abstract
      * @param number $module_id
      * @param string $slug
      *
+     * @return string Since 2.5.0 return the module's main file path.
+     *
      * @since  1.2.2
      */
     private function store_id_slug_type_path_map($module_id, $slug)
@@ -1328,8 +1331,10 @@ class Freemius extends \Freemius_Abstract
      *         add-ons are relying on loading the SDK from the parent module, and also allows themes including the
      *         SDK an internal file instead of directly from functions.php.
      * @since  1.2.1.7 Knows how to handle cases when an add-on includes the parent module logic.
+     *
+     * @param number $module_id @since 2.5.0
      */
-    private function get_caller_main_file_and_type()
+    private function get_caller_main_file_and_type($module_id)
     {
     }
     #----------------------------------------------------------------------------------
@@ -1367,6 +1372,54 @@ class Freemius extends \Freemius_Abstract
     function _submit_uninstall_reason_action()
     {
     }
+    #--------------------------------------------------------------------------------
+    #region Deactivation Feedback Snoozing
+    #--------------------------------------------------------------------------------
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  2.4.3
+     *
+     * @param int $period
+     *
+     * @return bool True if the value was set, false otherwise.
+     */
+    private static function snooze_deactivation_form($period)
+    {
+    }
+    /**
+     * Check if deactivation feedback form is snoozed.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.4.3
+     *
+     * @return bool
+     */
+    static function is_deactivation_snoozed()
+    {
+    }
+    /**
+     * Reset deactivation snoozing. When `$period` is `0` will stop deactivation snoozing by deleting the transients. Otherwise, will set the transients for the selected period.
+     *
+     * @param int $period Period in seconds.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.4.3
+     */
+    private static function reset_deactivation_snoozing($period = 0)
+    {
+    }
+    /**
+     * The deactivation snooze expiration UNIX timestamp (in sec).
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.4.3
+     *
+     * @return int
+     */
+    static function deactivation_snooze_expires_at()
+    {
+    }
+    #endregion
     /**
      * @author Leo Fajardo (@leorw)
      * @since  2.1.4
@@ -1476,6 +1529,12 @@ class Freemius extends \Freemius_Abstract
      * @return false|Freemius
      */
     function get_addon_instance($id_or_slug)
+    {
+    }
+    /**
+     * @return Freemius[]
+     */
+    static function _get_all_instances()
     {
     }
     #endregion ------------------------------------------------------------------
@@ -1674,6 +1733,44 @@ class Freemius extends \Freemius_Abstract
     private static function _load_required_static()
     {
     }
+    #--------------------------------------------------------------------------------
+    #region Clone
+    #--------------------------------------------------------------------------------
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.0
+     *
+     * @return bool
+     */
+    private function is_unresolved_clone()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.0
+     */
+    function is_clone()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.0
+     *
+     * @param number $site_id
+     */
+    function fetch_install_by_id($site_id)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.0
+     *
+     * @return string|object|bool
+     */
+    function _handle_long_term_duplicate()
+    {
+    }
+    #endregion
     /**
      * @author Leo Fajardo (@leorw)
      *
@@ -1738,6 +1835,15 @@ class Freemius extends \Freemius_Abstract
      * @since  1.0.8
      */
     static function _debug_page_actions()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.5.0
+     * 
+     * @return array
+     */
+    static function get_all_modules_sites()
     {
     }
     /**
@@ -1833,6 +1939,16 @@ class Freemius extends \Freemius_Abstract
      * @return string
      */
     function get_anonymous_id($blog_id = \null)
+    {
+    }
+    /**
+     * Returns anonymous network ID.
+     *
+     * @since  2.4.3
+     *
+     * @return string
+     */
+    function get_anonymous_network_id()
     {
     }
     /**
@@ -2681,6 +2797,13 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.5.0
+     */
+    private function maybe_schedule_sync_cron()
+    {
+    }
+    /**
      * @author Vova Feldman (@svovaf)
      * @since  1.1.7.3
      *
@@ -2832,13 +2955,16 @@ class Freemius extends \Freemius_Abstract
     /**
      * Show a notice that activation is currently pending.
      *
+     * @todo Add some sort of mechanism to allow users to update the email address they would like to opt-in with when $is_suspicious_email is true.
+     *
      * @author Vova Feldman (@svovaf)
      * @since  1.0.7
      *
      * @param bool|string $email
      * @param bool        $is_pending_trial Since 1.2.1.5
+     * @param bool        $is_suspicious_email Since 2.5.0 Set to true when there's an indication that email address the user opted in with is fake/dummy/placeholder.
      */
-    function _add_pending_activation_notice($email = \false, $is_pending_trial = \false)
+    function _add_pending_activation_notice($email = \false, $is_pending_trial = \false, $is_suspicious_email = \false)
     {
     }
     /**
@@ -2919,7 +3045,7 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /* Events
-    		------------------------------------------------------------------------------------------------------------------*/
+       ------------------------------------------------------------------------------------------------------------------*/
     /**
      * Delete site install from Database.
      *
@@ -3201,7 +3327,17 @@ class Freemius extends \Freemius_Abstract
      * @uses   Freemius::is_network_anonymous() to check if the super-admin network skipped.
      * @uses   Freemius::is_network_delegated_connection() to check if the super-admin network delegated the connection to the site admins.
      */
-    function _after_new_blog_callback($blog_id, $user_id, $domain, $path, $network_id, $meta)
+    public function _after_new_blog_callback($blog_id, $user_id, $domain, $path, $network_id, $meta)
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  2.5.0
+     *
+     * @param \WP_Site $new_site
+     * @param array    $args
+     */
+    public function _after_wp_initialize_site_callback(\WP_Site $new_site, $args)
     {
     }
     /**
@@ -3338,12 +3474,13 @@ class Freemius extends \Freemius_Abstract
      *
      * @param string[] string           $override
      * @param bool     $only_diff
+     * @param bool     $is_keepalive
      * @param bool     $include_plugins Since 1.1.8 by default include plugin changes.
      * @param bool     $include_themes  Since 1.1.8 by default include plugin changes.
      *
      * @return array
      */
-    private function get_installs_data_for_api(array $override, $only_diff = \false, $include_plugins = \true, $include_themes = \true)
+    private function get_installs_data_for_api(array $override, $only_diff = \false, $is_keepalive = \false, $include_plugins = \true, $include_themes = \true)
     {
     }
     /**
@@ -3369,10 +3506,11 @@ class Freemius extends \Freemius_Abstract
      *
      * @param string[] string $override
      * @param bool     $flush
+     * @param bool     $is_two_way_sync @since 2.5.0 If true and there's a successful API request, the install sync cron will be cleared.
      *
      * @return false|object|string
      */
-    private function send_install_update($override = array(), $flush = \false)
+    private function send_install_update($override = array(), $flush = \false, $is_two_way_sync = \false)
     {
     }
     /**
@@ -3383,10 +3521,11 @@ class Freemius extends \Freemius_Abstract
      *
      * @param string[] string $override
      * @param bool     $flush
+     * @param bool     $is_two_way_sync @since 2.5.0 If true and there's a successful API request, the install sync cron will be cleared.
      *
      * @return false|object|string
      */
-    private function send_installs_update($override = array(), $flush = \false)
+    private function send_installs_update($override = array(), $flush = \false, $is_two_way_sync = \false)
     {
     }
     /**
@@ -3417,7 +3556,7 @@ class Freemius extends \Freemius_Abstract
      * @param string[] string $override
      * @param bool     $flush
      */
-    private function sync_install($override = array(), $flush = \false)
+    function sync_install($override = array(), $flush = \false)
     {
     }
     /**
@@ -3754,7 +3893,7 @@ class Freemius extends \Freemius_Abstract
     }
     #endregion ------------------------------------------------------------------
     /* Account
-    		------------------------------------------------------------------------------------------------------------------*/
+       ------------------------------------------------------------------------------------------------------------------*/
     /**
      * Find plugin's slug by plugin's basename.
      *
@@ -3789,7 +3928,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return array[string]FS_Site
      */
-    private static function get_all_sites($module_type = \WP_FS__MODULE_TYPE_PLUGIN, $blog_id = \null)
+    private static function get_all_sites($module_type = \WP_FS__MODULE_TYPE_PLUGIN, $blog_id = \null, $is_backup = \false)
     {
     }
     /**
@@ -4024,6 +4163,29 @@ class Freemius extends \Freemius_Abstract
      * @return FS_Site
      */
     function get_site()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.0
+     */
+    function store_site($site)
+    {
+    }
+    /**
+     * Deletes the current install with an option to back it up in case restoration will be needed (e.g., if the automatic clone resolution attempt fails).
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.0
+     */
+    function delete_current_install($back_up)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.0
+     */
+    function restore_backup_site()
     {
     }
     /**
@@ -4749,6 +4911,29 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Displays an email address update dialog box when the user clicks on the email address "Edit" button on the "Account" page.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  2.5.0
+     */
+    function _add_email_address_update_dialog_box()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.0
+     */
+    function _add_email_address_update_option()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.0
+     */
+    function _email_address_update_ajax_handler()
+    {
+    }
+    /**
      * Returns a collection of IDs of installs that are associated with the context product and its add-ons, and activated with foreign licenses.
      *
      * @author Leo Fajardo (@leorw)
@@ -5391,6 +5576,15 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.5.0
+     *
+     * @return bool
+     */
+    static function is_admin_post()
+    {
+    }
+    /**
      * Check if a real user is visiting the admin dashboard.
      *
      * @author Vova Feldman (@svovaf)
@@ -5527,12 +5721,17 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * @todo Implement pagination when accessing the subsites collection.
+     *
      * @author Leo Fajardo (@leorw)
      * @since  2.0.0
      *
+     * @param int $limit  Default to 1,000
+     * @param int $offset Default to 0
+     *
      * @return array Active & public sites collection.
      */
-    static function get_sites()
+    static function get_sites($limit = 1000, $offset = 0)
     {
     }
     /**
@@ -5611,10 +5810,11 @@ class Freemius extends \Freemius_Abstract
      *
      * @param int     $blog_id
      * @param FS_Site $install
+     * @param bool    $flush
      *
      * @return bool Since 2.3.1 returns if a switch was made.
      */
-    function switch_to_blog($blog_id, \FS_Site $install = \null)
+    function switch_to_blog($blog_id, \FS_Site $install = \null, $flush = \false)
     {
     }
     /**
@@ -5798,6 +5998,17 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Executed after site deletion, called from wp_delete_site
+     *
+     * @author Dario Curvino (@dudo)
+     * @since  2.5.0
+     *
+     * @param WP_Site $old_site
+     */
+    public function _after_wpsite_deleted_callback(\WP_Site $old_site)
+    {
+    }
+    /**
      * Executed after site re-activation.
      *
      * @author Vova Feldman (@svovaf)
@@ -5967,7 +6178,7 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /* Logger
-    		------------------------------------------------------------------------------------------------------------------*/
+       ------------------------------------------------------------------------------------------------------------------*/
     /**
      * @param string $id
      * @param bool   $prefix_slug
@@ -5990,7 +6201,7 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /* Security
-    		------------------------------------------------------------------------------------------------------------------*/
+       ------------------------------------------------------------------------------------------------------------------*/
     private static function _encrypt($str)
     {
     }
@@ -6137,11 +6348,12 @@ class Freemius extends \Freemius_Abstract
      * @param bool        $is_disconnected      Whether or not to opt in without tracking.
      * @param null|bool   $is_marketing_allowed
      * @param array       $sites                If network-level opt-in, an array of containing details of sites.
+     * @param bool        $redirect
      *
      * @return string|object
      * @use    WP_Error
      */
-    function opt_in($email = \false, $first = \false, $last = \false, $license_key = \false, $is_uninstall = \false, $trial_plan_id = \false, $is_disconnected = \false, $is_marketing_allowed = \null, $sites = array())
+    function opt_in($email = \false, $first = \false, $last = \false, $license_key = \false, $is_uninstall = \false, $trial_plan_id = \false, $is_disconnected = \false, $is_marketing_allowed = \null, $sites = array(), $redirect = \true)
     {
     }
     /**
@@ -6275,7 +6487,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return string Since 1.2.1.5 if $redirect is `false`, return the pending activation page.
      */
-    private function set_pending_confirmation($email = \false, $redirect = \true, $license_key = \false, $is_pending_trial = \false)
+    private function set_pending_confirmation($email = \false, $redirect = \true, $license_key = \false, $is_pending_trial = \false, $is_suspicious_email = \false)
     {
     }
     /**
@@ -6298,7 +6510,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return object|string If redirect is `false`, returns the next page the user should be redirected to, or the API error object if failed to install.
      */
-    private function install_with_current_user($license_key = \false, $trial_plan_id = \false, $sites = array(), $redirect = \true)
+    function install_with_current_user($license_key = \false, $trial_plan_id = \false, $sites = array(), $redirect = \true)
     {
     }
     /**
@@ -6690,7 +6902,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return string
      */
-    private static function get_ajax_action_static($tag, $module_id = \null)
+    static function get_ajax_action_static($tag, $module_id = \null)
     {
     }
     /**
@@ -6855,7 +7067,7 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /* Account Page
-    		------------------------------------------------------------------------------------------------------------------*/
+       ------------------------------------------------------------------------------------------------------------------*/
     /**
      * Update site information.
      *
@@ -6866,7 +7078,16 @@ class Freemius extends \Freemius_Abstract
      * @param null|int $network_level_or_blog_id Since 2.0.0
      * @param \FS_Site $site                     Since 2.0.0
      */
-    private function _store_site($store = \true, $network_level_or_blog_id = \null, \FS_Site $site = \null)
+    private function _store_site($store = \true, $network_level_or_blog_id = \null, \FS_Site $site = \null, $is_backup = \false)
+    {
+    }
+    /**
+     * Stores the context site in the sites backup storage. This logic is used before deleting the site info so that it can be restored later on if necessary (e.g., if the automatic clone resolution attempt fails).
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.0
+     */
+    private function back_up_site()
     {
     }
     /**
@@ -7631,10 +7852,11 @@ class Freemius extends \Freemius_Abstract
      * @uses   FS_Api
      *
      * @param string $candidate_email
+     * @param string $transfer_type
      *
      * @return bool Is ownership change successfully initiated.
      */
-    private function init_change_owner($candidate_email)
+    private function init_change_owner($candidate_email, $transfer_type)
     {
     }
     /**
@@ -7788,7 +8010,7 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /* Pricing & Upgrade
-    		------------------------------------------------------------------------------------------------------------------*/
+       ------------------------------------------------------------------------------------------------------------------*/
     /**
      * Render pricing page.
      *
@@ -7849,16 +8071,16 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /* CSS & JavaScript
-    		------------------------------------------------------------------------------------------------------------------*/
+       ------------------------------------------------------------------------------------------------------------------*/
     /*		function _enqueue_script($handle, $src) {
-    					$url = plugins_url( substr( WP_FS__DIR_JS, strlen( $this->_plugin_dir_path ) ) . '/assets/js/' . $src );
+                        $url = plugins_url( substr( WP_FS__DIR_JS, strlen( $this->_plugin_dir_path ) ) . '/assets/js/' . $src );
     
-    					$this->_logger->entrance( 'script = ' . $url );
+                        $this->_logger->entrance( 'script = ' . $url );
     
-    					wp_enqueue_script( $handle, $url );
-    				}*/
+                        wp_enqueue_script( $handle, $url );
+                    }*/
     /* SDK
-    		------------------------------------------------------------------------------------------------------------------*/
+       ------------------------------------------------------------------------------------------------------------------*/
     private $_user_api;
     /**
      *
@@ -7869,7 +8091,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return FS_Api
      */
-    private function get_api_user_scope($flush = \false)
+    function get_api_user_scope($flush = \false)
     {
     }
     /**
@@ -7906,6 +8128,21 @@ class Freemius extends \Freemius_Abstract
      * @return FS_Api
      */
     private function get_api_site_scope($flush = \false)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.0
+     *
+     * @param string $path
+     * @param string $method
+     * @param array  $params
+     * @param bool   $flush_instance
+     *
+     * @return array|mixed|string|void
+     * @throws Freemius_Exception
+     */
+    private function api_site_call($path, $method = 'GET', $params = array(), $flush_instance = \false)
     {
     }
     private $_plugin_api;
@@ -8031,7 +8268,7 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /* Action Links
-    		------------------------------------------------------------------------------------------------------------------*/
+       ------------------------------------------------------------------------------------------------------------------*/
     private $_action_links_hooked = \false;
     private $_action_links = array();
     /**
@@ -8803,7 +9040,7 @@ class FS_Admin_Notices
      *
      * @uses   add_action()
      */
-    function add($message, $title = '', $type = 'success', $is_sticky = \false, $id = '', $store_if_sticky = \true, $network_level_or_blog_id = \null)
+    function add($message, $title = '', $type = 'success', $is_sticky = \false, $id = '', $store_if_sticky = \true, $network_level_or_blog_id = \null, $is_dimissible = \null)
     {
     }
     /**
@@ -8812,8 +9049,9 @@ class FS_Admin_Notices
      *
      * @param string|string[] $ids
      * @param int|null        $network_level_or_blog_id
+     * @param bool            $store
      */
-    function remove_sticky($ids, $network_level_or_blog_id = \null)
+    function remove_sticky($ids, $network_level_or_blog_id = \null, $store = \true)
     {
     }
     /**
@@ -8845,8 +9083,23 @@ class FS_Admin_Notices
      * @param string|null $plugin_title
      * @param bool        $is_network_and_blog_admins Whether or not the message should be shown both on network and
      *                                                blog admin pages.
+     * @param bool        $is_dismissible
      */
-    function add_sticky($message, $id, $title = '', $type = 'success', $network_level_or_blog_id = \null, $wp_user_id = \null, $plugin_title = \null, $is_network_and_blog_admins = \false)
+    function add_sticky($message, $id, $title = '', $type = 'success', $network_level_or_blog_id = \null, $wp_user_id = \null, $plugin_title = \null, $is_network_and_blog_admins = \false, $is_dismissible = \true, $data = array())
+    {
+    }
+    /**
+     * Retrieves the data of a sticky notice.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since 2.4.3
+     *
+     * @param string   $id
+     * @param int|null $network_level_or_blog_id
+     *
+     * @return array|null
+     */
+    function get_sticky($id, $network_level_or_blog_id)
     {
     }
     /**
@@ -8903,6 +9156,20 @@ class FS_Admin_Notices
     private function should_use_network_notices($id = '', $network_level_or_blog_id = \null)
     {
     }
+    /**
+     * Retrieves an instance of FS_Admin_Notice_Manager.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.0
+     *
+     * @param string   $id
+     * @param int|null $network_level_or_blog_id
+     *
+     * @return FS_Admin_Notice_Manager
+     */
+    private function get_site_or_network_notices($id, $network_level_or_blog_id)
+    {
+    }
     #endregion
 }
 /**
@@ -8953,6 +9220,13 @@ class FS_Api
      */
     private $_sdk_version;
     /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.0
+     *
+     * @var string
+     */
+    private $_url;
+    /**
      * @param string      $slug
      * @param string      $scope      'app', 'developer', 'user' or 'install'.
      * @param number      $id         Element's id.
@@ -8960,10 +9234,11 @@ class FS_Api
      * @param bool        $is_sandbox
      * @param bool|string $secret_key Element's secret key.
      * @param null|string $sdk_version
+     * @param null|string $url
      *
      * @return FS_Api
      */
-    static function instance($slug, $scope, $id, $public_key, $is_sandbox, $secret_key = \false, $sdk_version = \null)
+    static function instance($slug, $scope, $id, $public_key, $is_sandbox, $secret_key = \false, $sdk_version = \null, $url = \null)
     {
     }
     private static function _init()
@@ -8977,8 +9252,9 @@ class FS_Api
      * @param bool|string $secret_key Element's secret key.
      * @param bool        $is_sandbox
      * @param null|string $sdk_version
+     * @param null|string $url
      */
-    private function __construct($slug, $scope, $id, $public_key, $secret_key, $is_sandbox, $sdk_version)
+    private function __construct($slug, $scope, $id, $public_key, $secret_key, $is_sandbox, $sdk_version, $url)
     {
     }
     /**
@@ -11969,6 +12245,15 @@ class FS_User extends \FS_Scope_Entity
     function is_verified()
     {
     }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.4.2
+     *
+     * @return bool
+     */
+    function is_beta()
+    {
+    }
     static function get_type()
     {
     }
@@ -12803,6 +13088,17 @@ class FS_Admin_Notice_Manager
     {
     }
     /**
+     * Check if admin notices should be shown on page. E.g., we don't want to show notices in the Visual Editor.
+     *
+     * @author Xiaheng Chen (@xhchen)
+     * @since  2.4.2
+     *
+     * @return bool
+     */
+    function show_admin_notices()
+    {
+    }
+    /**
      * Add admin message to admin messages queue, and hook to admin_notices / all_admin_notices if not yet hooked.
      *
      * @author Vova Feldman (@svovaf)
@@ -12818,10 +13114,12 @@ class FS_Admin_Notice_Manager
      * @param string|null $plugin_title
      * @param bool        $is_network_and_blog_admins Whether or not the message should be shown both on network
      *                                                and blog admin pages.
+     * @param bool|null   $is_dismissible
+     * @param array       $data
      *
      * @uses   add_action()
      */
-    function add($message, $title = '', $type = 'success', $is_sticky = \false, $id = '', $store_if_sticky = \true, $wp_user_id = \null, $plugin_title = \null, $is_network_and_blog_admins = \false)
+    function add($message, $title = '', $type = 'success', $is_sticky = \false, $id = '', $store_if_sticky = \true, $wp_user_id = \null, $plugin_title = \null, $is_network_and_blog_admins = \false, $is_dismissible = \null, $data = array())
     {
     }
     /**
@@ -12829,8 +13127,9 @@ class FS_Admin_Notice_Manager
      * @since  1.0.7
      *
      * @param string|string[] $ids
+     * @param bool            $store
      */
-    function remove_sticky($ids)
+    function remove_sticky($ids, $store = \true)
     {
     }
     /**
@@ -12860,8 +13159,23 @@ class FS_Admin_Notice_Manager
      * @param string|null $plugin_title
      * @param bool        $is_network_and_blog_admins Whether or not the message should be shown both on network
      *                                                and blog admin pages.
+     * @param bool        $is_dimissible
+     * @param array       $data
      */
-    function add_sticky($message, $id, $title = '', $type = 'success', $wp_user_id = \null, $plugin_title = \null, $is_network_and_blog_admins = \false)
+    function add_sticky($message, $id, $title = '', $type = 'success', $wp_user_id = \null, $plugin_title = \null, $is_network_and_blog_admins = \false, $is_dimissible = \true, $data = array())
+    {
+    }
+    /**
+     * Retrieves the data of an sticky notice.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  2.4.3
+     *
+     * @param string $id Message ID.
+     *
+     * @return array|null
+     */
+    function get_sticky($id)
     {
     }
     /**
@@ -13068,6 +13382,459 @@ class FS_Cache_Manager
      * @since  2.0.0
      */
     function migrate_to_network()
+    {
+    }
+    #endregion
+}
+/**
+ * Manages the detection of clones and provides the logged-in WordPress user with options for manually resolving them.
+ *
+ * @since 2.5.0
+ *
+ * @property int    $clone_identification_timestamp
+ * @property int    $temporary_duplicate_mode_selection_timestamp
+ * @property int    $temporary_duplicate_notice_shown_timestamp
+ * @property string $request_handler_id
+ * @property int    $request_handler_timestamp
+ * @property int    $request_handler_retries_count
+ */
+class FS_Clone_Manager
+{
+    /**
+     * @var FS_Option_Manager
+     */
+    private $_storage;
+    /**
+     * @var FS_Option_Manager
+     */
+    private $_network_storage;
+    /**
+     * @var array {
+     * @type int    $clone_identification_timestamp
+     * @type int    $temporary_duplicate_mode_selection_timestamp
+     * @type int    $temporary_duplicate_notice_shown_timestamp
+     * @type string $request_handler_id
+     * @type int    $request_handler_timestamp
+     * @type int    $request_handler_retries_count
+     * }
+     */
+    private $_data;
+    /**
+     * @var array {
+     * @type array $new_blog_install_map
+     * }
+     */
+    private $_network_data;
+    /**
+     * @var FS_Admin_Notices
+     */
+    private $_notices;
+    /**
+     * @var FS_Logger
+     */
+    protected $_logger;
+    /**
+     * @var int 3 minutes
+     */
+    const CLONE_RESOLUTION_MAX_EXECUTION_TIME = 180;
+    /**
+     * @var int
+     */
+    const CLONE_RESOLUTION_MAX_RETRIES = 3;
+    /**
+     * @var int
+     */
+    const TEMPORARY_DUPLICATE_PERIOD = \WP_FS__TIME_WEEK_IN_SEC * 2;
+    /**
+     * @var string
+     */
+    const OPTION_NAME = 'clone_resolution';
+    /**
+     * @var string
+     */
+    const OPTION_MANAGER_NAME = 'clone_management';
+    /**
+     * @var string
+     */
+    const OPTION_TEMPORARY_DUPLICATE = 'temporary_duplicate';
+    /**
+     * @var string
+     */
+    const OPTION_NEW_HOME = 'new_home';
+    #--------------------------------------------------------------------------------
+    #region Singleton
+    #--------------------------------------------------------------------------------
+    /**
+     * @var FS_Clone_Manager
+     */
+    private static $_instance;
+    /**
+     * @return FS_Clone_Manager
+     */
+    static function instance()
+    {
+    }
+    #endregion
+    private function __construct()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.0
+     */
+    function _init()
+    {
+    }
+    /**
+     * Retrieves the timestamp that was stored when a clone was identified.
+     *
+     * @return int|null
+     */
+    function get_clone_identification_timestamp()
+    {
+    }
+    /**
+     * Stores the time when a clone was identified.
+     */
+    function store_clone_identification_timestamp()
+    {
+    }
+    /**
+     * Retrieves the timestamp for the temporary duplicate mode's expiration.
+     *
+     * @return int
+     */
+    function get_temporary_duplicate_expiration_timestamp()
+    {
+    }
+    /**
+     * Determines if the SDK should handle clones. The SDK handles clones only up to 3 times with 3 min interval.
+     *
+     * @return bool
+     */
+    private function should_handle_clones()
+    {
+    }
+    /**
+     * Executes the clones handler logic if it should be executed, i.e., based on the return value of the should_handle_clones() method.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.0
+     */
+    function maybe_run_clone_resolution()
+    {
+    }
+    /**
+     * Executes the clones handler logic.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.0
+     */
+    function _handle_clone_resolution()
+    {
+    }
+    #--------------------------------------------------------------------------------
+    #region Automatic Clone Resolution
+    #--------------------------------------------------------------------------------
+    /**
+     * @var array All installs cache.
+     */
+    private $all_installs;
+    /**
+     * Checks if a given instance's install is a clone of another subsite in the network.
+     *
+     * @author Vova Feldman (@svovaf)
+     *
+     * @return FS_Site
+     */
+    private function find_network_subsite_clone_install(\Freemius $instance)
+    {
+    }
+    /**
+     * Tries to find a different install of the context product that is associated with the current URL and loads it.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.0
+     *
+     * @param Freemius $instance
+     * @param string   $url
+     *
+     * @return object
+     */
+    private function find_other_install_by_url(\Freemius $instance, $url)
+    {
+    }
+    /**
+     * Delete the current install associated with a given instance and opt-in/activate-license to create a fresh install.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since 2.5.0
+     *
+     * @param Freemius    $instance
+     * @param string|false $license_key
+     *
+     * @return bool TRUE if successfully connected. FALSE if failed and had to restore install from backup.
+     */
+    private function delete_install_and_connect(\Freemius $instance, $license_key = \false)
+    {
+    }
+    /**
+     * Try to resolve the clone situation automatically.
+     *
+     * @param Freemius  $instance
+     * @param string    $current_url
+     * @param bool      $is_localhost
+     * @param bool|null $is_clone_of_network_subsite
+     *
+     * @return bool If managed to automatically resolve the clone.
+     */
+    private function try_resolve_clone_automatically(\Freemius $instance, $current_url, $is_localhost, $is_clone_of_network_subsite = \null)
+    {
+    }
+    /**
+     * Tries to recover the install of a newly created subsite or resolve it if it's a clone.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.0
+     *
+     * @param Freemius $instance
+     */
+    function maybe_resolve_new_subsite_install_automatically(\Freemius $instance)
+    {
+    }
+    /**
+     * If a new install was created after creating a new subsite, its ID is stored in the blog-install map so that it can be recovered in case it's replaced with a clone install (e.g., when the newly created subsite is a clone).
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.0
+     *
+     * @param int     $blog_id
+     * @param FS_Site $site
+     */
+    function store_new_blog_install_info($blog_id, $site = \null)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.0
+     *
+     * @param int $blog_id
+     */
+    private function remove_new_blog_install_info_from_storage($blog_id)
+    {
+    }
+    /**
+     * Tries to resolve all clones automatically.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.0
+     *
+     * @return bool If managed to automatically resolve all clones.
+     */
+    private function try_automatic_resolution()
+    {
+    }
+    #endregion
+    #--------------------------------------------------------------------------------
+    #region Manual Clone Resolution
+    #--------------------------------------------------------------------------------
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.0
+     */
+    function _add_clone_resolution_javascript()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.0
+     */
+    function _clone_resolution_action_ajax_handler()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.0
+     *
+     * @param string $clone_action
+     */
+    private function resolve_cloned_sites($clone_action)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.0
+     */
+    private function hide_clone_admin_notices()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.0
+     */
+    private function maybe_show_clone_admin_notice()
+    {
+    }
+    /**
+     * Removes the notices from the storage if the context product is either no longer active on the context subsite or it's active but there's no longer any clone. This prevents the notices from being shown on the network-level admin page when they are no longer relevant.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.1
+     *
+     * @return string[]
+     */
+    private function maybe_remove_notices()
+    {
+    }
+    /**
+     * Adds a notice that provides the logged-in WordPress user with manual clone resolution options.
+     *
+     * @param number[] $product_ids
+     * @param string[] $site_urls
+     * @param string   $current_url
+     * @param bool     $has_license
+     * @param bool     $is_premium
+     * @param string   $doc_url
+     */
+    private function add_manual_clone_resolution_admin_notice($product_ids, $product_titles, $site_urls, $current_url, $has_license, $is_premium, $doc_url)
+    {
+    }
+    #endregion
+    #--------------------------------------------------------------------------------
+    #region Temporary Duplicate (Short Term)
+    #--------------------------------------------------------------------------------
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.0
+     *
+     * @return string
+     */
+    private function get_temporary_duplicate_admin_notice_string($site_urls, $product_titles, $module_label)
+    {
+    }
+    /**
+     * Determines if the temporary duplicate mode has already expired.
+     *
+     * @return bool
+     */
+    function has_temporary_duplicate_mode_expired()
+    {
+    }
+    /**
+     * Determines if the logged-in WordPress user manually selected the temporary duplicate mode for the site.
+     *
+     * @return bool
+     */
+    function was_temporary_duplicate_mode_selected()
+    {
+    }
+    /**
+     * Stores the time when the logged-in WordPress user selected the temporary duplicate mode for the site.
+     */
+    private function store_temporary_duplicate_timestamp()
+    {
+    }
+    /**
+     * Removes the notice that is shown when the logged-in WordPress user has selected the temporary duplicate mode for the site.
+     *
+     * @param bool $store
+     */
+    function remove_clone_resolution_options_notice($store = \true)
+    {
+    }
+    /**
+     * Removes the notice that is shown when the logged-in WordPress user has selected the temporary duplicate mode for the site.
+     *
+     * @param bool $store
+     */
+    function remove_temporary_duplicate_notice($store = \true)
+    {
+    }
+    /**
+     * Determines if the manual clone resolution options notice is currently being shown.
+     *
+     * @return bool
+     */
+    function is_clone_resolution_options_notice_shown()
+    {
+    }
+    /**
+     * Determines if the temporary duplicate notice is currently being shown.
+     *
+     * @return bool
+     */
+    function is_temporary_duplicate_notice_shown()
+    {
+    }
+    /**
+     * Determines if a site was marked as a temporary duplicate and if it's still a temporary duplicate.
+     *
+     * @return bool
+     */
+    function is_temporary_duplicate_by_blog_id($blog_id)
+    {
+    }
+    /**
+     * Determines the last time the temporary duplicate notice was shown.
+     *
+     * @return int|null
+     */
+    function last_time_temporary_duplicate_notice_was_shown()
+    {
+    }
+    /**
+     * Clears the time that has been stored when the temporary duplicate notice was shown.
+     */
+    function clear_temporary_duplicate_notice_shown_timestamp()
+    {
+    }
+    /**
+     * Adds a temporary duplicate notice that provides the logged-in WordPress user with an option to activate a license for the site.
+     *
+     * @param number[]    $product_ids
+     * @param string      $message
+     * @param string      $message
+     * @param string|null $plugin_title
+     */
+    function add_temporary_duplicate_sticky_notice($product_ids, $message, $plugin_title = \null)
+    {
+    }
+    #endregion
+    /**
+     * @author Leo Fajardo
+     * @since 2.5.0
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
+    private function should_use_network_storage($key)
+    {
+    }
+    #--------------------------------------------------------------------------------
+    #region Magic methods
+    #--------------------------------------------------------------------------------
+    /**
+     * @param string     $name
+     * @param int|string $value
+     */
+    function __set($name, $value)
+    {
+    }
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
+    function __isset($name)
+    {
+    }
+    /**
+     * @param string $name
+     *
+     * @return null|int|string
+     */
+    function __get($name)
     {
     }
     #endregion
@@ -13391,19 +14158,15 @@ class FS_Key_Value_Storage implements \ArrayAccess, \Iterator, \Countable
     function __get($k)
     {
     }
-    #[\ReturnTypeWillChange]
     function offsetSet($k, $v)
     {
     }
-    #[\ReturnTypeWillChange]
     function offsetExists($k)
     {
     }
-    #[\ReturnTypeWillChange]
     function offsetUnset($k)
     {
     }
-    #[\ReturnTypeWillChange]
     function offsetGet($k)
     {
     }
@@ -13414,7 +14177,6 @@ class FS_Key_Value_Storage implements \ArrayAccess, \Iterator, \Countable
      * @link http://php.net/manual/en/iterator.current.php
      * @return mixed Can return any type.
      */
-    #[\ReturnTypeWillChange]
     public function current()
     {
     }
@@ -13425,7 +14187,6 @@ class FS_Key_Value_Storage implements \ArrayAccess, \Iterator, \Countable
      * @link http://php.net/manual/en/iterator.next.php
      * @return void Any returned value is ignored.
      */
-    #[\ReturnTypeWillChange]
     public function next()
     {
     }
@@ -13436,7 +14197,6 @@ class FS_Key_Value_Storage implements \ArrayAccess, \Iterator, \Countable
      * @link http://php.net/manual/en/iterator.key.php
      * @return mixed scalar on success, or null on failure.
      */
-    #[\ReturnTypeWillChange]
     public function key()
     {
     }
@@ -13448,7 +14208,6 @@ class FS_Key_Value_Storage implements \ArrayAccess, \Iterator, \Countable
      * @return boolean The return value will be casted to boolean and then evaluated.
      *       Returns true on success or false on failure.
      */
-    #[\ReturnTypeWillChange]
     public function valid()
     {
     }
@@ -13459,7 +14218,6 @@ class FS_Key_Value_Storage implements \ArrayAccess, \Iterator, \Countable
      * @link http://php.net/manual/en/iterator.rewind.php
      * @return void Any returned value is ignored.
      */
-    #[\ReturnTypeWillChange]
     public function rewind()
     {
     }
@@ -13473,7 +14231,6 @@ class FS_Key_Value_Storage implements \ArrayAccess, \Iterator, \Countable
      *       <p>
      *       The return value is cast to an integer.
      */
-    #[\ReturnTypeWillChange]
     public function count()
     {
     }
