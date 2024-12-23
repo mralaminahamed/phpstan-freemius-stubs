@@ -33,6 +33,14 @@ abstract class Freemius_Abstract
      * @return bool
      */
     abstract function is_anonymous();
+    /**
+     * Check if the user currently in activation mode.
+     *
+     * @since 1.0.7
+     *
+     * @return bool
+     */
+    abstract function is_activation_mode();
     #endregion Identity ------------------------------------------------------------------
     #region Permissions ------------------------------------------------------------------
     /**
@@ -328,9 +336,12 @@ abstract class Freemius_Abstract
 class Freemius extends \Freemius_Abstract
 {
     /**
+     * SDK Version
+     *
      * @var string
      */
-    public $version = '1.1.2';
+    public $version = '1.1.3';
+    #region Plugin Info
     /**
      * @since 1.0.1
      *
@@ -338,16 +349,38 @@ class Freemius extends \Freemius_Abstract
      */
     private $_slug;
     /**
-     * @since 1.0.6
+     * @since 1.0.0
      *
      * @var string
      */
-    private $_menu_slug;
     private $_plugin_basename;
+    /**
+     * @since 1.0.0
+     *
+     * @var string
+     */
     private $_free_plugin_basename;
+    /**
+     * @since 1.0.0
+     *
+     * @var string
+     */
     private $_plugin_dir_path;
+    /**
+     * @since 1.0.0
+     *
+     * @var string
+     */
     private $_plugin_dir_name;
+    /**
+     * @since 1.0.0
+     *
+     * @var string
+     */
     private $_plugin_main_file_path;
+    /**
+     * @var string[]
+     */
     private $_plugin_data;
     /**
      * @since 1.0.9
@@ -355,11 +388,19 @@ class Freemius extends \Freemius_Abstract
      * @var string
      */
     private $_plugin_name;
+    #endregion Plugin Info
     /**
      * @since 1.0.9
+     *
      * @var bool If false, don't turn Freemius on.
      */
     private $_is_on;
+    /**
+     * @since 1.1.3
+     *
+     * @var bool If false, don't turn Freemius on.
+     */
+    private $_is_anonymous;
     /**
      * @since 1.0.9
      * @var bool If false, issues with connectivity to Freemius API.
@@ -390,47 +431,51 @@ class Freemius extends \Freemius_Abstract
      */
     private $_storage;
     /**
-     * @var Freemius[]
-     */
-    private static $_instances = array();
-    /**
-     * @var FS_Logger
      * @since 1.0.0
+     *
+     * @var FS_Logger
      */
     private $_logger;
     /**
-     * @var FS_Plugin
      * @since 1.0.4
+     *
+     * @var FS_Plugin
      */
     private $_plugin = \false;
     /**
-     * @var FS_Plugin
      * @since 1.0.4
+     *
+     * @var FS_Plugin
      */
     private $_parent_plugin = \false;
     /**
-     * @var Freemius
      * @since 1.1.1
+     *
+     * @var Freemius
      */
     private $_parent = \false;
     /**
-     * @var FS_User
      * @since 1.0.1
+     *
+     * @var FS_User
      */
     private $_user = \false;
     /**
-     * @var FS_Site
      * @since 1.0.1
+     *
+     * @var FS_Site
      */
     private $_site = \false;
     /**
-     * @var FS_Plugin_License
      * @since 1.0.1
+     *
+     * @var FS_Plugin_License
      */
     private $_license;
     /**
-     * @var FS_Plugin_Plan[]
      * @since 1.0.2
+     *
+     * @var FS_Plugin_Plan[]
      */
     private $_plans = \false;
     /**
@@ -438,6 +483,12 @@ class Freemius extends \Freemius_Abstract
      * @since 1.0.5
      */
     private $_licenses = \false;
+    /**
+     * @since 1.0.1
+     *
+     * @var FS_Admin_Menu_Manager
+     */
+    private $_menu;
     /**
      * @var FS_Admin_Notice_Manager
      */
@@ -452,6 +503,10 @@ class Freemius extends \Freemius_Abstract
      * @since 1.0.2
      */
     private static $_accounts;
+    /**
+     * @var Freemius[]
+     */
+    private static $_instances = array();
     /* Ctor
     ------------------------------------------------------------------------------------------------------------------*/
     private function __construct($slug)
@@ -618,17 +673,6 @@ class Freemius extends \Freemius_Abstract
      * @return bool
      */
     function is_activation_mode()
-    {
-    }
-    /**
-     * Is user on plugin's admin activation page.
-     *
-     * @author Vova Feldman (@svovaf)
-     * @since  1.0.8
-     *
-     * @return bool
-     */
-    function is_activation_page()
     {
     }
     private static $_statics_loaded = \false;
@@ -812,7 +856,7 @@ class Freemius extends \Freemius_Abstract
     function _plugin_code_type_changed()
     {
     }
-    #endregion ------------------------------------------------------------------
+    #endregion Initialization ------------------------------------------------------------------
     #region Add-ons -------------------------------------------------------------------------
     /**
      * Generate add-on plugin information.
@@ -913,6 +957,7 @@ class Freemius extends \Freemius_Abstract
     {
     }
     #endregion ------------------------------------------------------------------
+    #region Sandbox ------------------------------------------------------------------
     /**
      * Set Freemius into sandbox mode for debugging.
      *
@@ -935,6 +980,7 @@ class Freemius extends \Freemius_Abstract
     function is_payments_sandbox()
     {
     }
+    #endregion Sandbox ------------------------------------------------------------------
     /**
      * Check if running test vs. live plugin.
      *
@@ -1099,6 +1145,22 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.3
+     *
+     * @param bool $is_anonymous
+     */
+    private function set_anonymous_mode($is_anonymous = \true)
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.3
+     */
+    private function reset_anonymous_mode()
+    {
+    }
+    /**
      * Skip account connect, and set anonymous mode.
      *
      * @author Vova Feldman (@svovaf)
@@ -1120,9 +1182,41 @@ class Freemius extends \Freemius_Abstract
      * Update install details.
      *
      * @author Vova Feldman (@svovaf)
-     * @since  1.0.9
+     * @since  1.1.2
+     *
+     * @param string[] string $override
+     *
+     * @return array
      */
-    private function send_install_update($params)
+    private function get_install_data_for_api($override = array())
+    {
+    }
+    /**
+     * Update install only if changed.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.0.9
+     *
+     * @param string[] string $override
+     * @param bool     $flush
+     *
+     * @return false|object|string
+     */
+    private function send_install_update($override = array(), $flush = \false)
+    {
+    }
+    /**
+     * Update install only if changed.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.0.9
+     *
+     * @param string[] string $override
+     * @param bool     $flush
+     *
+     * @return false|object|string
+     */
+    private function sync_install($override = array(), $flush = \false)
     {
     }
     /**
@@ -1957,6 +2051,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @param FS_User $user
      * @param FS_Site $site
+     * @param bool    $redirect
      *
      * @return bool False if account already set.
      */
@@ -2033,59 +2128,21 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
-     * Override submenu's action.
-     *
-     * @author Vova Feldman (@svovaf)
-     * @since  1.1.0
-     *
-     * @param $parent_slug
-     * @param $menu_slug
-     * @param $function
-     *
-     * @return false|string If submenu exist, will return the hook name.
-     */
-    private function override_plugin_submenu_action($parent_slug, $menu_slug, $function)
-    {
-    }
-    /**
-     * Find plugin's admin dashboard main menu item.
-     *
-     * @author Vova Feldman (@svovaf)
-     * @since  1.0.2
-     *
-     * @return string[]|false
-     */
-    private function find_plugin_main_menu()
-    {
-    }
-    /**
-     * Remove all sub-menu items.
-     *
-     * @author Vova Feldman (@svovaf)
-     * @since  1.0.7
-     *
-     * @return bool If submenu with plugin's menu slug was found.
-     */
-    private function remove_all_submenu_items()
-    {
-    }
-    /**
-     *
-     * @author Vova Feldman (@svovaf)
-     * @since  1.0.9
-     *
-     * @return array[string]mixed
-     */
-    private function remove_menu_item()
-    {
-    }
-    /**
      * Remove plugin's all admin menu items & pages, and replace with activation page.
      *
      * @author Vova Feldman (@svovaf)
      * @since  1.0.1
      */
     private function override_plugin_menu_with_activation()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.0.0
+     *
+     * @return string
+     */
+    private function get_top_level_menu_slug()
     {
     }
     /**
@@ -2098,9 +2155,6 @@ class Freemius extends \Freemius_Abstract
     {
     }
     function _add_default_submenu_items()
-    {
-    }
-    private function _get_menu_slug($slug = '')
     {
     }
     /**
@@ -2197,17 +2251,6 @@ class Freemius extends \Freemius_Abstract
      * @uses   add_filter()
      */
     function add_filter($tag, $function_to_add, $priority = 10, $accepted_args = 1)
-    {
-    }
-    /* Activation
-    		------------------------------------------------------------------------------------------------------------------*/
-    /**
-     * Render activation/sign-up page.
-     *
-     * @author Vova Feldman (@svovaf)
-     * @since  1.0.1
-     */
-    function _activation_page_render()
     {
     }
     /* Account Page
@@ -2772,6 +2815,17 @@ class Freemius extends \Freemius_Abstract
      * @return string
      */
     private function get_activation_url()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.3
+     *
+     * @param string $filter Filter name.
+     *
+     * @return string
+     */
+    private function get_after_activation_url($filter)
     {
     }
     /**
@@ -3913,7 +3967,31 @@ class FS_Site extends \FS_Scope_Entity
     /**
      * @var string
      */
+    public $title;
+    /**
+     * @var string
+     */
+    public $url;
+    /**
+     * @var string
+     */
     public $version;
+    /**
+     * @var string E.g. en-GB
+     */
+    public $language;
+    /**
+     * @var string E.g. UTF-8
+     */
+    public $charset;
+    /**
+     * @var string Platform version (e.g WordPress version).
+     */
+    public $platform_version;
+    /**
+     * @var string Programming language version (e.g PHP version).
+     */
+    public $programming_language_version;
     /**
      * @var FS_Plugin_Plan $plan
      */
@@ -4112,6 +4190,302 @@ class FS_User extends \FS_Scope_Entity
     static function get_type()
     {
     }
+}
+class FS_Admin_Menu_Manager
+{
+    #region Properties
+    /**
+     * @var string
+     */
+    protected $_plugin_slug;
+    /**
+     * @since 1.0.6
+     *
+     * @var string
+     */
+    private $_menu_slug;
+    /**
+     * @since 1.1.3
+     *
+     * @var string
+     */
+    private $_parent_slug;
+    /**
+     * @since 1.1.3
+     *
+     * @var string
+     */
+    private $_parent_type;
+    /**
+     * @since 1.1.3
+     *
+     * @var string
+     */
+    private $_type;
+    /**
+     * @since 1.1.3
+     *
+     * @var bool
+     */
+    private $_is_top_level;
+    /**
+     * @since 1.1.3
+     *
+     * @var bool
+     */
+    private $_is_override_exact;
+    /**
+     * @since 1.1.3
+     *
+     * @var string[]bool
+     */
+    private $_default_submenu_items;
+    /**
+     * @since 1.1.3
+     *
+     * @var string
+     */
+    private $_first_time_path;
+    #endregion Properties
+    /**
+     * @var FS_Logger
+     */
+    protected $_logger;
+    #region Singleton
+    /**
+     * @var FS_Admin_Menu_Manager[]
+     */
+    private static $_instances = array();
+    /**
+     * @param string $plugin_slug
+     *
+     * @return FS_Admin_Notice_Manager
+     */
+    static function instance($plugin_slug)
+    {
+    }
+    protected function __construct($plugin_slug)
+    {
+    }
+    #endregion Singleton
+    #region Helpers
+    private function get_option(&$options, $key, $default = \false)
+    {
+    }
+    private function get_bool_option(&$options, $key, $default = \false)
+    {
+    }
+    #endregion Helpers
+    /**
+     * @param array $menu
+     * @param bool  $is_addon
+     */
+    function init($menu, $is_addon = \false)
+    {
+    }
+    /**
+     * Check if top level menu.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.3
+     *
+     * @return bool False if submenu item.
+     */
+    function is_top_level()
+    {
+    }
+    /**
+     * Check if the page should be override on exact URL match.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.3
+     *
+     * @return bool False if submenu item.
+     */
+    function is_override_exact()
+    {
+    }
+    /**
+     * Get the path of the page the user should be forwarded to after first activation.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.3
+     *
+     * @return string
+     */
+    function get_first_time_path()
+    {
+    }
+    /**
+     * Check if plugin's menu item is part of a custom top level menu.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.3
+     *
+     * @return bool
+     */
+    function has_custom_parent()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.3
+     *
+     * @return string
+     */
+    //		function slug(){
+    //			return $this->_menu_slug;
+    //		}
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.3
+     *
+     * @param string $id
+     * @param bool   $default
+     *
+     * @return bool
+     */
+    function is_submenu_item_visible($id, $default = \true)
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.3
+     *
+     * @param string $page
+     *
+     * @return string
+     */
+    function get_slug($page = '')
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.3
+     *
+     * @return string
+     */
+    function get_parent_slug()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.3
+     *
+     * @return string
+     */
+    function get_type()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.3
+     *
+     * @return bool
+     */
+    function is_cpt()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.3
+     *
+     * @return string
+     */
+    function get_parent_type()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.3
+     *
+     * @return string
+     */
+    function get_raw_slug()
+    {
+    }
+    /**
+     * Get plugin's original menu slug.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.3
+     *
+     * @return string
+     */
+    function get_original_menu_slug()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.3
+     *
+     * @return string
+     */
+    function get_top_level_menu_slug()
+    {
+    }
+    /**
+     * Is user on plugin's admin activation page.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.0.8
+     *
+     * @return bool
+     */
+    function is_activation_page()
+    {
+    }
+    #region Submenu Override
+    /**
+     * Override submenu's action.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.0
+     *
+     * @param string   $parent_slug
+     * @param string   $menu_slug
+     * @param callable $function
+     *
+     * @return false|string If submenu exist, will return the hook name.
+     */
+    function override_submenu_action($parent_slug, $menu_slug, $function)
+    {
+    }
+    #endregion Submenu Override
+    #region Top level menu Override
+    /**
+     * Find plugin's admin dashboard main menu item.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.0.2
+     *
+     * @return string[]|false
+     */
+    private function find_top_level_menu()
+    {
+    }
+    /**
+     * Remove all sub-menu items.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.0.7
+     *
+     * @return bool If submenu with plugin's menu slug was found.
+     */
+    private function remove_all_submenu_items()
+    {
+    }
+    /**
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.0.9
+     *
+     * @return array[string]mixed
+     */
+    function remove_menu_item()
+    {
+    }
+    #endregion Top level menu Override
 }
 class FS_Admin_Notice_Manager
 {
@@ -4974,15 +5348,9 @@ abstract class Freemius_Api_Base
      * @param string $pMethod
      * @param array  $pParams
      *
-     * @return array|object|null
+     * @return object[]|object|null
      */
     private function _Api($pPath, $pMethod = 'GET', $pParams = array())
-    {
-    }
-    private function GetCloudFlareDDoSError($pResult = '')
-    {
-    }
-    private function GetSquidAclError($pResult = '')
     {
     }
     /**
@@ -5054,10 +5422,10 @@ class Freemius_Api extends \Freemius_Api_Base
      */
     public static $CURL_OPTS = array(\CURLOPT_CONNECTTIMEOUT => 10, \CURLOPT_RETURNTRANSFER => \true, \CURLOPT_TIMEOUT => 60, \CURLOPT_USERAGENT => \FS_SDK__USER_AGENT);
     /**
-     * @param string      $pScope 'app', 'developer', 'user' or 'install'.
-     * @param number      $pID Element's id.
-     * @param string      $pPublic Public key.
-     * @param string|bool $pSecret Element's secret key.
+     * @param string      $pScope   'app', 'developer', 'user' or 'install'.
+     * @param number      $pID      Element's id.
+     * @param string      $pPublic  Public key.
+     * @param string|bool $pSecret  Element's secret key.
      * @param bool        $pSandbox Whether or not to run API in sandbox mode.
      */
     public function __construct($pScope, $pID, $pPublic, $pSecret = \false, $pSandbox = \false)
@@ -5074,6 +5442,7 @@ class Freemius_Api extends \Freemius_Api_Base
      * Set clock diff for all API calls.
      *
      * @since 1.0.3
+     *
      * @param $pSeconds
      */
     public static function SetClockDiff($pSeconds)
@@ -5103,10 +5472,11 @@ class Freemius_Api extends \Freemius_Api_Base
      * Sign request with the following HTTP headers:
      *      Content-MD5: MD5(HTTP Request body)
      *      Date: Current date (i.e Sat, 14 Feb 2015 20:24:46 +0000)
-     *      Authorization: FS {scope_entity_id}:{scope_entity_public_key}:base64encode(sha256(string_to_sign, {scope_entity_secret_key}))
+     *      Authorization: FS {scope_entity_id}:{scope_entity_public_key}:base64encode(sha256(string_to_sign,
+     *      {scope_entity_secret_key}))
      *
      * @param string $pResourceUrl
-     * @param array $opts
+     * @param array  $opts
      */
     protected function SignRequest($pResourceUrl, &$opts)
     {
@@ -5129,16 +5499,54 @@ class Freemius_Api extends \Freemius_Api_Base
      * make the request.
      *
      * @param string        $pCanonizedPath The URL to make the request to
-     * @param string        $pMethod HTTP method
-     * @param array         $params The parameters to use for the POST body
-     * @param null|resource $ch Initialized curl handle
+     * @param string        $pMethod        HTTP method
+     * @param array         $params         The parameters to use for the POST body
+     * @param null|resource $ch             Initialized curl handle
      *
-     * @return mixed
+     * @return object[]|object|null
+     *
      * @throws Freemius_Exception
      */
     public function MakeRequest($pCanonizedPath, $pMethod = 'GET', $params = array(), $ch = \null)
     {
     }
+    /**
+     * @param string $pResult
+     *
+     * @throws Freemius_Exception
+     */
+    private function ThrowNoCurlException($pResult = '')
+    {
+    }
+    /**
+     * @param string $pResult
+     *
+     * @throws Freemius_Exception
+     */
+    private function ThrowCloudFlareDDoSException($pResult = '')
+    {
+    }
+    /**
+     * @param string $pResult
+     *
+     * @throws Freemius_Exception
+     */
+    private function ThrowSquidAclException($pResult = '')
+    {
+    }
+}
+/**
+ * Get object's public variables.
+ *
+ * @author Vova Feldman (@svovaf)
+ * @since  1.0.0
+ *
+ * @param object $object
+ *
+ * @return array
+ */
+function fs_get_object_public_vars($object)
+{
 }
 function fs_dummy()
 {
@@ -5182,6 +5590,9 @@ function fs_enqueue_local_style($handle, $path, $deps = array(), $ver = \false, 
 function fs_enqueue_local_script($handle, $path, $deps = array(), $ver = \false, $in_footer = 'all')
 {
 }
+function fs_img_url($path)
+{
+}
 /* Request handlers.
 	--------------------------------------------------------------------------------------------*/
 /**
@@ -5212,6 +5623,17 @@ function fs_request_is_action($action, $action_key = 'action')
 {
 }
 function fs_is_plugin_page($menu_slug)
+{
+}
+/**
+ * Get client IP.
+ *
+ * @author Vova Feldman (@svovaf)
+ * @since  1.1.2
+ *
+ * @return string|null
+ */
+function fs_get_ip()
 {
 }
 /* Core UI.
@@ -5277,6 +5699,62 @@ function fs_normalize_path($path)
 {
 }
 function fs_nonce_url($actionurl, $action = -1, $name = '_wpnonce')
+{
+}
+/**
+ * Check if string starts with.
+ *
+ * @author Vova Feldman (@svovaf)
+ * @since  1.1.3
+ *
+ * @param string $haystack
+ * @param string $needle
+ *
+ * @return bool
+ */
+function fs_starts_with($haystack, $needle)
+{
+}
+#region Url Canonization ------------------------------------------------------------------
+/**
+ * @author Vova Feldman (@svovaf)
+ * @since  1.1.3
+ *
+ * @param string $url
+ * @param bool   $omit_host
+ * @param array  $ignore_params
+ *
+ * @return string
+ */
+function fs_canonize_url($url, $omit_host = \false, $ignore_params = array())
+{
+}
+/**
+ * @author Vova Feldman (@svovaf)
+ * @since  1.1.3
+ *
+ * @param array $params
+ * @param array $ignore_params
+ * @param bool  $params_prefix
+ *
+ * @return string
+ */
+function fs_canonize_query_string(array $params, array &$ignore_params, $params_prefix = \false)
+{
+}
+/**
+ * @author Vova Feldman (@svovaf)
+ * @since  1.1.3
+ *
+ * @param string|string[] $input
+ *
+ * @return array|mixed|string
+ */
+function fs_urlencode_rfc3986($input)
+{
+}
+#endregion Url Canonization ------------------------------------------------------------------
+function fs_download_image($from, $to)
 {
 }
 /**

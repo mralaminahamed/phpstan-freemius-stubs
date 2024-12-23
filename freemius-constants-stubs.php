@@ -10,10 +10,15 @@
 /**
  * API Connectivity Simulation
  */
-\define('WP_FS__SIMULATE_NO_API_CONNECTIVITY', \false);
-\define('WP_FS__SIMULATE_NO_API_CONNECTIVITY_SQUID_ACL', \false);
-\define('FS_SDK__SIMULATE_NO_API_CONNECTIVITY', \true);
+\define('WP_FS__SIMULATE_NO_API_CONNECTIVITY', \false && \WP_FS__DEV_MODE);
+\define('WP_FS__SIMULATE_NO_CURL', \false && \WP_FS__DEV_MODE);
+\define('WP_FS__SIMULATE_NO_API_CONNECTIVITY_CLOUDFLARE', \false && \WP_FS__DEV_MODE);
+\define('WP_FS__SIMULATE_NO_API_CONNECTIVITY_SQUID_ACL', \false && \WP_FS__DEV_MODE);
+\define('FS_SDK__SIMULATE_NO_CURL', \true);
+\define('FS_SDK__SIMULATE_NO_API_CONNECTIVITY_CLOUDFLARE', \true);
 \define('FS_SDK__SIMULATE_NO_API_CONNECTIVITY_SQUID_ACL', \true);
+// VVV default public network IP.
+\define('WP_FS__VVV_DEFAULT_PUBLIC_IP', '192.168.50.4');
 /**
  * If true and running with secret key, the opt-in process
  * will skip the email activation process which is invoked
@@ -36,6 +41,7 @@
 \define('WP_FS__DIR_ASSETS', \WP_FS__DIR . '/assets');
 \define('WP_FS__DIR_CSS', \WP_FS__DIR_ASSETS . '/css');
 \define('WP_FS__DIR_JS', \WP_FS__DIR_ASSETS . '/js');
+\define('WP_FS__DIR_IMG', \WP_FS__DIR_ASSETS . '/img');
 \define('WP_FS__DIR_SDK', \WP_FS__DIR_INCLUDES . '/sdk');
 /**
  * Domain / URL / Address
@@ -47,7 +53,7 @@
 \define('WP_FS__ADDRESS_PRODUCTION', 'https://' . \WP_FS__DOMAIN_PRODUCTION);
 \define('WP_FS__IS_PRODUCTION_MODE', !\defined('WP_FS__DEV_MODE') || !\WP_FS__DEV_MODE || \WP_FS__TESTING_DOMAIN !== $_SERVER['HTTP_HOST']);
 \define('WP_FS__ADDRESS', \WP_FS__IS_PRODUCTION_MODE ? \WP_FS__ADDRESS_PRODUCTION : \WP_FS__ADDRESS_LOCALHOST);
-\define('WP_FS__IS_LOCALHOST', \substr($_SERVER['REMOTE_ADDR'], 0, 4) == '127.' || $_SERVER['REMOTE_ADDR'] == '::1');
+\define('WP_FS__IS_LOCALHOST', \WP_FS__LOCALHOST_IP == $_SERVER['REMOTE_ADDR']);
 \define('WP_FS__IS_LOCALHOST_FOR_SERVER', \false !== \strpos($_SERVER['HTTP_HOST'], 'localhost'));
 \define('FS_API__ADDRESS', 'http://api.freemius:8080');
 \define('FS_API__SANDBOX_ADDRESS', 'http://sandbox-api.freemius:8080');
@@ -86,6 +92,7 @@
 \define('WP_FS__LOWEST_PRIORITY', 999999999);
 \define('WP_FS__SECURITY_PARAMS_PREFIX', 's_');
 \define('FS_SDK__USER_AGENT', 'fs-php-' . \Freemius_Api_Base::VERSION);
+\define('FS_SDK__HAS_CURL', !\FS_SDK__SIMULATE_NO_CURL && \function_exists('curl_version'));
 \define('FS_API__PROTOCOL', \version_compare($curl_version['version'], '7.37', '>=') ? 'https' : 'http');
 /**
  * Copyright 2014 Freemius, Inc.
