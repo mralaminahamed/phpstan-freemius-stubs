@@ -801,13 +801,6 @@ class Freemius extends \Freemius_Abstract
     #endregion
     /**
      * @author Leo Fajardo (@leorw)
-     * @since 2.3.1
-     *
-     * @var boolean|null
-     */
-    private $_use_external_pricing = \null;
-    /**
-     * @author Leo Fajardo (@leorw)
      * @since 2.4.2
      *
      * @var string|null
@@ -1078,12 +1071,13 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
-     * Opens the support forum subemenu item in a new browser page.
+     * Modifies all external links in the submenu by altering their href, and also opens them in new tab if needed.
      *
      * @author Vova Feldman (@svovaf)
+     * @author Swashata Ghosh (@swashata)
      * @since  2.1.4
      */
-    static function _open_support_forum_in_new_page()
+    static function _handle_submenu_external_link()
     {
     }
     /**
@@ -5006,6 +5000,8 @@ class Freemius extends \Freemius_Abstract
      * @author Leo Fajardo (@leorw)
      * @since 2.3.1
      *
+     * @deprecated Since v2.9.0 we have removed the iFrame based pricing. This will always return `false`.
+     *
      * @return bool
      */
     function should_use_external_pricing()
@@ -6765,8 +6761,9 @@ class Freemius extends \Freemius_Abstract
      * @param int    $priority
      * @param bool   $show_submenu
      * @param string $class
+     * @param bool   $new_tab
      */
-    function add_submenu_link_item($menu_title, $url, $menu_slug = \false, $capability = 'read', $priority = \WP_FS__DEFAULT_PRIORITY, $show_submenu = \true, $class = '')
+    function add_submenu_link_item($menu_title, $url, $menu_slug = \false, $capability = 'read', $priority = \WP_FS__DEFAULT_PRIORITY, $show_submenu = \true, $class = '', $new_tab = \false)
     {
     }
     #endregion ------------------------------------------------------------------
@@ -7607,10 +7604,11 @@ class Freemius extends \Freemius_Abstract
      * @since  1.1.8.1
      *
      * @param bool|string $plan_name
+     * @param bool        $add_sticky_notice
      *
      * @return bool If trial was successfully started.
      */
-    function start_trial($plan_name = \false)
+    function start_trial($plan_name = \false, $add_sticky_notice = \false)
     {
     }
     /**
@@ -8040,7 +8038,7 @@ class Freemius extends \Freemius_Abstract
      * @author Leo Fajardo (@leorw)
      * @since  2.3.1
      */
-    function _maybe_add_pricing_ajax_handler()
+    function _add_pricing_ajax_handler()
     {
     }
     /**
@@ -10649,6 +10647,18 @@ class FS_Security
      * @return array
      */
     function get_context_params(\FS_Scope_Entity $entity, $timestamp = \false, $action = '')
+    {
+    }
+    /**
+     * Gets a sandbox trial token for a given plugin, plan, and trial timestamp.
+     *
+     * @param FS_Plugin      $plugin
+     * @param FS_Plugin_Plan $plan
+     * @param int            $trial_timestamp
+     *
+     * @return string
+     */
+    function get_trial_token(\FS_Plugin $plugin, \FS_Plugin_Plan $plan, $trial_timestamp)
     {
     }
 }
@@ -13664,6 +13674,89 @@ class FS_Cache_Manager
     }
     #endregion
 }
+class FS_Checkout_Manager
+{
+    # region Singleton
+    /**
+     * @var FS_Checkout_Manager
+     */
+    private static $_instance;
+    /**
+     * @return FS_Checkout_Manager
+     */
+    static function instance()
+    {
+    }
+    private function __construct()
+    {
+    }
+    #endregion
+    /**
+     * Retrieves the query params needed to load the Freemius Checkout in the context of the plugin.
+     *
+     * @param Freemius $fs
+     * @param number   $plugin_id
+     * @param number   $plan_id
+     * @param number   $licenses
+     *
+     * @return array
+     */
+    public function get_query_params(\Freemius $fs, $plugin_id, $plan_id, $licenses)
+    {
+    }
+    /**
+     * The return URL to pass to the checkout when the checkout is loaded in "redirect" mode.
+     *
+     * @param Freemius $fs
+     *
+     * @return string
+     */
+    public function get_checkout_redirect_return_url(\Freemius $fs)
+    {
+    }
+    /**
+     * @param array  $query_params
+     * @param string $base_url
+     *
+     * @return string
+     */
+    public function get_full_checkout_url(array $query_params, $base_url = \FS_CHECKOUT__ADDRESS)
+    {
+    }
+    /**
+     * Verifies the redirect after a checkout with the nonce.
+     *
+     * @param Freemius $fs
+     */
+    public function verify_checkout_redirect_nonce(\Freemius $fs)
+    {
+    }
+    /**
+     * Get the URL to process a new install after the checkout.
+     *
+     * @param Freemius $fs
+     * @param number   $plugin_id
+     *
+     * @return string
+     */
+    public function get_install_url(\Freemius $fs, $plugin_id)
+    {
+    }
+    /**
+     * Get the URL to process a pending activation after the checkout.
+     *
+     * @param Freemius $fs
+     * @param number   $plugin_id
+     *
+     * @return string
+     */
+    public function get_pending_activation_url(\Freemius $fs, $plugin_id)
+    {
+    }
+    private function get_checkout_redirect_nonce_action(\Freemius $fs)
+    {
+    }
+}
 /**
  * Manages the detection of clones and provides the logged-in WordPress user with options for manually resolving them.
  *
@@ -14188,6 +14281,44 @@ class FS_Clone_Manager
     {
     }
     #endregion
+}
+class FS_Contact_Form_Manager
+{
+    # region Singleton
+    /**
+     * @var FS_Contact_Form_Manager
+     */
+    private static $_instance;
+    /**
+     * @return FS_Contact_Form_Manager
+     */
+    static function instance()
+    {
+    }
+    private function __construct()
+    {
+    }
+    #endregion
+    /**
+     * Retrieves the query params needed to load the Freemius Contact Form in the context of the plugin.
+     *
+     * @param Freemius $fs
+     *
+     * @return array<string, string>
+     */
+    public function get_query_params(\Freemius $fs)
+    {
+    }
+    /**
+     * Retrieves the standalone link to the Freemius Contact Form.
+     *
+     * @param Freemius $fs
+     *
+     * @return string
+     */
+    public function get_standalone_link(\Freemius $fs)
+    {
+    }
 }
 class FS_GDPR_Manager
 {
