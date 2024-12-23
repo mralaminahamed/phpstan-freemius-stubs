@@ -733,7 +733,40 @@ class Freemius extends \Freemius_Abstract
      *
      * @return array[string]array
      */
-    private function get_active_plugins()
+    private static function get_active_plugins()
+    {
+    }
+    /**
+     * Get collection of all plugins.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.8
+     *
+     * @return array Key is the plugin file path and the value is an array of the plugin data.
+     */
+    private static function get_all_plugins()
+    {
+    }
+    /**
+     * Cached result of get_site_transient( 'update_plugins' )
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.8
+     *
+     * @var object
+     */
+    private static $_plugins_info;
+    /**
+     * Helper function to get specified plugin's slug.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.8
+     *
+     * @param $basename
+     *
+     * @return string
+     */
+    private static function get_plugin_slug($basename)
     {
     }
     private static $_statics_loaded = \false;
@@ -1532,16 +1565,50 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Return a list of modified plugins since the last sync.
+     *
+     * Note:
+     *  There's no point to store a plugins counter since even if the number of
+     *  plugins didn't change, we still need to check if the versions are all the
+     *  same and the activity state is similar.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.8
+     *
+     * @return array|false
+     */
+    private function get_plugins_data_for_api()
+    {
+    }
+    /**
+     * Return a list of modified themes since the last sync.
+     *
+     * Note:
+     *  There's no point to store a themes counter since even if the number of
+     *  themes didn't change, we still need to check if the versions are all the
+     *  same and the activity state is similar.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.8
+     *         
+     * @return array|false
+     */
+    private function get_themes_data_for_api()
+    {
+    }
+    /**
      * Update install details.
      *
      * @author Vova Feldman (@svovaf)
      * @since  1.1.2
      *
-     * @param string[] string $override
+     * @param string[] string           $override
+     * @param bool     $include_plugins Since 1.1.8 by default include plugin changes.
+     * @param bool     $include_themes  Since 1.1.8 by default include plugin changes.
      *
      * @return array
      */
-    private function get_install_data_for_api($override = array())
+    private function get_install_data_for_api(array $override, $include_plugins = \true, $include_themes = \true)
     {
     }
     /**
@@ -1550,7 +1617,7 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.9
      *
-     * @param string[] string $override
+     * @param string[]string $override
      * @param bool     $flush
      *
      * @return false|object|string
@@ -4719,6 +4786,77 @@ class FS_Pricing extends \FS_Entity
     static function get_type()
     {
     }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.8
+     *
+     * @return bool
+     */
+    function has_monthly()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.8
+     *
+     * @return bool
+     */
+    function has_annual()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.8
+     *
+     * @return bool
+     */
+    function has_lifetime()
+    {
+    }
+    /**
+     * Check if unlimited licenses pricing.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.8
+     *
+     * @return bool
+     */
+    function is_unlimited()
+    {
+    }
+    /**
+     * Check if pricing has more than one billing cycle.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.8
+     *
+     * @return bool
+     */
+    function is_multi_cycle()
+    {
+    }
+    /**
+     * Get annual over monthly discount.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.8
+     *
+     * @return int
+     */
+    function annual_discount_percentage()
+    {
+    }
+    /**
+     * Get annual over monthly savings.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.8
+     *
+     * @return float
+     */
+    function annual_savings()
+    {
+    }
 }
 class FS_Site extends \FS_Scope_Entity
 {
@@ -5025,8 +5163,8 @@ class FS_Plugin_Info_Dialog
      * @author Vova Feldman (@svovaf)
      * @since  1.1.7
      *
-     * @param \FS_Plugin_Plan $plan
-     * @param \FS_Pricing     $pricing
+     * @param FS_Plugin_Plan $plan
+     * @param FS_Pricing     $pricing
      *
      * @return float|null|string
      */
