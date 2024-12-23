@@ -30,9 +30,12 @@ abstract class Freemius_Abstract
      *          `$fs->is_registered() && $fs->is_tracking_allowed()`
      *
      * @since 1.0.1
+     *
+     * @param bool $ignore_anonymous_state Since 2.5.1
+     *
      * @return bool
      */
-    abstract function is_registered();
+    abstract function is_registered($ignore_anonymous_state = \false);
     /**
      * Check if the user skipped connecting the account with Freemius.
      *
@@ -49,62 +52,6 @@ abstract class Freemius_Abstract
      * @return bool
      */
     abstract function is_activation_mode();
-    #endregion
-    #----------------------------------------------------------------------------------
-    #region Usage Tracking
-    #----------------------------------------------------------------------------------
-    /**
-     * Returns TRUE if the user opted-in and didn't disconnect (opt-out).
-     *
-     * @author Leo Fajardo (@leorw)
-     * @since 1.2.1.5
-     *
-     * @return bool
-     */
-    abstract function is_tracking_allowed();
-    /**
-     * Returns TRUE if the user never opted-in or manually opted-out.
-     *
-     * @author Vova Feldman (@svovaf)
-     * @since 1.2.1.5
-     *
-     * @return bool
-     */
-    function is_tracking_prohibited()
-    {
-    }
-    /**
-     * Opt-out from usage tracking.
-     *
-     * Note: This will not delete the account information but will stop all tracking.
-     *
-     * Returns:
-     *  1. FALSE  - If the user never opted-in.
-     *  2. TRUE   - If successfully opted-out.
-     *  3. object - API Result on failure.
-     *
-     * @author Leo Fajardo (@leorw)
-     * @since  1.2.1.5
-     *
-     * @return bool|object
-     */
-    abstract function stop_tracking();
-    /**
-     * Opt-in back into usage tracking.
-     *
-     * Note: This will only work if the user opted-in previously.
-     *
-     * Returns:
-     *  1. FALSE  - If the user never opted-in.
-     *  2. TRUE   - If successfully opted-in back to usage tracking.
-     *  3. object - API result on failure.
-     *
-     * @author Leo Fajardo (@leorw)
-     * @since  1.2.1.5
-     *
-     * @return bool|object
-     */
-    abstract function allow_tracking();
     #endregion
     #----------------------------------------------------------------------------------
     #region Module Type
@@ -851,6 +798,7 @@ class Freemius extends \Freemius_Abstract
     const REASON_NOT_WHAT_I_WAS_LOOKING_FOR = 13;
     const REASON_DIDNT_WORK_AS_EXPECTED = 14;
     const REASON_TEMPORARY_DEACTIVATION = 15;
+    #endregion
     /**
      * @author Leo Fajardo (@leorw)
      * @since 2.3.1
@@ -865,7 +813,8 @@ class Freemius extends \Freemius_Abstract
      * @var string|null
      */
     private $_pricing_js_path = \null;
-    #endregion
+    const VERSION_MAX_CHARS = 16;
+    const LANGUAGE_MAX_CHARS = 8;
     /* Ctor
     ------------------------------------------------------------------------------------------------------------------*/
     /**
@@ -1022,29 +971,6 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
-     * @author Leo Fajardo (@leorw)
-     * @since  2.0.0
-     */
-    private function migrate_to_subscriptions_collection()
-    {
-    }
-    /**
-     * @author Leo Fajardo (@leorw)
-     * @since  2.0.0
-     */
-    private function consolidate_licenses()
-    {
-    }
-    /**
-     * Remove invalid paths.
-     *
-     * @author Leo Fajardo (@leorw)
-     * @since  1.2.3
-     */
-    private function remove_invalid_paths()
-    {
-    }
-    /**
      * @author Vova Feldman (@svovaf)
      * @since  1.2.2.7
      *
@@ -1146,16 +1072,6 @@ class Freemius extends \Freemius_Abstract
      *
      */
     function _plugins_loaded()
-    {
-    }
-    /**
-     * Add special parameter to WP admin AJAX calls so when we
-     * process AJAX calls we can identify its source properly.
-     *
-     * @author Leo Fajardo (@leorw)
-     * @since  2.0.0
-     */
-    static function _enrich_ajax_url()
     {
     }
     /**
@@ -1740,16 +1656,33 @@ class Freemius extends \Freemius_Abstract
      * @author Leo Fajardo (@leorw)
      * @since 2.5.0
      *
+     * @param bool $only_if_manual_resolution_is_not_hidden
+     *
      * @return bool
      */
-    private function is_unresolved_clone()
+    private function is_unresolved_clone($only_if_manual_resolution_is_not_hidden = \false)
     {
     }
     /**
      * @author Leo Fajardo (@leorw)
      * @since 2.5.0
+     *
+     * @param bool $only_if_manual_resolution_is_not_hidden
      */
-    function is_clone()
+    function is_clone($only_if_manual_resolution_is_not_hidden = \false)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.0
+     *        
+     * @param int|null $blog_id
+     * @param bool     $strip_protocol
+     * @param bool     $add_trailing_slash
+     *
+     * @return string
+     */
+    static function get_unfiltered_site_url($blog_id = \null, $strip_protocol = \false, $add_trailing_slash = \false)
     {
     }
     /**
@@ -2101,74 +2034,55 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
-     * @author Leo Fajardo (@leorw)
+     * @param string[] $permissions
+     * @param bool     $is_enabled
+     * @param int|null $blog_id
      *
-     * @since  1.2.1.5
+     * @return true|object `true` on success, API error object on failure.
      */
-    function _stop_tracking_callback()
+    private function update_site_permissions(array $permissions, $is_enabled, $blog_id = \null)
     {
     }
     /**
-     * @author Leo Fajardo (@leorw)
-     * @since  1.2.1.5
+     * @param string[] $permissions
+     * @param bool     $is_enabled
+     * @param bool     $has_site_delegated_connection
+     *
+     * @return true|object `true` on success, API error object on failure.
      */
-    function _allow_tracking_callback()
+    private function update_network_permissions(array $permissions, $is_enabled, &$has_site_delegated_connection)
     {
     }
     /**
-     * Opt-out from usage tracking.
+     * @param mixed $result
      *
-     * Note: This will not delete the account information but will stop all tracking.
-     *
-     * Returns:
-     *  1. FALSE  - If the user never opted-in.
-     *  2. TRUE   - If successfully opted-out.
-     *  3. object - API result on failure.
-     *
-     * @author Leo Fajardo (@leorw)
-     * @since  1.2.1.5
-     *
-     * @return bool|object
+     * @return string
      */
-    function stop_site_tracking()
+    private function get_api_error_message($result)
     {
     }
     /**
-     * Opt-out network from usage tracking.
-     *
-     * Note: This will not delete the account information but will stop all tracking.
-     *
-     * Returns:
-     *  1. FALSE  - If the user never opted-in.
-     *  2. TRUE   - If successfully opted-out.
-     *  3. object - API result on failure.
-     *
-     * @author Leo Fajardo (@leorw)
-     * @since  1.2.1.5
-     *
-     * @return bool|object
+     * @author Vova Feldman (@svovaf)
+     * @since  2.5.1
      */
-    function stop_network_tracking()
+    function _toggle_permission_tracking_callback()
     {
     }
     /**
-     * Opt-out from usage tracking.
+     * @param string[] $permissions
+     * @param bool     $is_enabled
+     * @param int|null $blog_id
      *
-     * Note: This will not delete the account information but will stop all tracking.
-     *
-     * Returns:
-     *  1. FALSE  - If the user never opted-in.
-     *  2. TRUE   - If successfully opted-out.
-     *  3. object - API result on failure.
-     *
-     * @author Leo Fajardo (@leorw)
-     * @since  1.2.1.5
-     *
-     * @param bool $is_network_action
-     *
-     * @return bool|object
+     * @return bool|mixed `true` if updated successfully or no update is needed.
      */
-    function stop_tracking($is_network_action = \false)
+    private function toggle_permission_tracking($permissions, $is_enabled, $blog_id = \null)
+    {
+    }
+    /**
+     * @param bool     $is_enabled
+     * @param int|null $blog_id
+     */
+    private function toggle_user_permission($is_enabled, $blog_id = \null)
     {
     }
     /**
@@ -2184,47 +2098,11 @@ class Freemius extends \Freemius_Abstract
      * @author Leo Fajardo (@leorw)
      * @since  1.2.1.5
      *
-     * @return bool|object
-     */
-    function allow_site_tracking()
-    {
-    }
-    /**
-     * Opt-in network back into usage tracking.
-     *
-     * Note: This will only work if the user opted-in previously.
-     *
-     * Returns:
-     *  1. FALSE  - If the user never opted-in.
-     *  2. TRUE   - If successfully opted-in back to usage tracking.
-     *  3. object - API result on failure.
-     *
-     * @author Leo Fajardo (@leorw)
-     * @since  1.2.1.5
+     * @bool $is_enabled
      *
      * @return bool|object
      */
-    function allow_network_tracking()
-    {
-    }
-    /**
-     * Opt-in back into usage tracking.
-     *
-     * Note: This will only work if the user opted-in previously.
-     *
-     * Returns:
-     *  1. FALSE  - If the user never opted-in.
-     *  2. TRUE   - If successfully opted-in back to usage tracking.
-     *  3. object - API result on failure.
-     *
-     * @author Leo Fajardo (@leorw)
-     * @since  1.2.1.5
-     *
-     * @param bool $is_network_action
-     *
-     * @return bool|object
-     */
-    function allow_tracking($is_network_action = \false)
+    private function toggle_site_tracking($is_enabled, $blog_id = \null)
     {
     }
     /**
@@ -2240,28 +2118,15 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
-     * @author Vova Feldman (@svovaf)
-     * @since  2.3.2
+     * Update permission tracking flags. When updating in a network context, in addition to updating the network-level flags, also update the permissions on the site-level for all non-delegated sites.
      *
-     * @return bool
-     */
-    function is_extensions_tracking_allowed()
-    {
-    }
-    /**
-     * @author Vova Feldman (@svovaf)
-     * @since  2.3.2
-     */
-    function _update_tracking_permission_callback()
-    {
-    }
-    /**
-     * @author Leo Fajardo (@leorw)
-     * @since 2.3.2
+     * @param string[] $permissions
+     * @param bool     $is_enabled
+     * @param int|null $blog_id
      *
-     * @param bool|null $is_enabled
+     * @return array
      */
-    function update_extensions_tracking_flag($is_enabled)
+    private function update_tracking_permissions($permissions, $is_enabled, $blog_id = \null)
     {
     }
     /**
@@ -2533,6 +2398,13 @@ class Freemius extends \Freemius_Abstract
      * @return bool
      */
     function is_pending_activation()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.0
+     */
+    private function clear_pending_activation_mode()
     {
     }
     /**
@@ -3030,7 +2902,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return string
      */
-    function current_page_url()
+    static function current_page_url()
     {
     }
     /**
@@ -3148,9 +3020,18 @@ class Freemius extends \Freemius_Abstract
      * @author Leo Fajardo (@leorw)
      * @since  1.2.2
      *
-     * @return string
+     * @return bool
      */
     private function can_activate_previous_theme()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.5.0
+     *
+     * @return bool
+     */
+    private function can_activate_theme($slug)
     {
     }
     /**
@@ -3313,6 +3194,15 @@ class Freemius extends \Freemius_Abstract
     }
     /**
      * @author Vova Feldman (@svovaf)
+     * @since  2.5.1
+     *
+     * @param bool|int $network_or_blog_id
+     */
+    private function unset_anonymous_mode($network_or_blog_id = 0)
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
      * @since  2.0.0
      *
      * @param int    $blog_id    Site ID.
@@ -3344,9 +3234,9 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.1.3
      *
-     * @param bool|int $network_or_blog_id Since 2.0.0.
+     * @param bool|int|int[] $network_or_blog_ids Since 2.0.0.
      */
-    private function reset_anonymous_mode($network_or_blog_id = 0)
+    private function reset_anonymous_mode($network_or_blog_ids = \false)
     {
     }
     /**
@@ -3375,10 +3265,9 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.1.1
      *
-     * @param array|null $sites            Since 2.0.0. Specific sites.
-     * @param bool       $skip_all_network Since 2.0.0. If true, skip connection for all sites.
+     * @param bool|int|int[] $network_or_blog_ids Since 2.5.1
      */
-    function skip_connection($sites = \null, $skip_all_network = \false)
+    function skip_connection($network_or_blog_ids = \false)
     {
     }
     /**
@@ -3390,7 +3279,7 @@ class Freemius extends \Freemius_Abstract
      * @param int|null $blog_id
      * @param bool     $send_skip
      */
-    private function skip_site_connection($blog_id = \null, $send_skip = \true)
+    private function skip_site_connection($blog_id = \null)
     {
     }
     /**
@@ -3457,7 +3346,7 @@ class Freemius extends \Freemius_Abstract
      * @param string[] $override
      * @param bool     $include_plugins   Since 1.1.8 by default include plugin changes.
      * @param bool     $include_themes    Since 1.1.8 by default include plugin changes.
-     * @param bool     $include_blog_data Since 2.3.0 by default include the current blog's data (language, charset, title, and URL).
+     * @param bool     $include_blog_data Since 2.3.0 by default include the current blog's data (language, title, and URL).
      *
      * @return array
      */
@@ -3496,6 +3385,23 @@ class Freemius extends \Freemius_Abstract
      * @return array
      */
     private function get_install_diff_for_api($site, $install, $override = array())
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.5.1
+     */
+    private function send_pending_clone_update_once()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.5.1
+     *
+     * @param string  $resolution_type
+     * @param FS_Site $clone_context_install
+     */
+    function send_clone_resolution_update($resolution_type, $clone_context_install)
     {
     }
     /**
@@ -3759,6 +3665,27 @@ class Freemius extends \Freemius_Abstract
      * @return string|null Bundle public key.
      */
     function get_bundle_public_key()
+    {
+    }
+    /**
+     * Get whether the SDK has been initiated in the context of a Bundle.
+     *
+     * This will return true, if `bundle_id` is present in the SDK init parameters.
+     *
+     * ```php
+     * $my_fs = fs_dynamic_init( array(
+     *     // ...
+     *     'bundle_id'         => 'XXXX', // Will return true since we have bundle id.
+     *     'bundle_public_key' => 'pk_XXXX',
+     * ) );
+     * ```
+     *
+     * @author Swashata Ghosh (@swashata)
+     * @since  2.5.0
+     *
+     * @return bool True if we are running in bundle context, false otherwise.
+     */
+    private function has_bundle_context()
     {
     }
     /**
@@ -4113,9 +4040,12 @@ class Freemius extends \Freemius_Abstract
      *
      * @author Vova Feldman (@svovaf)
      * @since  1.0.1
+     *
+     * @param bool $ignore_anonymous_state Since 2.5.1
+     *
      * @return bool
      */
-    function is_registered()
+    function is_registered($ignore_anonymous_state = \false)
     {
     }
     /**
@@ -4126,7 +4056,20 @@ class Freemius extends \Freemius_Abstract
      *
      * @return bool
      */
-    function is_tracking_allowed()
+    function is_tracking_allowed($blog_id = \null, $install = \null)
+    {
+    }
+    /**
+     * Returns TRUE if the user never opted-in or manually opted-out.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since 1.2.1.5
+     *
+     * @param int|null $blog_id
+     *
+     * @return bool
+     */
+    function is_tracking_prohibited($blog_id = \null)
     {
     }
     /**
@@ -5138,6 +5081,9 @@ class Freemius extends \Freemius_Abstract
      * @param null|int    $blog_id
      * @param null|number $plugin_id
      * @param null|number $license_owner_id
+     * @param bool|null   $is_extensions_tracking_allowed
+     * @param bool|null   $is_diagnostic_tracking_allowed Since 2.5.0.2 to allow license activation with minimal data footprint.
+     *
      *
      * @return array {
      *      @var bool   $success
@@ -5145,7 +5091,7 @@ class Freemius extends \Freemius_Abstract
      *      @var string $next_page
      * }
      */
-    private function activate_license($license_key, $sites = array(), $is_marketing_allowed = \null, $blog_id = \null, $plugin_id = \null, $license_owner_id = \null, $is_extensions_tracking_allowed = \null)
+    private function activate_license($license_key, $sites = array(), $is_marketing_allowed = \null, $blog_id = \null, $plugin_id = \null, $license_owner_id = \null, $is_extensions_tracking_allowed = \null, $is_diagnostic_tracking_allowed = \null)
     {
     }
     /**
@@ -5263,6 +5209,16 @@ class Freemius extends \Freemius_Abstract
      * @return bool
      */
     function has_affiliate_program()
+    {
+    }
+    /**
+     * Get Plugin ID under which we will track affiliate application.
+     *
+     * This could either be the Bundle ID or the main plugin ID.
+     *
+     * @return number Bundle ID if developer has provided one, else the main plugin ID.
+     */
+    private function get_plugin_id_for_affiliate_terms()
     {
     }
     /**
@@ -5650,9 +5606,9 @@ class Freemius extends \Freemius_Abstract
      * @author Leo Fajardo (@leorw)
      * @since  2.0.0
      *
-     * @param array|null $sites
+     * @param bool|int[] $all_or_blog_ids
      */
-    private function delegate_connection($sites = \null)
+    private function delegate_connection($all_or_blog_ids = \true)
     {
     }
     /**
@@ -5689,7 +5645,7 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
-     * Check if delegated the connection. When running within the the network admin,
+     * Check if delegated the connection. When running within the network admin,
      * and haven't specified the blog ID, checks if network level delegated. If running
      * within a site admin or specified a blog ID, check if delegated the connection for
      * the current context site.
@@ -5776,6 +5732,26 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * @author Vova Feldman (@svovaf)
+     * @since  2.5.1
+     *
+     * @param bool|null $is_delegated When `true`, returns only connection delegated blog IDs. When `false`, only non-delegated blog IDs.
+     *
+     * @return int[]
+     */
+    private function get_blog_ids($is_delegated = \null)
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  2.5.1
+     *
+     * @return int[]
+     */
+    private function get_non_delegated_blog_ids()
+    {
+    }
+    /**
      * Gets a map of module IDs that the given user has opted-in to.
      *
      * @author Leo Fajardo (@leorw)
@@ -5838,14 +5814,26 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * @author Vova Feldman (@svovaf)
+     * @since  2.5.1
+     *
+     * @param WP_Site[]|array[] $sites
+     *
+     * @return int[]
+     */
+    static function get_sites_blog_ids($sites)
+    {
+    }
+    /**
      * @author Leo Fajardo (@leorw)
      * @since  2.0.0
      *
      * @param array|WP_Site|null $site
+     * @param bool               $load_registration Since 2.5.1 When set to `true` the method will attempt to return the subsite's registration date, regardless of the `$site` type and value. In most calls, the registration date will be returned anyway, even when the value is `false`. This param is purely for performance optimization.
      *
      * @return array
      */
-    function get_site_info($site = \null)
+    function get_site_info($site = \null, $load_registration = \false)
     {
     }
     /**
@@ -6147,10 +6135,11 @@ class Freemius extends \Freemius_Abstract
      *
      * @param bool|string $topic
      * @param bool|string $message
+     * @param bool|string $summary Since 2.5.1.
      *
      * @return string
      */
-    function contact_url($topic = \false, $message = \false)
+    function contact_url($topic = \false, $message = \false, $summary = \false)
     {
     }
     /**
@@ -6301,6 +6290,48 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Get sanitized site language.
+     *
+     * @param string $language
+     * @param int    $max_len
+     *
+     * @since  2.5.1
+     * @author Vova Feldman (@svovaf)
+     *
+     * @return string
+     */
+    private static function get_sanitized_language($language = '', $max_len = self::LANGUAGE_MAX_CHARS)
+    {
+    }
+    /**
+     * Get core version stripped from pre-release and build.
+     *
+     * @since  2.5.1
+     * @author Vova Feldman (@svovaf)
+     *
+     * @param string $version
+     * @param int    $parts
+     * @param int    $max_len
+     * @param bool   $include_pre_release
+     *
+     * @return string
+     */
+    private static function get_core_version($version, $parts = 3, $max_len = self::VERSION_MAX_CHARS, $include_pre_release = \false)
+    {
+    }
+    /**
+     * @param string $prop
+     * @param mixed  $val
+     *
+     * @return mixed
+     *@author Vova Feldman (@svovaf)
+     *
+     * @since  2.5.1
+     */
+    private static function get_api_sanitized_property($prop, $val)
+    {
+    }
+    /**
      * @author Leo Fajardo (@leorw)
      * @since 2.3.0
      *
@@ -6345,7 +6376,7 @@ class Freemius extends \Freemius_Abstract
      *                                          In this case, the user and site info will be sent to the server but no
      *                                          data will be saved to the WP installation's database.
      * @param number|bool $trial_plan_id
-     * @param bool        $is_disconnected      Whether or not to opt in without tracking.
+     * @param bool        $is_disconnected      Whether to opt in without tracking.
      * @param null|bool   $is_marketing_allowed
      * @param array       $sites                If network-level opt-in, an array of containing details of sites.
      * @param bool        $redirect
@@ -6424,6 +6455,7 @@ class Freemius extends \Freemius_Abstract
      * @param string    $user_secret_key
      * @param bool|null $is_marketing_allowed
      * @param bool|null $is_extensions_tracking_allowed Since 2.3.2
+     * @param bool|null $is_diagnostic_tracking_allowed Since 2.5.0.2
      * @param number    $install_id
      * @param string    $install_public_key
      * @param string    $install_secret_key
@@ -6432,7 +6464,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return string If redirect is `false`, returns the next page the user should be redirected to.
      */
-    private function install_with_new_user($user_id, $user_public_key, $user_secret_key, $is_marketing_allowed, $is_extensions_tracking_allowed, $install_id, $install_public_key, $install_secret_key, $redirect = \true, $auto_install = \false)
+    private function install_with_new_user($user_id, $user_public_key, $user_secret_key, $is_marketing_allowed, $is_extensions_tracking_allowed, $is_diagnostic_tracking_allowed, $install_id, $install_public_key, $install_secret_key, $redirect = \true, $auto_install = \false)
     {
     }
     /**
@@ -6446,6 +6478,7 @@ class Freemius extends \Freemius_Abstract
      * @param string    $user_secret_key
      * @param bool|null $is_marketing_allowed
      * @param bool|null $is_extensions_tracking_allowed Since 2.3.2
+     * @param bool|null $is_diagnostic_tracking_allowed Since 2.5.0.2
      * @param array     $site_ids
      * @param bool      $license_key
      * @param bool      $trial_plan_id
@@ -6453,7 +6486,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return string If redirect is `false`, returns the next page the user should be redirected to.
      */
-    private function install_many_pending_with_user($user_id, $user_public_key, $user_secret_key, $is_marketing_allowed, $is_extensions_tracking_allowed, $site_ids, $license_key = \false, $trial_plan_id = \false, $redirect = \true)
+    private function install_many_pending_with_user($user_id, $user_public_key, $user_secret_key, $is_marketing_allowed, $is_extensions_tracking_allowed, $is_diagnostic_tracking_allowed, $site_ids, $license_key = \false, $trial_plan_id = \false, $redirect = \true)
     {
     }
     /**
@@ -6467,13 +6500,14 @@ class Freemius extends \Freemius_Abstract
      * @param string    $user_secret_key
      * @param bool|null $is_marketing_allowed
      * @param bool|null $is_extensions_tracking_allowed Since 2.3.2
+     * @param bool|null $is_diagnostic_tracking_allowed Since 2.5.0.2
      * @param object[]  $installs
      * @param bool      $redirect
      * @param bool      $auto_install                   Since 1.2.1.7 If `true` and setting up an account with a valid license, will redirect (or return a URL) to the account page with a special parameter to trigger the auto installation processes.
      *
      * @return string If redirect is `false`, returns the next page the user should be redirected to.
      */
-    private function install_many_with_new_user($user_id, $user_public_key, $user_secret_key, $is_marketing_allowed, $is_extensions_tracking_allowed, array $installs, $redirect = \true, $auto_install = \false)
+    private function install_many_with_new_user($user_id, $user_public_key, $user_secret_key, $is_marketing_allowed, $is_extensions_tracking_allowed, $is_diagnostic_tracking_allowed, array $installs, $redirect = \true, $auto_install = \false)
     {
     }
     /**
@@ -7002,6 +7036,19 @@ class Freemius extends \Freemius_Abstract
      * @param mixed $error Optional error message.
      */
     static function shoot_ajax_failure($error = '')
+    {
+    }
+    /**
+     * Returns an AJAX URL with a special extra param to indicate whether the request was triggered from the network admin or blog admin.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.5.1
+     *
+     * @param string $wrap_with By default, returns the AJAX URL wrapped with single quotes.
+     *
+     * @return string
+     */
+    static function ajax_url($wrap_with = "'")
     {
     }
     /**
@@ -9109,8 +9156,9 @@ class FS_Admin_Notices
      * @since  2.0.0
      *
      * @param int|null $network_level_or_blog_id
+     * @param bool     $is_temporary
      */
-    function clear_all_sticky($network_level_or_blog_id = \null)
+    function clear_all_sticky($network_level_or_blog_id = \null, $is_temporary = \false)
     {
     }
     /**
@@ -9518,6 +9566,78 @@ class FS_Api
     {
     }
     #endregion
+}
+/**
+ * Class FS_Lock
+ *
+ * @author Vova Feldman (@svovaf)
+ * @since  2.5.1
+ */
+class FS_Lock
+{
+    /**
+     * @var int Random ID representing the current PHP thread.
+     */
+    private static $_thread_id;
+    /**
+     * @var string
+     */
+    private $_lock_id;
+    /**
+     * @param string $lock_id
+     */
+    function __construct($lock_id)
+    {
+    }
+    /**
+     * Try to acquire lock. If the lock is already set or is being acquired by another locker, don't do anything.
+     *
+     * @param int $expiration
+     *
+     * @return bool TRUE if successfully acquired lock.
+     */
+    function try_lock($expiration = 0)
+    {
+    }
+    /**
+     * Acquire lock regardless if it's already acquired by another locker or not.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.1.0
+     *
+     * @param int $expiration
+     */
+    function lock($expiration = 0)
+    {
+    }
+    /**
+     * Checks if lock is currently acquired.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.1.0
+     *
+     * @return bool
+     */
+    function is_locked()
+    {
+    }
+    /**
+     * Unlock the lock.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.1.0
+     */
+    function unlock()
+    {
+    }
+    /**
+     * Checks if lock is currently acquired by the current locker.
+     *
+     * @return bool
+     */
+    protected function has_lock()
+    {
+    }
 }
 class FS_Logger
 {
@@ -10103,7 +10223,7 @@ class FS_Plugin_Updater
     {
     }
     /**
-     * Get module's required data for the updates mechanism.
+     * Get module's required data for the updates' mechanism.
      *
      * @author Vova Feldman (@svovaf)
      * @since  2.0.0
@@ -10394,9 +10514,11 @@ class FS_Security
  *
  * A wrapper class for handling network level and single site level storage.
  *
- * @property bool   $is_network_activation
- * @property int    $network_install_blog_id
- * @property object $sync_cron
+ * @property bool        $is_network_activation
+ * @property int         $network_install_blog_id
+ * @property bool|null   $is_extensions_tracking_allowed
+ * @property bool|null   $is_diagnostic_tracking_allowed
+ * @property object      $sync_cron
  */
 class FS_Storage
 {
@@ -10443,6 +10565,15 @@ class FS_Storage
      * }
      */
     private static $_NETWORK_OPTIONS_MAP;
+    const OPTION_LEVEL_UNDEFINED = -1;
+    // The option should be stored on the network level.
+    const OPTION_LEVEL_NETWORK = 0;
+    // The option should be stored on the network level when the plugin is network-activated.
+    const OPTION_LEVEL_NETWORK_ACTIVATED = 1;
+    // The option should be stored on the network level when the plugin is network-activated and the opt-in connection was NOT delegated to the sub-site admin.
+    const OPTION_LEVEL_NETWORK_ACTIVATED_NOT_DELEGATED = 2;
+    // The option should be stored on the site level.
+    const OPTION_LEVEL_SITE = 3;
     /**
      * @author Leo Fajardo (@leorw)
      *
@@ -10492,9 +10623,10 @@ class FS_Storage
      * @param string        $key
      * @param mixed         $value
      * @param null|bool|int $network_level_or_blog_id When an integer, use the given blog storage. When `true` use the multisite storage (if there's a network). When `false`, use the current context blog storage. When `null`, the decision which storage to use (MS vs. Current S) will be handled internally and determined based on the $option (based on self::$_BINARY_MAP).
+     * @param int           $option_level Since 2.5.1
      * @param bool          $flush
      */
-    function store($key, $value, $network_level_or_blog_id = \null, $flush = \true)
+    function store($key, $value, $network_level_or_blog_id = \null, $option_level = self::OPTION_LEVEL_UNDEFINED, $flush = \true)
     {
     }
     /**
@@ -10523,10 +10655,11 @@ class FS_Storage
      * @param string        $key
      * @param mixed         $default
      * @param null|bool|int $network_level_or_blog_id When an integer, use the given blog storage. When `true` use the multisite storage (if there's a network). When `false`, use the current context blog storage. When `null`, the decision which storage to use (MS vs. Current S) will be handled internally and determined based on the $option (based on self::$_BINARY_MAP).
+     * @param int           $option_level Since 2.5.1
      *
      * @return mixed
      */
-    function get($key, $default = \false, $network_level_or_blog_id = \null)
+    function get($key, $default = \false, $network_level_or_blog_id = \null, $option_level = self::OPTION_LEVEL_UNDEFINED)
     {
     }
     /**
@@ -10604,10 +10737,11 @@ class FS_Storage
      * @since  2.0.0
      *
      * @param string $key
+     * @param int    $option_level Since 2.5.1
      *
-     * @return bool|mixed
+     * @return bool
      */
-    private function is_multisite_option($key)
+    private function is_multisite_option($key, $option_level = self::OPTION_LEVEL_UNDEFINED)
     {
     }
     /**
@@ -10615,10 +10749,11 @@ class FS_Storage
      *
      * @param string        $key
      * @param null|bool|int $network_level_or_blog_id When an integer, use the given blog storage. When `true` use the multisite storage (if there's a network). When `false`, use the current context blog storage. When `null`, the decision which storage to use (MS vs. Current S) will be handled internally and determined based on the $option (based on self::$_BINARY_MAP).
+     * @param int           $option_level Since 2.5.1
      *
      * @return bool
      */
-    private function should_use_network_storage($key, $network_level_or_blog_id = \null)
+    private function should_use_network_storage($key, $network_level_or_blog_id = \null, $option_level = self::OPTION_LEVEL_UNDEFINED)
     {
     }
     /**
@@ -10656,13 +10791,9 @@ class FS_Storage
 class FS_User_Lock
 {
     /**
-     * @var int
+     * @var FS_Lock
      */
-    private $_wp_user_id;
-    /**
-     * @var int
-     */
-    private $_thread_id;
+    private $_lock;
     #--------------------------------------------------------------------------------
     #region Singleton
     #--------------------------------------------------------------------------------
@@ -10708,31 +10839,12 @@ class FS_User_Lock
     {
     }
     /**
-     * Checks if lock is currently acquired.
-     *
-     * @author Vova Feldman (@svovaf)
-     * @since  2.1.0
-     *
-     * @return bool
-     */
-    function is_locked()
-    {
-    }
-    /**
      * Unlock the lock.
      *
      * @author Vova Feldman (@svovaf)
      * @since  2.1.0
      */
     function unlock()
-    {
-    }
-    /**
-     * Checks if lock is currently acquired by the current locker.
-     *
-     * @return bool
-     */
-    private function has_lock()
     {
     }
 }
@@ -10908,6 +11020,10 @@ class FS_AffiliateTerms extends \FS_Scope_Entity
      * @var bool If `true`, allow referrals from any site.
      */
     public $is_any_site_allowed;
+    /**
+     * @var string $plugin_title Title of the plugin. This is used in case we are showing affiliate form for a Bundle instead of the `plugin` in context.
+     */
+    public $plugin_title;
     #endregion Properties
     /**
      * @author Leo Fajardo (@leorw)
@@ -11912,6 +12028,9 @@ class FS_Pricing extends \FS_Entity
     {
     }
 }
+/**
+ * @property int $blog_id
+ */
 class FS_Site extends \FS_Scope_Entity
 {
     /**
@@ -11942,10 +12061,6 @@ class FS_Site extends \FS_Scope_Entity
      * @var string E.g. en-GB
      */
     public $language;
-    /**
-     * @var string E.g. UTF-8
-     */
-    public $charset;
     /**
      * @var string Platform version (e.g WordPress version).
      */
@@ -11989,6 +12104,8 @@ class FS_Site extends \FS_Scope_Entity
      * @author Leo Fajardo (@leorw)
      *
      * @since  1.2.1.5
+     * @deprecated Since 2.5.1
+     * @todo Remove after a few releases.
      *
      * @var bool
      */
@@ -12059,29 +12176,22 @@ class FS_Site extends \FS_Scope_Entity
     {
     }
     /**
-     * @author Vova Feldman (@svovaf)
-     * @since  2.0.0
-     *
-     * @return bool
-     */
-    function is_tracking_allowed()
-    {
-    }
-    /**
-     * @author Vova Feldman (@svovaf)
-     * @since  2.0.0
-     *
-     * @return bool
-     */
-    function is_tracking_prohibited()
-    {
-    }
-    /**
      * @author Edgar Melkonyan
      *
      * @return bool
      */
     function is_beta()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.1
+     *
+     * @param string $site_url
+     *
+     * @return bool
+     */
+    function is_clone($site_url)
     {
     }
 }
@@ -13183,8 +13293,10 @@ class FS_Admin_Notice_Manager
      *
      * @author Vova Feldman (@svovaf)
      * @since  1.0.8
+     *
+     * @param bool $is_temporary @since 2.5.1
      */
-    function clear_all_sticky()
+    function clear_all_sticky($is_temporary = \false)
     {
     }
     #--------------------------------------------------------------------------------
@@ -13397,6 +13509,8 @@ class FS_Cache_Manager
  * @property string $request_handler_id
  * @property int    $request_handler_timestamp
  * @property int    $request_handler_retries_count
+ * @property bool   $hide_manual_resolution
+ * @property array  $new_blog_install_map
  */
 class FS_Clone_Manager
 {
@@ -13408,23 +13522,6 @@ class FS_Clone_Manager
      * @var FS_Option_Manager
      */
     private $_network_storage;
-    /**
-     * @var array {
-     * @type int    $clone_identification_timestamp
-     * @type int    $temporary_duplicate_mode_selection_timestamp
-     * @type int    $temporary_duplicate_notice_shown_timestamp
-     * @type string $request_handler_id
-     * @type int    $request_handler_timestamp
-     * @type int    $request_handler_retries_count
-     * }
-     */
-    private $_data;
-    /**
-     * @var array {
-     * @type array $new_blog_install_map
-     * }
-     */
-    private $_network_data;
     /**
      * @var FS_Admin_Notices
      */
@@ -13460,6 +13557,10 @@ class FS_Clone_Manager
     /**
      * @var string
      */
+    const OPTION_LONG_TERM_DUPLICATE = 'long_term_duplicate';
+    /**
+     * @var string
+     */
     const OPTION_NEW_HOME = 'new_home';
     #--------------------------------------------------------------------------------
     #region Singleton
@@ -13479,6 +13580,16 @@ class FS_Clone_Manager
     {
     }
     /**
+     * Migrate clone resolution options from 2.5.0 array-based structure, to a new flat structure.
+     *
+     * The reason this logic is not in a separate migration script is that we want to be 100% sure data is migrated before any execution of clone logic.
+     *
+     * @todo Delete this one in the future.
+     */
+    private function maybe_migrate_options()
+    {
+    }
+    /**
      * @author Leo Fajardo (@leorw)
      * @since 2.5.0
      */
@@ -13491,6 +13602,15 @@ class FS_Clone_Manager
      * @return int|null
      */
     function get_clone_identification_timestamp()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.1
+     *
+     * @param string $sdk_last_version
+     */
+    function maybe_update_clone_resolution_support_flag($sdk_last_version)
     {
     }
     /**
@@ -13513,6 +13633,15 @@ class FS_Clone_Manager
      * @return bool
      */
     private function should_handle_clones()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.1
+     *
+     * @return bool
+     */
+    function should_hide_manual_resolution()
     {
     }
     /**
@@ -13588,7 +13717,34 @@ class FS_Clone_Manager
      *
      * @return bool If managed to automatically resolve the clone.
      */
-    private function try_resolve_clone_automatically(\Freemius $instance, $current_url, $is_localhost, $is_clone_of_network_subsite = \null)
+    private function try_resolve_clone_automatically_by_instance(\Freemius $instance, $current_url, $is_localhost, $is_clone_of_network_subsite = \null)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.0
+     */
+    private function try_resolve_clone_automatically()
+    {
+    }
+    /**
+     * Tries to resolve the clone situation automatically based on the config in the wp-config.php file.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since 2.5.0
+     *
+     * @param string $clone_action
+     */
+    private function try_resolve_clone_automatically_by_config($clone_action)
+    {
+    }
+    /**
+     * @author Leo Fajard (@leorw)
+     * @since 2.5.0
+     *
+     * @return string|null
+     */
+    private function get_clone_resolution_action_from_config()
     {
     }
     /**
@@ -13603,7 +13759,7 @@ class FS_Clone_Manager
     {
     }
     /**
-     * If a new install was created after creating a new subsite, its ID is stored in the blog-install map so that it can be recovered in case it's replaced with a clone install (e.g., when the newly created subsite is a clone).
+     * If a new install was created after creating a new subsite, its ID is stored in the blog-install map so that it can be recovered in case it's replaced with a clone install (e.g., when the newly created subsite is a clone). The IDs of the clone subsites that were created while not running this version of the SDK or a higher version will also be stored in the said map so that the clone manager can also try to resolve them later on.
      *
      * @author Leo Fajardo (@leorw)
      * @since 2.5.0
@@ -13611,7 +13767,7 @@ class FS_Clone_Manager
      * @param int     $blog_id
      * @param FS_Site $site
      */
-    function store_new_blog_install_info($blog_id, $site = \null)
+    function store_blog_install_info($blog_id, $site = \null)
     {
     }
     /**
@@ -13656,9 +13812,13 @@ class FS_Clone_Manager
      * @author Leo Fajardo (@leorw)
      * @since 2.5.0
      *
-     * @param string $clone_action
+     * @param string     $clone_action
+     * @param Freemius[] $fs_instances
+     * @param int        $blog_id
+     *
+     * @return array
      */
-    private function resolve_cloned_sites($clone_action)
+    private function resolve_cloned_sites($clone_action, $fs_instances = array(), $blog_id = 0)
     {
     }
     /**
@@ -13672,7 +13832,7 @@ class FS_Clone_Manager
      * @author Leo Fajardo (@leorw)
      * @since 2.5.0
      */
-    private function maybe_show_clone_admin_notice()
+    function maybe_show_clone_admin_notice()
     {
     }
     /**
@@ -13793,7 +13953,6 @@ class FS_Clone_Manager
      *
      * @param number[]    $product_ids
      * @param string      $message
-     * @param string      $message
      * @param string|null $plugin_title
      */
     function add_temporary_duplicate_sticky_notice($product_ids, $message, $plugin_title = \null)
@@ -13809,6 +13968,25 @@ class FS_Clone_Manager
      * @return bool
      */
     private function should_use_network_storage($key)
+    {
+    }
+    /**
+     * @param string      $key
+     * @param number|null $blog_id
+     *
+     * @return FS_Option_Manager
+     */
+    private function get_storage($key, $blog_id = \null)
+    {
+    }
+    /**
+     * @param string      $name
+     * @param bool        $flush
+     * @param number|null $blog_id
+     *
+     * @return mixed
+     */
+    private function get_option($name, $flush = \false, $blog_id = \null)
     {
     }
     #--------------------------------------------------------------------------------
@@ -13827,6 +14005,12 @@ class FS_Clone_Manager
      * @return bool
      */
     function __isset($name)
+    {
+    }
+    /**
+     * @param string $name
+     */
+    function __unset($name)
     {
     }
     /**
@@ -14326,14 +14510,11 @@ class FS_License_Manager
     }
 }
 /**
- * 3-layer lazy options manager.
- *      layer 3: Memory
- *      layer 2: Cache (if there's any caching plugin and if WP_FS__DEBUG_SDK is FALSE)
- *      layer 1: Database (options table). All options stored as one option record in the DB to reduce number of DB
- *      queries.
+ * 2-layer lazy options manager.
+ *      layer 2: Memory
+ *      layer 1: Database (options table). All options stored as one option record in the DB to reduce number of DB queries.
  *
- * If load() is not explicitly called, starts as empty manager. Same thing about saving the data - you have to
- * explicitly call store().
+ * If load() is not explicitly called, starts as empty manager. Same thing about saving the data - you have to explicitly call store().
  *
  * Class Freemius_Option_Manager
  */
@@ -14448,10 +14629,11 @@ class FS_Option_Manager
      * @since  1.0.6
      *
      * @param string $option
+     * @param bool   $flush
      *
      * @return bool
      */
-    function has_option($option)
+    function has_option($option, $flush = \false)
     {
     }
     /**
@@ -14460,10 +14642,11 @@ class FS_Option_Manager
      *
      * @param string $option
      * @param mixed  $default
+     * @param bool   $flush
      *
      * @return mixed
      */
-    function get_option($option, $default = \null)
+    function get_option($option, $default = \null, $flush = \false)
     {
     }
     /**
@@ -14531,13 +14714,345 @@ class FS_Option_Manager
     private function get_option_manager_name()
     {
     }
+    #endregion
+}
+/**
+ * This class is responsible for managing the user permissions.
+ *
+ * @author Vova Feldman (@svovaf)
+ * @since 2.5.1
+ */
+class FS_Permission_Manager
+{
     /**
-     * @author Vova Feldman (@svovaf)
-     * @since  2.0.0
+     * @var Freemius
+     */
+    private $_fs;
+    /**
+     * @var FS_Storage
+     */
+    private $_storage;
+    /**
+     * @var array<number,self>
+     */
+    private static $_instances = array();
+    const PERMISSION_USER = 'user';
+    const PERMISSION_SITE = 'site';
+    const PERMISSION_EVENTS = 'events';
+    const PERMISSION_ESSENTIALS = 'essentials';
+    const PERMISSION_DIAGNOSTIC = 'diagnostic';
+    const PERMISSION_EXTENSIONS = 'extensions';
+    const PERMISSION_NEWSLETTER = 'newsletter';
+    /**
+     * @param Freemius $fs
      *
+     * @return self
+     */
+    static function instance(\Freemius $fs)
+    {
+    }
+    /**
+     * @param Freemius $fs
+     */
+    protected function __construct(\Freemius $fs)
+    {
+    }
+    /**
+     * @return string[]
+     */
+    static function get_all_permission_ids()
+    {
+    }
+    /**
+     * @return string[]
+     */
+    static function get_api_managed_permission_ids()
+    {
+    }
+    /**
+     * @param string $permission
+     *
+     * @return bool
+     */
+    static function is_supported_permission($permission)
+    {
+    }
+    /**
+     * @param bool    $is_license_activation
+     * @param array[] $extra_permissions
+     *
+     * @return array[]
+     */
+    function get_permissions($is_license_activation, array $extra_permissions = array())
+    {
+    }
+    #--------------------------------------------------------------------------------
+    #region Opt-In Permissions
+    #--------------------------------------------------------------------------------
+    /**
+     * @param array[] $extra_permissions
+     *
+     * @return array[]
+     */
+    function get_opt_in_permissions(array $extra_permissions = array(), $load_default_from_storage = \false, $is_optional = \false)
+    {
+    }
+    /**
+     * @param bool $load_default_from_storage
+     *
+     * @return array[]
+     */
+    function get_opt_in_required_permissions($load_default_from_storage = \false)
+    {
+    }
+    /**
+     * @param bool $load_default_from_storage
+     * @param bool $is_optional
+     *
+     * @return array[]
+     */
+    function get_opt_in_optional_permissions($load_default_from_storage = \false, $is_optional = \false)
+    {
+    }
+    /**
+     * @param bool $load_default_from_storage
+     * @param bool $is_optional
+     *
+     * @return array[]
+     */
+    function get_opt_in_diagnostic_permissions($load_default_from_storage = \false, $is_optional = \false)
+    {
+    }
+    #endregion
+    #--------------------------------------------------------------------------------
+    #region License Activation Permissions
+    #--------------------------------------------------------------------------------
+    /**
+     * @param array[] $extra_permissions
+     *
+     * @return array[]
+     */
+    function get_license_activation_permissions(array $extra_permissions = array(), $include_optional_label = \true)
+    {
+    }
+    /**
+     * @param bool $load_default_from_storage
+     *
+     * @return array[]
+     */
+    function get_license_required_permissions($load_default_from_storage = \false)
+    {
+    }
+    /**
+     * @return array[]
+     */
+    function get_license_optional_permissions($include_optional_label = \false, $load_default_from_storage = \false)
+    {
+    }
+    /**
+     * @param bool $include_optional_label
+     * @param bool $load_default_from_storage
+     *
+     * @return array
+     */
+    function get_diagnostic_permission($include_optional_label = \false, $load_default_from_storage = \false)
+    {
+    }
+    #endregion
+    #--------------------------------------------------------------------------------
+    #region Common Permissions
+    #--------------------------------------------------------------------------------
+    /**
+     * @param bool $is_license_activation
+     * @param bool $include_optional_label
+     * @param bool $load_default_from_storage
+     *
+     * @return array
+     */
+    function get_extensions_permission($is_license_activation, $include_optional_label = \false, $load_default_from_storage = \false)
+    {
+    }
+    /**
+     * @param bool $load_default_from_storage
+     *
+     * @return array
+     */
+    function get_user_permission($load_default_from_storage = \false)
+    {
+    }
+    #endregion
+    #--------------------------------------------------------------------------------
+    #region Optional Permissions
+    #--------------------------------------------------------------------------------
+    /**
+     * @return array[]
+     */
+    function get_newsletter_permission()
+    {
+    }
+    #endregion
+    #--------------------------------------------------------------------------------
+    #region Permissions Storage
+    #--------------------------------------------------------------------------------
+    /**
+     * @param int|null $blog_id
+     *
+     * @return bool
+     */
+    function is_extensions_tracking_allowed($blog_id = \null)
+    {
+    }
+    /**
+     * @param int|null $blog_id
+     *
+     * @return bool
+     */
+    function is_essentials_tracking_allowed($blog_id = \null)
+    {
+    }
+    /**
+     * @param bool $default
+     *
+     * @return bool
+     */
+    function is_diagnostic_tracking_allowed($default = \true)
+    {
+    }
+    /**
+     * @param int|null $blog_id
+     *
+     * @return bool
+     */
+    function is_homepage_url_tracking_allowed($blog_id = \null)
+    {
+    }
+    /**
+     * @param int|null $blog_id
+     *
+     * @return bool
+     */
+    function update_site_tracking($is_enabled, $blog_id = \null, $only_if_not_set = \false)
+    {
+    }
+    /**
+     * @param string   $permission
+     * @param bool     $default
+     * @param int|null $blog_id
+     *
+     * @return bool
+     */
+    function is_permission_allowed($permission, $default = \false, $blog_id = \null)
+    {
+    }
+    /**
+     * @param string   $permission
+     * @param bool     $is_allowed
+     * @param int|null $blog_id
+     *
+     * @return bool
+     */
+    function is_permission($permission, $is_allowed, $blog_id = \null)
+    {
+    }
+    /**
+     * @param string   $permission
+     * @param int|null $blog_id
+     *
+     * @return bool
+     */
+    function is_permission_set($permission, $blog_id = \null)
+    {
+    }
+    /**
+     * @param string[] $permissions
+     * @param bool     $is_allowed
+     *
+     * @return bool `true` if all given permissions are in sync with `$is_allowed`.
+     */
+    function are_permissions($permissions, $is_allowed, $blog_id = \null)
+    {
+    }
+    /**
+     * @param string   $permission
+     * @param bool     $is_enabled
+     * @param int|null $blog_id
+     *
+     * @return bool `false` if permission not supported or `$is_enabled` is not a boolean.
+     */
+    function update_permission_tracking_flag($permission, $is_enabled, $blog_id = \null)
+    {
+    }
+    /**
+     * @param array<string,bool> $permissions
+     */
+    function update_permissions_tracking_flag($permissions)
+    {
+    }
+    #endregion
+    /**
+     * @param string $permission
+     *
+     * @return bool
+     */
+    function get_permission_default($permission)
+    {
+    }
+    /**
      * @return string
      */
-    private function get_cache_group()
+    function get_site_permission_name()
+    {
+    }
+    /**
+     * @return string[]
+     */
+    function get_site_tracking_permission_names()
+    {
+    }
+    #--------------------------------------------------------------------------------
+    #region Rendering
+    #--------------------------------------------------------------------------------
+    /**
+     * @param array $permission
+     */
+    function render_permission(array $permission)
+    {
+    }
+    /**
+     * @param array $permissions_group
+     */
+    function render_permissions_group(array $permissions_group)
+    {
+    }
+    function require_permissions_js()
+    {
+    }
+    #endregion
+    #--------------------------------------------------------------------------------
+    #region Helper Methods
+    #--------------------------------------------------------------------------------
+    /**
+     * @param string $id
+     * @param string $dashicon
+     * @param string $label
+     * @param string $desc
+     * @param string $tooltip
+     * @param int    $priority
+     * @param bool   $is_optional
+     * @param bool   $is_on_by_default
+     * @param bool   $load_from_storage
+     *
+     * @return array
+     */
+    private function get_permission($id, $dashicon, $label, $desc, $tooltip = '', $priority = 10, $is_optional = \false, $is_on_by_default = \true, $load_from_storage = \false)
+    {
+    }
+    /**
+     * @param array $permissions
+     *
+     * @return array[]
+     */
+    private function get_sorted_permissions_by_priority(array $permissions)
     {
     }
     #endregion
@@ -15429,7 +15944,7 @@ function fs_sort_by_priority($a, $b)
  *
  * @return string
  *
- * @global       $fs_text , $fs_text_overrides
+ * @global       $fs_text_overrides
  */
 function fs_text($key, $slug = 'freemius')
 {
@@ -15881,42 +16396,9 @@ function fs_redirect($location, $exit = \true, $status = 302)
 {
 }
 /**
- * Retrieve a translated text by key.
+ * Get server IP.
  *
- * @deprecated Use `fs_text()` instead since methods starting with `__` trigger warnings in Php 7.
- * @todo Remove this method in the future.
- *
- * @author     Vova Feldman (@svovaf)
- * @since      1.1.4
- *
- * @param string $key
- * @param string $slug
- *
- * @return string
- *
- * @global       $fs_text, $fs_text_overrides
- */
-function __fs($key, $slug = 'freemius')
-{
-}
-/**
- * Output a translated text by key.
- *
- * @deprecated Use `fs_echo()` instead for consistency with `fs_text()`.
- *
- * @todo Remove this method in the future.
- *
- * @author     Vova Feldman (@svovaf)
- * @since      1.1.4
- *
- * @param string $key
- * @param string $slug
- */
-function _efs($key, $slug = 'freemius')
-{
-}
-/**
- * Get client IP.
+ * @since 2.5.1 This method returns the server IP.
  *
  * @author Vova Feldman (@svovaf)
  * @since  1.1.2
@@ -16029,6 +16511,9 @@ function fs_find_direct_caller_plugin_file($file)
  * @return array
  */
 function fs_get_plugins($delete_cache = \false)
+{
+}
+function fs_migrate_251(\Freemius $fs, $install_by_blog_id)
 {
 }
 /**
