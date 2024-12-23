@@ -548,6 +548,12 @@ class Freemius extends \Freemius_Abstract
      */
     private $_plugin_basename;
     /**
+     * @since 2.2.1
+     *
+     * @var string
+     */
+    private $_premium_plugin_basename;
+    /**
      * @since 1.0.0
      *
      * @var string
@@ -944,12 +950,12 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
-     * Makes paths relative.
+     * Remove invalid paths.
      *
      * @author Leo Fajardo (@leorw)
      * @since  1.2.3
      */
-    private function make_paths_relative()
+    private function remove_invalid_paths()
     {
     }
     /**
@@ -1067,6 +1073,15 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Opens the support forum subemenu item in a new browser page.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.1.4
+     */
+    static function _open_support_forum_in_new_page()
+    {
+    }
+    /**
      * @author Vova Feldman (@svovaf)
      * @since  1.0.9
      */
@@ -1088,8 +1103,10 @@ class Freemius extends \Freemius_Abstract
     }
     /**
      * @since 1.2.0 Invalidate module's main file cache, otherwise, FS_Plugin_Updater will not fetch updates.
+     *
+     * @param bool $store_prev_path
      */
-    private function clear_module_main_file_cache()
+    private function clear_module_main_file_cache($store_prev_path = \true)
     {
     }
     /**
@@ -1104,6 +1121,13 @@ class Freemius extends \Freemius_Abstract
      * @since  1.0.9
      */
     private function _register_account_hooks()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.1.4
+     */
+    function _enqueue_plugin_upgrade_notice_style()
     {
     }
     /**
@@ -1215,6 +1239,24 @@ class Freemius extends \Freemius_Abstract
     }
     /**
      * @author Leo Fajardo (@leorw)
+     * @since  2.1.4
+     */
+    function cancel_subscription_or_trial_ajax_action()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.1.4
+     *
+     * @param number $plugin_id
+     *
+     * @return object
+     */
+    private function cancel_subscription_or_trial($plugin_id)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
      * @since 2.0.2
      */
     function _delete_theme_update_data_action()
@@ -1255,10 +1297,11 @@ class Freemius extends \Freemius_Abstract
      * @since  1.2.2
      *
      * @param  string|number $id_or_slug
+     * @param  string        $module_type
      *
      * @return number|false
      */
-    private static function get_module_id($id_or_slug)
+    private static function get_module_id($id_or_slug, $module_type = \WP_FS__MODULE_TYPE_PLUGIN)
     {
     }
     /**
@@ -1277,11 +1320,12 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.1
      *
-     * @param $plugin_file
+     * @param string $plugin_file
+     * @param string $module_type
      *
      * @return false|Freemius
      */
-    static function get_instance_by_file($plugin_file)
+    static function get_instance_by_file($plugin_file, $module_type = \WP_FS__MODULE_TYPE_PLUGIN)
     {
     }
     /**
@@ -2901,6 +2945,17 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * This is used to ensure that before redirecting to the opt-in page after resetting the anonymous mode or
+     * deleting the account in the network level, the URL of the page to redirect to is correct.
+     *
+     * @author Leo Fajardo (@leorw)
+     *
+     * @since 2.1.3
+     */
+    private function maybe_set_slug_and_network_menu_exists_flag()
+    {
+    }
+    /**
      * Clears the anonymous mode and redirects to the opt-in screen.
      *
      * @author Vova Feldman (@svovaf)
@@ -3155,8 +3210,23 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Set the basename of the current product and hook _activate_plugin_event_hook() to the activation action.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.2.1
+     *
+     * @param string $is_premium
+     * @param string $caller
+     *
+     * @return string
+     */
+    function set_basename($is_premium, $caller)
+    {
+    }
+    /**
      * @author Vova Feldman (@svovaf)
      * @since  1.1.1
+     * @since  2.2.1 If the context product is in its premium version, use the current module's basename, even if it was renamed.
      *
      * @return string
      */
@@ -3215,6 +3285,17 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.2.1
+     *
+     * @return string
+     */
+    function get_premium_slug()
+    {
+    }
+    /**
+     * Retrieve the desired folder name for the product.
+     *
      * @author Vova Feldman (@svovaf)
      * @since  1.2.1.7
      *
@@ -3283,9 +3364,22 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.9
      *
+     * @param string|bool $premium_suffix
+     *
      * @return string
      */
-    function get_plugin_name()
+    function get_plugin_name($premium_suffix = \false)
+    {
+    }
+    /**
+     * Calculates and stores the product's name. This helper function was created specifically for get_plugin_name() just to make the code clearer.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.2.1
+     *
+     * @param string $premium_suffix
+     */
+    private function set_name($premium_suffix = '')
     {
     }
     /**
@@ -4193,6 +4287,20 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Displays a subscription cancellation dialog box when the user clicks on the "Deactivate License"
+     * link on the "Account" page or deactivates a plugin and there's an active subscription that is
+     * either associated with a non-lifetime single-site license or non-lifetime multisite license that
+     * is only activated on a single production site.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  2.2.1
+     *
+     * @param bool $is_license_deactivation
+     */
+    function _maybe_add_subscription_cancellation_dialog_box($is_license_deactivation = \false)
+    {
+    }
+    /**
      * @author Leo Fajardo (@leorw)
      * @since  2.0.2
      */
@@ -4411,6 +4519,17 @@ class Freemius extends \Freemius_Abstract
      * @return string
      */
     function get_trial_url()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.1.4
+     *
+     * @param string $new_version
+     *
+     * @return string
+     */
+    function version_upgrade_checkout_link($new_version)
     {
     }
     /**
@@ -5270,6 +5389,18 @@ class Freemius extends \Freemius_Abstract
      * @param bool|array $plans
      */
     private function _set_account(\FS_User $user, \FS_Site $site, $plans = \false)
+    {
+    }
+    /**
+     * Get a sanitized array with the WordPress version, SDK version, and PHP version.
+     * Each version is trimmed after the 16th char.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.2.1
+     *
+     * @return array
+     */
+    private function get_versions()
     {
     }
     /**
@@ -6216,10 +6347,11 @@ class Freemius extends \Freemius_Abstract
      * @param bool|number $plugin_id
      * @param bool        $flush      Since 1.1.7.3
      * @param int         $expiration Since 1.2.2.7
+     * @param bool|string $newer_than Since 2.2.1
      *
      * @return object|false New plugin tag info if exist.
      */
-    private function _fetch_newer_version($plugin_id = \false, $flush = \true, $expiration = \WP_FS__TIME_24_HOURS_IN_SEC)
+    private function _fetch_newer_version($plugin_id = \false, $flush = \true, $expiration = \WP_FS__TIME_24_HOURS_IN_SEC, $newer_than = \false)
     {
     }
     /**
@@ -6229,10 +6361,11 @@ class Freemius extends \Freemius_Abstract
      * @param bool|number $plugin_id
      * @param bool        $flush      Since 1.1.7.3
      * @param int         $expiration Since 1.2.2.7
+     * @param bool|string $newer_than Since 2.2.1
      *
      * @return bool|FS_Plugin_Tag
      */
-    function get_update($plugin_id = \false, $flush = \true, $expiration = \WP_FS__TIME_24_HOURS_IN_SEC)
+    function get_update($plugin_id = \false, $flush = \true, $expiration = \WP_FS__TIME_24_HOURS_IN_SEC, $newer_than = \false)
     {
     }
     /**
@@ -6388,10 +6521,23 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.2.1
+     *
+     * @param FS_Plugin_License $license
+     * @param bool|string       $hmm_text
+     * @param bool              $show_notice
+     */
+    private function handle_license_deactivation_result($license, $hmm_text = \false, $show_notice = \true)
+    {
+    }
+    /**
      * Site plan downgrade.
      *
      * @author Vova Feldman (@svovaf)
      * @since  1.0.4
+     *
+     * @return object
      *
      * @uses   FS_Api
      */
@@ -6414,6 +6560,8 @@ class Freemius extends \Freemius_Abstract
      *
      * @author Vova Feldman (@svovaf)
      * @since  1.0.9
+     *
+     * @return object
      *
      * @uses   FS_Api
      */
@@ -6460,12 +6608,14 @@ class Freemius extends \Freemius_Abstract
      * @since  1.0.4
      *
      * @param bool|number $addon_id
-     * @param bool        $flush      Since 1.1.7.3
-     * @param int         $expiration Since 1.2.2.7
+     * @param bool        $flush        Since 1.1.7.3
+     * @param int         $expiration   Since 1.2.2.7
+     * @param bool|string $newer_than   Since 2.2.1
+     * @param bool|string $fetch_readme Since 2.2.1
      *
      * @return object|false Plugin latest tag info.
      */
-    function _fetch_latest_version($addon_id = \false, $flush = \true, $expiration = \WP_FS__TIME_24_HOURS_IN_SEC)
+    function _fetch_latest_version($addon_id = \false, $flush = \true, $expiration = \WP_FS__TIME_24_HOURS_IN_SEC, $newer_than = \false, $fetch_readme = \true)
     {
     }
     #----------------------------------------------------------------------------------
@@ -6554,8 +6704,9 @@ class Freemius extends \Freemius_Abstract
      * @param bool|number $plugin_id
      * @param bool        $flush      Since 1.1.7.3
      * @param int         $expiration Since 1.2.2.7
+     * @param bool|string $newer_than Since 2.2.1
      */
-    private function check_updates($background = \false, $plugin_id = \false, $flush = \true, $expiration = \WP_FS__TIME_24_HOURS_IN_SEC)
+    private function check_updates($background = \false, $plugin_id = \false, $flush = \true, $expiration = \WP_FS__TIME_24_HOURS_IN_SEC, $newer_than = \false)
     {
     }
     /**
@@ -7122,6 +7273,17 @@ class Freemius extends \Freemius_Abstract
      * @param string $type
      */
     function add_sticky_admin_message($message, $id, $title = '', $type = 'success')
+    {
+    }
+    /**
+     * Check if the paid version of the module is installed.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.2.0
+     *
+     * @return bool
+     */
+    private function is_premium_version_installed()
     {
     }
     /**
@@ -8630,6 +8792,7 @@ class FS_Plugin_Updater
      * @since 2.1.2
      */
     private $_translation_updates;
+    private static $_upgrade_basename = \null;
     #--------------------------------------------------------------------------------
     #region Singleton
     #--------------------------------------------------------------------------------
@@ -8657,6 +8820,22 @@ class FS_Plugin_Updater
      * @since  1.0.4
      */
     private function filters()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.1.4
+     */
+    function catch_plugin_information_dialog_contents()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.1.4
+     *
+     * @param string $hook_suffix
+     */
+    function edit_and_echo_plugin_information_dialog_contents($hook_suffix)
     {
     }
     /**
@@ -8844,10 +9023,12 @@ class FS_Plugin_Updater
      * @since  1.2.1.7
      *
      * @param number|bool $addon_id
+     * @param bool|string $newer_than   Since 2.2.1
+     * @param bool|string $fetch_readme Since 2.2.1
      *
      * @return object
      */
-    private function get_latest_download_details($addon_id = \false)
+    private function get_latest_download_details($addon_id = \false, $newer_than = \false, $fetch_readme = \true)
     {
     }
     /**
@@ -8857,11 +9038,9 @@ class FS_Plugin_Updater
      * @author Vova Feldman (@svovaf)
      * @since  1.2.1.6
      *
-     * @param string $basename Current plugin's basename.
-     *
      * @return bool
      */
-    private function is_correct_folder_name($basename = '')
+    private function is_correct_folder_name()
     {
     }
     /**
@@ -8938,6 +9117,20 @@ class FS_Plugin_Updater
     {
     }
     /**
+     * Store the basename since it's not always available in the `_maybe_adjust_source_dir` method below.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since 2.2.1
+     *
+     * @param bool|WP_Error $response   Response.
+     * @param array         $hook_extra Extra arguments passed to hooked filters.
+     *
+     * @return bool|WP_Error
+     */
+    static function _store_basename_for_source_adjustment($response, $hook_extra)
+    {
+    }
+    /**
      * Adjust the plugin directory name if necessary.
      * Assumes plugin has a folder (not a single file plugin).
      *
@@ -8948,6 +9141,7 @@ class FS_Plugin_Updater
      *
      * @author Vova Feldman
      * @since  1.2.1.7
+     * @since  2.2.1 The method was converted to static since when the admin update bulk products via the Updates section, the logic applies the `upgrader_source_selection` filter for every product that is being updated.
      *
      * @param string       $source        Path to upgrade/zip-file-name.tmp/subdirectory/.
      * @param string       $remote_source Path to upgrade/zip-file-name.tmp.
@@ -8955,7 +9149,7 @@ class FS_Plugin_Updater
      *
      * @return string|WP_Error
      */
-    function _maybe_adjust_source_dir($source, $remote_source, $upgrader)
+    static function _maybe_adjust_source_dir($source, $remote_source, $upgrader)
     {
     }
     #endregion
@@ -10189,6 +10383,13 @@ class FS_Plugin extends \FS_Scope_Entity
      */
     public $slug;
     /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.2.1
+     *
+     * @var string
+     */
+    public $premium_slug;
+    /**
      * @since 1.2.2
      *
      * @var string 'plugin' or 'theme'
@@ -10229,6 +10430,13 @@ class FS_Plugin extends \FS_Scope_Entity
      * @var bool
      */
     public $is_premium;
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 2.2.1
+     *
+     * @var string
+     */
+    public $premium_suffix;
     /**
      * @since 1.0.9
      *
@@ -10983,6 +11191,16 @@ class FS_Admin_Menu_Manager
      * @return bool
      */
     function has_network_menu()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     *
+     * @param string $menu_slug
+     *
+     * @since 2.1.3
+     */
+    function set_slug_and_network_menu_exists_flag($menu_slug)
     {
     }
     /**
@@ -13667,6 +13885,17 @@ function fs_is_blog_admin()
  * @uses   apply_filters()
  */
 function fs_apply_filter($module_unique_affix, $tag, $value)
+{
+}
+/**
+ * @author Leo Fajardo (@leorw)
+ * @since 2.2.1
+ *
+ * @param bool $delete_cache
+ *
+ * @return array
+ */
+function fs_get_plugins($delete_cache = \false)
 {
 }
 /**
