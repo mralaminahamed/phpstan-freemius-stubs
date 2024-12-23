@@ -42,7 +42,7 @@ process_version() {
         cleanup_source
         update_composer_version "${version}"
         composer --working-dir=source/ require "freemius/wordpress-sdk:${version}"
-        "${SCRIPT_DIR}/generate.sh"
+        "bash ./generate.sh"
 
         # Git operations
         git add .
