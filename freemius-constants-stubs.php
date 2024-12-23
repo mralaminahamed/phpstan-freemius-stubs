@@ -87,6 +87,7 @@
 \define('WP_FS__TIME_5_MIN_IN_SEC', 300);
 \define('WP_FS__TIME_10_MIN_IN_SEC', 600);
 \define('WP_FS__TIME_24_HOURS_IN_SEC', 86400);
+\define('WP_FS__TIME_WEEK_IN_SEC', 7 * \WP_FS__TIME_24_HOURS_IN_SEC);
 \define('WP_FS__DEBUG_SDK', \is_numeric($debug_mode) ? 0 < $debug_mode : \WP_FS__DEV_MODE);
 \define('WP_FS__ECHO_DEBUG_SDK', \WP_FS__DEV_MODE && !empty($_GET['fs_dbg_echo']));
 \define('WP_FS__LOG_DATETIME_FORMAT', 'Y-m-d H:i:s');

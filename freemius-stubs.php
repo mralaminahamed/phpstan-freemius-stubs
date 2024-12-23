@@ -3268,6 +3268,20 @@ class Freemius extends \Freemius_Abstract
     }
     /**
      * @author Leo Fajardo (@leorw)
+     * @since 1.2.4
+     */
+    private function fetch_affiliate_terms()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since 1.2.4
+     */
+    private function fetch_affiliate_and_custom_terms()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
      * @since 1.2.3
      */
     private function fetch_affiliate_and_terms()
