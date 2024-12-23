@@ -664,6 +664,25 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Keeping the uninstall hook registered for free or premium plugin version may result to a fatal error that
+     * could happen when a user tries to uninstall either version while one of them is still active. Uninstalling a
+     * plugin will trigger inclusion of the free or premium version and if one of them is active during the
+     * uninstallation, a fatal error may occur in case the plugin's class or functions are already defined.
+     *
+     * @author Leo Fajardo (leorw)
+     *
+     * @since  1.2.0
+     */
+    private function unregister_uninstall_hook()
+    {
+    }
+    /**
+     * @since 1.2.0 Invalidate module's main file cache, otherwise, FS_Plugin_Updater will not fetch updates.
+     */
+    private function clear_module_main_file_cache()
+    {
+    }
+    /**
      * @author Vova Feldman (@svovaf)
      * @since  1.0.9
      */
@@ -1123,6 +1142,15 @@ class Freemius extends \Freemius_Abstract
      * @return bool
      */
     private function should_stop_execution()
+    {
+    }
+    /**
+     * Triggered after code type has changed.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.9.1
+     */
+    function _after_code_type_change()
     {
     }
     /**
@@ -2225,9 +2253,11 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.6
      *
+     * @param number|bool $site_license_id
+     *
      * @return FS_Plugin_License[]|object
      */
-    function _sync_licenses()
+    function _sync_licenses($site_license_id = \false)
     {
     }
     /**
@@ -2352,10 +2382,26 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Prepare page to include all required UI and logic for the license activation dialog.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.0
+     */
+    function _require_license_activation_dialog()
+    {
+    }
+    /**
      * @author Leo Fajardo (@leorw)
      * @since  1.1.9
      */
     function _activate_license_ajax_action()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  1.2.0
+     */
+    function _resend_license_key_ajax_action()
     {
     }
     #region URL Generators
@@ -2518,6 +2564,19 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Check if it's an AJAX call targeted for the current module.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.0
+     *
+     * @param array|string $actions Collection of AJAX actions.
+     *
+     * @return bool
+     */
+    function is_ajax_action($actions)
+    {
+    }
+    /**
      * @author Vova Feldman (@svovaf)
      * @since  1.1.7
      *
@@ -2563,6 +2622,20 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Plugin's account page + sync license URL.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.9.1
+     *
+     * @param bool|number $plugin_id
+     * @param bool        $add_action_nonce
+     *
+     * @return string
+     */
+    function _get_sync_license_url($plugin_id = \false, $add_action_nonce = \true)
+    {
+    }
+    /**
      * Plugin's account URL.
      *
      * @author Vova Feldman (@svovaf)
@@ -2576,6 +2649,22 @@ class Freemius extends \Freemius_Abstract
      * @return string
      */
     function get_account_url($action = \false, $params = array(), $add_action_nonce = \true)
+    {
+    }
+    /**
+     * @author  Vova Feldman (@svovaf)
+     * @since   1.2.0
+     *
+     * @param string $tab
+     * @param bool   $action
+     * @param array  $params
+     * @param bool   $add_action_nonce
+     *
+     * @return string
+     *
+     * @uses    get_account_url()
+     */
+    function get_account_tab_url($tab, $action = \false, $params = array(), $add_action_nonce = \true)
     {
     }
     /**
@@ -2715,7 +2804,7 @@ class Freemius extends \Freemius_Abstract
      * @param string|bool $email
      * @param string|bool $first
      * @param string|bool $last
-     * @param string|bool $license_key
+     * @param string|bool $license_secret_key
      *
      * @return bool Is successful opt-in (or set to pending).
      */
@@ -3232,10 +3321,23 @@ class Freemius extends \Freemius_Abstract
      * @uses   FS_Api
      *
      * @param number|bool $plugin_id
+     * @param number|bool $site_license_id
      *
      * @return FS_Plugin_License[]|object
      */
-    private function _fetch_licenses($plugin_id = \false)
+    private function _fetch_licenses($plugin_id = \false, $site_license_id = \false)
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.0
+     * @uses   FS_Api
+     *
+     * @param number|bool $plugin_id
+     *
+     * @return FS_Payment[]|object
+     */
+    function _fetch_payments($plugin_id = \false)
     {
     }
     /**
@@ -3497,6 +3599,19 @@ class Freemius extends \Freemius_Abstract
      * @return string
      */
     private function _get_latest_download_api_url($plugin_id = \false)
+    {
+    }
+    /**
+     * Get payment invoice URL.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.0
+     *
+     * @param bool|number $payment_id
+     *
+     * @return string
+     */
+    function _get_invoice_api_url($payment_id = \false)
     {
     }
     /**
@@ -4586,6 +4701,83 @@ class FS_Entity
     {
     }
 }
+class FS_Payment extends \FS_Entity
+{
+    #region Properties
+    /**
+     * @var number
+     */
+    public $plugin_id;
+    /**
+     * @var number
+     */
+    public $user_id;
+    /**
+     * @var number
+     */
+    public $install_id;
+    /**
+     * @var number
+     */
+    public $subscription_id;
+    /**
+     * @var number
+     */
+    public $plan_id;
+    /**
+     * @var number
+     */
+    public $license_id;
+    /**
+     * @var float
+     */
+    public $gross;
+    /**
+     * @var number
+     */
+    public $bound_payment_id;
+    /**
+     * @var string
+     */
+    public $external_id;
+    /**
+     * @var string
+     */
+    public $gateway;
+    /**
+     * @var string ISO 3166-1 alpha-2 - two-letter country code.
+     *
+     * @link http://www.wikiwand.com/en/ISO_3166-1_alpha-2
+     */
+    public $country_code;
+    /**
+     * @var string
+     */
+    public $vat_id;
+    /**
+     * @var float Actual Tax / VAT in $$$
+     */
+    public $vat;
+    #endregion Properties
+    /**
+     * @param object|bool $payment
+     */
+    function __construct($payment = \false)
+    {
+    }
+    static function get_type()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.0.0
+     *
+     * @return bool
+     */
+    function is_refund()
+    {
+    }
+}
 class FS_Plugin_Info extends \FS_Entity
 {
     public $plugin_id;
@@ -4642,6 +4834,10 @@ class FS_Plugin_License extends \FS_Entity
      * @var string
      */
     public $expiration;
+    /**
+     * @var string
+     */
+    public $secret_key;
     /**
      * @var bool $is_free_localhost Defaults to true. If true, allow unlimited localhost installs with the same
      *      license.
@@ -4704,6 +4900,15 @@ class FS_Plugin_License extends \FS_Entity
      * @return bool
      */
     function is_lifetime()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.0
+     *
+     * @return bool
+     */
+    function is_unlimited()
     {
     }
     /**
@@ -4836,6 +5041,17 @@ class FS_Plugin_Plan extends \FS_Entity
      * @return bool
      */
     function is_free()
+    {
+    }
+    /**
+     * Checks if this plan supports "Technical Support".
+     *
+     * @author Leo Fajardo (leorw)
+     * @since 1.2.0
+     *
+     * @return bool
+     */
+    function has_technical_support()
     {
     }
     /**
@@ -6028,6 +6244,37 @@ class FS_Cache_Manager
     {
     }
 }
+/**
+ * Class FS_Key_Value_Storage
+ *
+ * @property int           $install_timestamp
+ * @property int           $activation_timestamp
+ * @property int           $sync_timestamp
+ * @property object        $sync_cron
+ * @property int           $install_sync_timestamp
+ * @property array         $connectivity_test
+ * @property array         $is_on
+ * @property object        $trial_plan
+ * @property bool          $has_trial_plan
+ * @property bool          $trial_promotion_shown
+ * @property string        $sdk_version
+ * @property string        $sdk_last_version
+ * @property bool          $sdk_upgrade_mode
+ * @property bool          $sdk_downgrade_mode
+ * @property bool          $plugin_upgrade_mode
+ * @property bool          $plugin_downgrade_mode
+ * @property string        $plugin_version
+ * @property string        $plugin_last_version
+ * @property bool          $is_plugin_new_install
+ * @property bool          $was_plugin_loaded
+ * @property object        $plugin_main_file
+ * @property bool          $prev_is_premium
+ * @property array         $is_anonymous
+ * @property bool          $is_pending_activation
+ * @property bool          $sticky_optin_added
+ * @property object        $uninstall_reason
+ * @property object        $subscription
+ */
 class FS_Key_Value_Storage implements \ArrayAccess, \Iterator, \Countable
 {
     /**
