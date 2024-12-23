@@ -1089,6 +1089,33 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Makes Freemius-related updates unavailable on the "Add Plugins" admin page (/plugin-install.php) so that
+     * they won't interfere with the .org plugins' functionalities on that page (e.g. updating of a .org plugin).
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since 2.2.3
+     *
+     * @param object      $updates
+     * @param string|null $transient
+     *
+     * @return object
+     */
+    static function _remove_fs_updates_from_plugin_install_page($updates, $transient = \null)
+    {
+    }
+    /**
+     * Prepends the `fs_allow_updater_and_dialog` param to the plugin information URLs to tell the SDK to handle
+     * the information that is shown on the plugin details dialog that is shown when the relevant link is clicked.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since 2.2.3
+     *
+     * @return string
+     */
+    static function _prepend_fs_allow_updater_and_dialog_flag_url_param()
+    {
+    }
+    /**
      * Keeping the uninstall hook registered for free or premium plugin version may result to a fatal error that
      * could happen when a user tries to uninstall either version while one of them is still active. Uninstalling a
      * plugin will trigger inclusion of the free or premium version and if one of them is active during the
@@ -1121,13 +1148,6 @@ class Freemius extends \Freemius_Abstract
      * @since  1.0.9
      */
     private function _register_account_hooks()
-    {
-    }
-    /**
-     * @author Leo Fajardo (@leorw)
-     * @since 2.1.4
-     */
-    function _enqueue_plugin_upgrade_notice_style()
     {
     }
     /**
@@ -1836,6 +1856,15 @@ class Freemius extends \Freemius_Abstract
     }
     /**
      * @author Leo Fajardo (@leorw)
+     * @since 2.2.3
+     *
+     * @return bool
+     */
+    private function should_use_freemius_updater_and_dialog()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
      *
      * @since  1.2.1.5
      */
@@ -2325,6 +2354,17 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Sets the keepalive time to now.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  2.2.3
+     *
+     * @param bool|null $use_network_level_storage
+     */
+    private function set_keepalive_timestamp($use_network_level_storage = \null)
+    {
+    }
+    /**
      * Check if cron was executed in the last $period of seconds.
      *
      * @author Vova Feldman (@svovaf)
@@ -2453,9 +2493,12 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  2.0.0
      *
-     * @param int[] $blog_ids
+     * @param int[]    $blog_ids
+     * @param int|null $current_blog_id @since 2.2.3. This is passed from the `execute_cron` method and used by the
+     *                                  `_sync_plugin_license` method in order to switch to the previous blog when sending
+     *                                  updates for a single site in case `execute_cron` has switched to a different blog.
      */
-    function _sync_cron_method(array $blog_ids)
+    function _sync_cron_method(array $blog_ids, $current_blog_id = \null)
     {
     }
     /**
@@ -2622,9 +2665,10 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  2.0.0
      *
-     * @param int[] $blog_ids
+     * @param int[]    $blog_ids
+     * @param int|null $current_blog_id
      */
-    function _sync_install_cron_method(array $blog_ids)
+    function _sync_install_cron_method(array $blog_ids, $current_blog_id = \null)
     {
     }
     #endregion Async Install Sync ------------------------------------------------------------------
@@ -3117,6 +3161,16 @@ class Freemius extends \Freemius_Abstract
      * @return false|object|string
      */
     private function send_installs_update($override = array(), $flush = \false)
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     *
+     * @param bool|null $use_network_level_storage
+     *
+     * @return bool
+     */
+    private function should_send_keepalive_update($use_network_level_storage = \null)
     {
     }
     /**
@@ -4401,6 +4455,15 @@ class Freemius extends \Freemius_Abstract
      * @return bool
      */
     static function is_plugins_page()
+    {
+    }
+    /**
+     * @author Leo Fajardo (@leorw)
+     * @since  2.2.3
+     *
+     * @return bool
+     */
+    static function is_plugin_install_page()
     {
     }
     /**
@@ -6460,8 +6523,11 @@ class Freemius extends \Freemius_Abstract
      *                                     the admin.
      * @param bool $is_context_single_site @since 2.0.0. This is used when syncing a license for a single install from the
      *                                     network-level "Account" page.
+     * @param int|null $current_blog_id    @since 2.2.3. This is passed from the `execute_cron` method and used by the
+     *                                     `_sync_plugin_license` method in order to switch to the previous blog when sending
+     *                                      updates for a single site in case `execute_cron` has switched to a different blog.
      */
-    private function _sync_license($background = \false, $is_context_single_site = \false)
+    private function _sync_license($background = \false, $is_context_single_site = \false, $current_blog_id = \null)
     {
     }
     /**
@@ -6489,8 +6555,11 @@ class Freemius extends \Freemius_Abstract
      * @param bool $is_context_single_site Since 2.0.0. This is used when sending an update for a single install and
      *                                     syncing its license from the network-level "Account" page (e.g.: after
      *                                     activating a license only for the single install).
+     * @param int|null $current_blog_id    Since 2.2.3. This is passed from the `execute_cron` method so that it
+     *                                     can be used here to switch to the previous blog in case `execute_cron`
+     *                                     has switched to a different blog.
      */
-    private function _sync_plugin_license($background = \false, $send_installs_update = \true, $is_context_single_site = \false)
+    private function _sync_plugin_license($background = \false, $send_installs_update = \true, $is_context_single_site = \false, $current_blog_id = \null)
     {
     }
     /**
@@ -11639,6 +11708,17 @@ class FS_Admin_Notice_Manager
     {
     }
     /**
+     * Check if the current page is the Gutenberg block editor.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  2.2.3
+     *
+     * @return bool
+     */
+    function is_gutenberg_page()
+    {
+    }
+    /**
      * Add admin message to admin messages queue, and hook to admin_notices / all_admin_notices if not yet hooked.
      *
      * @author Vova Feldman (@svovaf)
@@ -13457,56 +13537,7 @@ function fs_sort_by_priority($a, $b)
 function fs_text($key, $slug = 'freemius')
 {
 }
-/**
- * Get a translatable text override if exists, or `false`.
- *
- * @author Vova Feldman (@svovaf)
- * @since  1.2.1.7
- *
- * @param string $text Translatable string.
- * @param string $key  String key for overrides.
- * @param string $slug Module slug for overrides.
- *
- * @return string|false
- */
-function fs_text_override($text, $key, $slug)
-{
-}
-/**
- * Get a translatable text and its text domain.
- *
- * When the text is overridden by the module, returns the overridden text and the text domain of the module. Otherwise, returns the original text and 'freemius' as the text domain.
- *
- * @author Vova Feldman (@svovaf)
- * @since  1.2.1.7
- *
- * @param string $text Translatable string.
- * @param string $key  String key for overrides.
- * @param string $slug Module slug for overrides.
- *
- * @return string[]
- */
-function fs_text_and_domain($text, $key, $slug)
-{
-}
 #region Private
-/**
- * Retrieve an inline translated text by key.
- *
- * @author Vova Feldman (@svovaf)
- * @since  1.2.3
- *
- * @param string $text Translatable string.
- * @param string $key  String key for overrides.
- * @param string $slug Module slug for overrides.
- *
- * @return string
- *
- * @global       $fs_text_overrides
- */
-function _fs_text_inline($text, $key = '', $slug = 'freemius')
-{
-}
 /**
  * Retrieve an inline translated text by key with a context.
  *
@@ -13526,23 +13557,6 @@ function _fs_text_x_inline($text, $context, $key = '', $slug = 'freemius')
 {
 }
 #endregion
-/**
- * Retrieve an inline translated text by key.
- *
- * @author Vova Feldman (@svovaf)
- * @since  1.2.3
- *
- * @param string $text Translatable string.
- * @param string $key  String key for overrides.
- * @param string $slug Module slug for overrides.
- *
- * @return string
- *
- * @global       $fs_text_overrides
- */
-function fs_text_inline($text, $key = '', $slug = 'freemius')
-{
-}
 /**
  * Retrieve an inline translated text by key with a context.
  *
@@ -13598,6 +13612,72 @@ function fs_echo_inline($text, $key = '', $slug = 'freemius')
  * @param string $slug    Module slug for overrides.
  */
 function fs_echo_x_inline($text, $context, $key = '', $slug = 'freemius')
+{
+}
+/**
+ * Get a translatable text override if exists, or `false`.
+ *
+ * @author Vova Feldman (@svovaf)
+ * @since  1.2.1.7
+ *
+ * @param string $text Translatable string.
+ * @param string $key  String key for overrides.
+ * @param string $slug Module slug for overrides.
+ *
+ * @return string|false
+ */
+function fs_text_override($text, $key, $slug)
+{
+}
+/**
+ * Get a translatable text and its text domain.
+ *
+ * When the text is overridden by the module, returns the overridden text and the text domain of the module. Otherwise, returns the original text and 'freemius' as the text domain.
+ *
+ * @author Vova Feldman (@svovaf)
+ * @since  1.2.1.7
+ *
+ * @param string $text Translatable string.
+ * @param string $key  String key for overrides.
+ * @param string $slug Module slug for overrides.
+ *
+ * @return string[]
+ */
+function fs_text_and_domain($text, $key, $slug)
+{
+}
+/**
+ * Retrieve an inline translated text by key.
+ *
+ * @author Vova Feldman (@svovaf)
+ * @since  1.2.3
+ *
+ * @param string $text Translatable string.
+ * @param string $key  String key for overrides.
+ * @param string $slug Module slug for overrides.
+ *
+ * @return string
+ *
+ * @global       $fs_text_overrides
+ */
+function _fs_text_inline($text, $key = '', $slug = 'freemius')
+{
+}
+/**
+ * Retrieve an inline translated text by key.
+ *
+ * @author Vova Feldman (@svovaf)
+ * @since  1.2.3
+ *
+ * @param string $text Translatable string.
+ * @param string $key  String key for overrides.
+ * @param string $slug Module slug for overrides.
+ *
+ * @return string
+ *
+ * @global       $fs_text_overrides
+ */
+function fs_text_inline($text, $key = '', $slug = 'freemius')
 {
 }
 /**
