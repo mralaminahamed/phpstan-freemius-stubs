@@ -11,7 +11,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/../lib/shared.sh"
 # Update composer version
 update_composer_version() {
     local version="$1"
-    local composer_file="${SOURCE_DIR}/composer.json"
+    local composer_file="${PROJECT_ROOT}/source/composer.json"
 
     log_message "info" "Updating composer.json to version ${version}"
     printf -v SED_EXP 's#\\("freemius/wordpress-sdk"\\): "[0-9]\\+\\.[0-9]\\+\\.[0-9]\\+"#\\1: "%s"#' "${version}"
