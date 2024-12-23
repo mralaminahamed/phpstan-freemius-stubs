@@ -47,7 +47,7 @@ abstract class Freemius_Abstract
      * Check if plugin is allowed to install executable files.
      *
      * @author Vova Feldman (@svovaf)
-     * @since 1.0.5
+     * @since  1.0.5
      *
      * @return bool
      */
@@ -59,7 +59,7 @@ abstract class Freemius_Abstract
      * Check if user in trial or in free plan (not paying).
      *
      * @author Vova Feldman (@svovaf)
-     * @since 1.0.4
+     * @since  1.0.4
      *
      * @return bool
      */
@@ -120,7 +120,7 @@ abstract class Freemius_Abstract
      *
      * @since  1.0.9
      *
-     * @param string $plan Plan name
+     * @param string $plan  Plan name
      * @param bool   $exact If true, looks for exact plan. If false, also check "higher" plans.
      *
      * @return bool
@@ -135,7 +135,7 @@ abstract class Freemius_Abstract
      *
      * @since  1.0.9
      *
-     * @param string $plan Plan name
+     * @param string $plan  Plan name
      * @param bool   $exact If true, looks for exact plan. If false, also check "higher" plans.
      *
      * @return bool
@@ -158,12 +158,12 @@ abstract class Freemius_Abstract
     /**
      * Check if the user has an activated and valid paid license on current plugin's install.
      *
-     * @since 1.0.4
+     * @since      1.0.4
      *
      * @return bool
      *
      * @deprecated Method name is confusing since it's not clear from the name the code will be removed.
-     * @using Alias to is_paying__premium_only()
+     * @using      Alias to is_paying__premium_only()
      */
     function is_paying__fs__()
     {
@@ -199,7 +199,7 @@ abstract class Freemius_Abstract
     /**
      * @since  1.0.2
      *
-     * @param string $plan Plan name
+     * @param string $plan  Plan name
      * @param bool   $exact If true, looks for exact plan. If false, also check "higher" plans.
      *
      * @return bool
@@ -210,7 +210,7 @@ abstract class Freemius_Abstract
      *
      * @since  1.0.9
      *
-     * @param string $plan Plan name
+     * @param string $plan  Plan name
      * @param bool   $exact If true, looks for exact plan. If false, also check "higher" plans.
      *
      * @return bool
@@ -221,7 +221,7 @@ abstract class Freemius_Abstract
      *
      * @since  1.0.9
      *
-     * @param string $plan Plan name
+     * @param string $plan  Plan name
      * @param bool   $exact If true, looks for exact plan. If false, also check "higher" plans.
      *
      * @return bool
@@ -278,7 +278,7 @@ abstract class Freemius_Abstract
      * Get upgrade URL.
      *
      * @author Vova Feldman (@svovaf)
-     * @since 1.0.2
+     * @since  1.0.2
      *
      * @param string $period Billing cycle
      *
@@ -330,7 +330,7 @@ class Freemius extends \Freemius_Abstract
     /**
      * @var string
      */
-    public $version = '1.1.0';
+    public $version = '1.1.2';
     /**
      * @since 1.0.1
      *
@@ -407,6 +407,11 @@ class Freemius extends \Freemius_Abstract
      * @var FS_Plugin
      * @since 1.0.4
      */
+    private $_parent_plugin = \false;
+    /**
+     * @var Freemius
+     * @since 1.1.1
+     */
     private $_parent = \false;
     /**
      * @var FS_User
@@ -471,6 +476,37 @@ class Freemius extends \Freemius_Abstract
      * @since  1.0.9
      */
     private function _register_account_hooks()
+    {
+    }
+    /**
+     * Displays a confirmation and feedback dialog box when the user clicks on the "Deactivate" link on the plugins
+     * page.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @author Leo Fajardo (@leorw)
+     * @since  1.1.2
+     */
+    function _add_deactivation_feedback_dialog_box()
+    {
+    }
+    /**
+     * @author Leo Fajardo (leorw)
+     * @since  1.1.2
+     *
+     * @param string $user_type
+     *
+     * @return array The uninstall reasons for the specified user type.
+     */
+    function _get_uninstall_reasons($user_type = 'long-term')
+    {
+    }
+    /**
+     * Called after the user has submitted his reason for deactivating the plugin.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  1.1.2
+     */
+    function _submit_uninstall_reason_action()
     {
     }
     /**
@@ -668,8 +704,10 @@ class Freemius extends \Freemius_Abstract
      *
      * @author Vova Feldman (@svovaf)
      * @since  1.0.9
+     *
+     * @param mixed $api_result
      */
-    function _add_connectivity_issue_message()
+    function _add_connectivity_issue_message($api_result)
     {
     }
     /**
@@ -698,6 +736,35 @@ class Freemius extends \Freemius_Abstract
     {
     }
     #endregion Connectivity Issues ------------------------------------------------------------------
+    #region Email ------------------------------------------------------------------
+    /**
+     * Generates and sends an HTML email with customizable sections.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  1.1.2
+     *
+     * @param string $to_address
+     * @param string $subject
+     * @param array  $sections
+     * @param array  $headers
+     *
+     * @return bool Whether the email contents were sent successfully.
+     */
+    private function send_email($to_address, $subject, $sections = array(), $headers = array())
+    {
+    }
+    /**
+     * Generates the data for the sections of the email content.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  1.1.2
+     *
+     * @return array
+     */
+    private function get_email_sections()
+    {
+    }
+    #endregion Email ------------------------------------------------------------------
     #region Initialization ------------------------------------------------------------------
     /**
      * Init plugin's Freemius instance.
@@ -812,6 +879,17 @@ class Freemius extends \Freemius_Abstract
      * @return Freemius[]
      */
     function get_installed_addons()
+    {
+    }
+    /**
+     * Check if any add-ons of the plugin are installed.
+     *
+     * @author Leo Fajardo (@leorw)
+     * @since  1.1.1
+     *
+     * @return bool
+     */
+    function has_installed_addons()
     {
     }
     /**
@@ -1021,6 +1099,15 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Skip account connect, and set anonymous mode.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.1
+     */
+    private function skip_connection()
+    {
+    }
+    /**
      * Plugin version update hook.
      *
      * @author Vova Feldman (@svovaf)
@@ -1078,6 +1165,15 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Load WordPress core pluggable.php module.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.2
+     */
+    private static function require_pluggable_essentials()
+    {
+    }
+    /**
      * Return plugin data.
      *
      * @author Vova Feldman (@svovaf)
@@ -1124,6 +1220,15 @@ class Freemius extends \Freemius_Abstract
      * @return mixed Plugin secret key.
      */
     function get_secret_key()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.1
+     *
+     * @return bool
+     */
+    function has_secret_key()
     {
     }
     /**
@@ -1855,7 +1960,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return bool False if account already set.
      */
-    function setup_account(\FS_User $user, \FS_Site $site)
+    function setup_account(\FS_User $user, \FS_Site $site, $redirect = \true)
     {
     }
     /**
@@ -2661,6 +2766,15 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.2
+     *
+     * @return string
+     */
+    private function get_activation_url()
+    {
+    }
+    /**
      * Handle account page updates / edits / actions.
      *
      * @author Vova Feldman (@svovaf)
@@ -3053,6 +3167,15 @@ class Freemius extends \Freemius_Abstract
     }
     #endregion ------------------------------------------------------------------
 }
+/**
+ * Class FS_Api
+ *
+ * Wraps Freemius API SDK to handle:
+ *      1. Clock sync.
+ *      2. Fallback to HTTP when HTTPS fails.
+ *      3. Adds caching layer to GET requests.
+ *      4. Adds consistency for failed requests by using last cached version.
+ */
 class FS_Api
 {
     /**
@@ -3092,7 +3215,6 @@ class FS_Api
      * @param bool        $is_sandbox
      * @param bool|string $secret_key Element's secret key.
      *
-     * @internal param Freemius $freemius
      * @return FS_Api
      */
     static function instance($slug, $scope, $id, $public_key, $is_sandbox, $secret_key = \false)
@@ -3108,8 +3230,6 @@ class FS_Api
      * @param string      $public_key Public key.
      * @param bool|string $secret_key Element's secret key.
      * @param bool        $is_sandbox
-     *
-     * @internal param \Freemius $freemius
      */
     private function __construct($slug, $scope, $id, $public_key, $secret_key, $is_sandbox)
     {
@@ -3117,9 +3237,11 @@ class FS_Api
     /**
      * Find clock diff between server and API server, and store the diff locally.
      *
+     * @param bool|int $diff
+     *
      * @return bool|int False if clock diff didn't change, otherwise returns the clock diff in seconds.
      */
-    private function _sync_clock_diff()
+    private function _sync_clock_diff($diff = \false)
     {
     }
     /**
@@ -3189,10 +3311,24 @@ class FS_Api
      * @author Vova Feldman (@svovaf)
      * @since  1.0.9
      *
+     * @param null|string $unique_anonymous_id
      *
      * @return object
      */
-    function ping()
+    function ping($unique_anonymous_id = \null)
+    {
+    }
+    /**
+     * Check if valid ping request result.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.1
+     *
+     * @param mixed $pong
+     *
+     * @return bool
+     */
+    function is_valid_ping($pong)
     {
     }
     function get_url($path = '')
@@ -3223,8 +3359,8 @@ class FS_Logger
     }
     /**
      * @param string $id
-     * @param bool $on
-     * @param bool $echo
+     * @param bool   $on
+     * @param bool   $echo
      *
      * @return FS_Logger
      */
@@ -3298,18 +3434,20 @@ class FS_Plugin_Updater
      * Initiate required filters.
      *
      * @author Vova Feldman (@svovaf)
-     * @since 1.0.4
+     * @since  1.0.4
      */
     private function _filters()
     {
     }
     /**
-     * Since WP version 3.6, a new security feature was added that denies access to repository with a local ip. During development mode we want to be able updating plugin versions via our localhost repository. This filter white-list all domains including "api.freemius".
+     * Since WP version 3.6, a new security feature was added that denies access to repository with a local ip.
+     * During development mode we want to be able updating plugin versions via our localhost repository. This
+     * filter white-list all domains including "api.freemius".
      *
-     * @link http://www.emanueletessore.com/wordpress-download-failed-valid-url-provided/
+     * @link   http://www.emanueletessore.com/wordpress-download-failed-valid-url-provided/
      *
      * @author Vova Feldman (@svovaf)
-     * @since 1.0.4
+     * @since  1.0.4
      *
      * @param bool   $allow
      * @param string $host
@@ -3329,9 +3467,9 @@ class FS_Plugin_Updater
      * See wp-includes/update.php line 121 for the original wp_update_plugins() function.
      *
      * @author Vova Feldman (@svovaf)
-     * @since 1.0.4
+     * @since  1.0.4
      *
-     * @uses FS_Api
+     * @uses   FS_Api
      *
      * @param stdClass $transient_data Update array build by WordPress.
      *
@@ -3344,7 +3482,7 @@ class FS_Plugin_Updater
      * Try to fetch plugin's info from .org repository.
      *
      * @author Vova Feldman (@svovaf)
-     * @since 1.0.5
+     * @since  1.0.5
      *
      * @param string $action
      * @param array  $args
@@ -3358,13 +3496,13 @@ class FS_Plugin_Updater
      * Updates information on the "View version x.x details" page with custom data.
      *
      * @author Vova Feldman (@svovaf)
-     * @since 1.0.4
+     * @since  1.0.4
      *
-     * @uses FS_Api
+     * @uses   FS_Api
      *
-     * @param object     $data
-     * @param string     $action
-     * @param mixed      $args
+     * @param object $data
+     * @param string $action
+     * @param mixed  $args
      *
      * @return object
      */
@@ -3399,8 +3537,17 @@ class FS_Security
 }
 class FS_Entity
 {
+    /**
+     * @var number
+     */
     public $id;
+    /**
+     * @var string Datetime value in 'YYYY-MM-DD HH:MM:SS' format.
+     */
     public $updated;
+    /**
+     * @var string Datetime value in 'YYYY-MM-DD HH:MM:SS' format.
+     */
     public $created;
     /**
      * @param bool|stdClass $entity
@@ -3430,8 +3577,8 @@ class FS_Entity
      * @author Vova Feldman (@svovaf)
      * @since  1.0.9
      *
-     * @param string|array[string]mixed $key
-     * @param string|bool               $val
+     * @param  string|array[string]mixed $key
+     * @param string|bool $val
      *
      * @return bool
      */
@@ -3447,6 +3594,17 @@ class FS_Entity
      * @return bool
      */
     function is_updated()
+    {
+    }
+    /**
+     * @param $id
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.2
+     *
+     * @return bool
+     */
+    static function is_valid_id($id)
     {
     }
 }
@@ -3473,13 +3631,54 @@ class FS_Plugin_Info extends \FS_Entity
 }
 class FS_Plugin_License extends \FS_Entity
 {
+    #region Properties
+    /**
+     * @var number
+     */
+    public $plugin_id;
+    /**
+     * @var number
+     */
+    public $user_id;
+    /**
+     * @var number
+     */
     public $plan_id;
-    public $activated;
-    public $activated_local;
+    /**
+     * @var number
+     */
+    public $pricing_id;
+    /**
+     * @var int
+     */
     public $quota;
+    /**
+     * @var int
+     */
+    public $activated;
+    /**
+     * @var int
+     */
+    public $activated_local;
+    /**
+     * @var string
+     */
     public $expiration;
+    /**
+     * @var bool $is_free_localhost Defaults to true. If true, allow unlimited localhost installs with the same
+     *      license.
+     */
     public $is_free_localhost;
+    /**
+     * @var bool $is_block_features Defaults to true. If false, don't block features after license expiry - only
+     *      block updates and support.
+     */
     public $is_block_features;
+    /**
+     * @var bool
+     */
+    public $is_cancelled;
+    #endregion Properties
     /**
      * @param stdClass|bool $license
      */
@@ -3561,12 +3760,26 @@ class FS_Plugin_License extends \FS_Entity
 }
 class FS_Plugin_Plan extends \FS_Entity
 {
-    public $title;
-    public $name;
-    public $trial_period;
-    public $is_require_subscription;
+    #region Properties
     /**
-     * @param stdClass|bool $plan
+     * @var string
+     */
+    public $title;
+    /**
+     * @var string
+     */
+    public $name;
+    /**
+     * @var int Trial days.
+     */
+    public $trial_period;
+    /**
+     * @var string If true, require payment for trial.
+     */
+    public $is_require_subscription;
+    #endregion Properties
+    /**
+     * @param object|bool $plan
      */
     function __construct($plan = \false)
     {
@@ -3606,7 +3819,13 @@ class FS_Plugin_Tag extends \FS_Entity
 }
 class FS_Scope_Entity extends \FS_Entity
 {
+    /**
+     * @var string
+     */
     public $public_key;
+    /**
+     * @var string
+     */
     public $secret_key;
     /**
      * @param bool|stdClass $scope_entity
@@ -3630,6 +3849,7 @@ class FS_Plugin extends \FS_Scope_Entity
      * @var string
      */
     public $slug;
+    #region Install Specific Properties
     /**
      * @var string
      */
@@ -3658,6 +3878,7 @@ class FS_Plugin extends \FS_Scope_Entity
      * @var bool
      */
     public $is_live;
+    #endregion Install Specific Properties
     /**
      * @param stdClass|bool $plugin
      */
@@ -3752,21 +3973,70 @@ class FS_Site extends \FS_Scope_Entity
 }
 class FS_Subscription extends \FS_Entity
 {
-    public $user_id;
-    public $install_id;
-    public $plan_id;
-    public $license_id;
-    public $amount_per_cycle;
-    public $billing_cycle;
-    public $outstanding_balance;
-    public $failed_payments;
-    public $gateway;
-    public $trial_ends;
-    public $next_payment;
-    public $vat_id;
-    public $country_code;
+    #region Properties
     /**
-     * @param stdClass|bool $subscription
+     * @var number
+     */
+    public $user_id;
+    /**
+     * @var number
+     */
+    public $install_id;
+    /**
+     * @var number
+     */
+    public $plan_id;
+    /**
+     * @var number
+     */
+    public $license_id;
+    /**
+     * @var float
+     */
+    public $total_gross;
+    /**
+     * @var float
+     */
+    public $amount_per_cycle;
+    /**
+     * @var int # of months
+     */
+    public $billing_cycle;
+    /**
+     * @var float
+     */
+    public $outstanding_balance;
+    /**
+     * @var int
+     */
+    public $failed_payments;
+    /**
+     * @var string
+     */
+    public $gateway;
+    /**
+     * @var string
+     */
+    public $external_id;
+    /**
+     * @var string|null
+     */
+    public $trial_ends;
+    /**
+     * @var string|null Datetime of the next payment, or null if cancelled
+     */
+    public $next_payment;
+    /**
+     * @var string|null
+     */
+    public $vat_id;
+    /**
+     * @var string Two characters country code
+     */
+    public $country_code;
+    #endregion Properties
+    /**
+     * @param object|bool $subscription
      */
     function __construct($subscription = \false)
     {
@@ -3801,12 +4071,34 @@ class FS_Subscription extends \FS_Entity
 }
 class FS_User extends \FS_Scope_Entity
 {
+    #region Properties
+    /**
+     * @var string
+     */
     public $email;
+    /**
+     * @var string
+     */
     public $first;
+    /**
+     * @var string
+     */
     public $last;
+    /**
+     * @var bool
+     */
     public $is_verified;
     /**
-     * @param stdClass|bool $user
+     * @var string|null
+     */
+    public $customer_id;
+    /**
+     * @var float
+     */
+    public $gross;
+    #endregion Properties
+    /**
+     * @param object|bool $user
      */
     function __construct($user = \false)
     {
@@ -4581,7 +4873,7 @@ class FS_Plugin_Manager
      * @since  1.0.6
      *
      * @param FS_Plugin $plugin
-     * @param bool       $store
+     * @param bool      $store
      */
     function set(\FS_Plugin $plugin, $store = \false)
     {
@@ -4661,11 +4953,11 @@ abstract class Freemius_Api_Base
     protected $_scope;
     protected $_sandbox;
     /**
-     * @param string $pScope 'app', 'developer', 'user' or 'install'.
-     * @param number $pID Element's id.
-     * @param string $pPublic Public key.
-     * @param string $pSecret Element's secret key.
-     * @param bool $pSandbox Whether or not to run API in sandbox mode.
+     * @param string $pScope   'app', 'developer', 'user' or 'install'.
+     * @param number $pID      Element's id.
+     * @param string $pPublic  Public key.
+     * @param string $pSecret  Element's secret key.
+     * @param bool   $pSandbox Whether or not to run API in sandbox mode.
      */
     public function Init($pScope, $pID, $pPublic, $pSecret, $pSandbox = \false)
     {
@@ -4685,6 +4977,12 @@ abstract class Freemius_Api_Base
      * @return array|object|null
      */
     private function _Api($pPath, $pMethod = 'GET', $pParams = array())
+    {
+    }
+    private function GetCloudFlareDDoSError($pResult = '')
+    {
+    }
+    private function GetSquidAclError($pResult = '')
     {
     }
     /**
@@ -4729,6 +5027,7 @@ abstract class Freemius_Api_Base
      *   No padded =
      *
      * @param string $input base64UrlEncoded string
+     *
      * @return string
      */
     protected static function Base64UrlDecode($input)
@@ -4741,6 +5040,7 @@ abstract class Freemius_Api_Base
      *   _ instead of /
      *
      * @param string $input string
+     *
      * @return string base64Url encoded string
      */
     protected static function Base64UrlEncode($input)
@@ -4951,12 +5251,12 @@ function fs_ui_action_link($slug, $page, $action, $title, $params = array())
 /**
  * Redirects to another page, with a workaround for the IIS Set-Cookie bug.
  *
- * @link http://support.microsoft.com/kb/q176113/
+ * @link  http://support.microsoft.com/kb/q176113/
  * @since 1.5.1
- * @uses apply_filters() Calls 'wp_redirect' hook on $location and $status.
+ * @uses  apply_filters() Calls 'wp_redirect' hook on $location and $status.
  *
  * @param string $location The path to redirect to
- * @param int $status Status code to use
+ * @param int    $status   Status code to use
  *
  * @return bool False if $location is not set
  */
@@ -4994,6 +5294,7 @@ function fs_kses_no_null($string)
  * no duplicate slashes exist.
  *
  * @param string $path Path to normalize.
+ *
  * @return string Normalized path.
  */
 function fs_normalize_path($path)
@@ -5018,7 +5319,7 @@ function fs_install_plugin_information()
  *
  * @return Freemius
  */
-function fs($slug)
+function freemius($slug)
 {
 }
 /**
