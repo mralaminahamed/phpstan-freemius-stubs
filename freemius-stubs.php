@@ -199,7 +199,7 @@ abstract class Freemius_Abstract
      *
      * @since  1.0.9
      *
-     * @param string $plan  Plan name
+     * @param string $plan  Plan name.
      * @param bool   $exact If true, looks for exact plan. If false, also check "higher" plans.
      *
      * @return bool
@@ -214,7 +214,7 @@ abstract class Freemius_Abstract
      *
      * @since  1.0.9
      *
-     * @param string $plan  Plan name
+     * @param string $plan  Plan name.
      * @param bool   $exact If true, looks for exact plan. If false, also check "higher" plans.
      *
      * @return bool
@@ -295,7 +295,7 @@ abstract class Freemius_Abstract
     /**
      * @since  1.0.2
      *
-     * @param string $plan  Plan name
+     * @param string $plan  Plan name.
      * @param bool   $exact If true, looks for exact plan. If false, also check "higher" plans.
      *
      * @return bool
@@ -306,7 +306,7 @@ abstract class Freemius_Abstract
      *
      * @since  1.0.9
      *
-     * @param string $plan  Plan name
+     * @param string $plan  Plan name.
      * @param bool   $exact If true, looks for exact plan. If false, also check "higher" plans.
      *
      * @return bool
@@ -317,7 +317,7 @@ abstract class Freemius_Abstract
      *
      * @since  1.0.9
      *
-     * @param string $plan  Plan name
+     * @param string $plan  Plan name.
      * @param bool   $exact If true, looks for exact plan. If false, also check "higher" plans.
      *
      * @return bool
@@ -356,6 +356,28 @@ abstract class Freemius_Abstract
      * @return bool
      */
     abstract function is_only_premium();
+    /**
+     * Check if module has a premium code version.
+     *
+     * Serviceware module might be freemium without any
+     * premium code version, where the paid features
+     * are all part of the service.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.6
+     *
+     * @return bool
+     */
+    abstract function has_premium_version();
+    /**
+     * Check if module has any release on Freemius,
+     * or all plugin's code is on WordPress.org (Serviceware).
+     *
+     * @return bool
+     */
+    function has_release_on_freemius()
+    {
+    }
     /**
      * Checks if it's a freemium plugin.
      *
@@ -398,7 +420,7 @@ abstract class Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.2
      *
-     * @param string $period Billing cycle
+     * @param string $period Billing cycle.
      *
      * @return string
      */
@@ -553,6 +575,16 @@ class Freemius extends \Freemius_Abstract
      * @var bool Hints the SDK if plugin have any free plans.
      */
     private $_is_premium_only;
+    /**
+     * @since 1.2.1.6
+     * @var bool Hints the SDK if plugin have premium code version at all.
+     */
+    private $_has_premium_version;
+    /**
+     * @since 1.2.1.6
+     * @var bool Hints the SDK if plugin should ignore pending mode by simulating a skip.
+     */
+    private $_ignore_pending_mode;
     /**
      * @since 1.0.8
      * @var bool Hints the SDK if the plugin has any paid plans.
@@ -1031,6 +1063,13 @@ class Freemius extends \Freemius_Abstract
      * @since  1.1.7.3
      */
     static function _toggle_debug_mode()
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.6
+     */
+    static function _get_debug_log()
     {
     }
     /**
@@ -2875,6 +2914,21 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Check if module has a premium code version.
+     *
+     * Serviceware module might be freemium without any
+     * premium code version, where the paid features
+     * are all part of the service.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.6
+     *
+     * @return bool
+     */
+    function has_premium_version()
+    {
+    }
+    /**
      * Check if feature supported with current site's plan.
      *
      * @author Vova Feldman (@svovaf)
@@ -2906,7 +2960,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @link   http://wordpress.stackexchange.com/questions/70676/how-to-check-if-i-am-in-admin-ajax
      */
-    function is_ajax()
+    static function is_ajax()
     {
     }
     /**
@@ -2920,6 +2974,20 @@ class Freemius extends \Freemius_Abstract
      * @return bool
      */
     function is_ajax_action($actions)
+    {
+    }
+    /**
+     * Check if it's an AJAX call targeted for current request.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.0
+     *
+     * @param array|string $actions Collection of AJAX actions.
+     * @param string       $slug
+     *
+     * @return bool
+     */
+    static function is_ajax_action_static($actions, $slug = '')
     {
     }
     /**
@@ -3419,6 +3487,18 @@ class Freemius extends \Freemius_Abstract
     }
     /**
      * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.6
+     *
+     * @param string $tag
+     * @param string $slug
+     *
+     * @return string
+     */
+    static function get_action_tag_static($tag, $slug = '')
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
      * @since  1.2.1
      *
      * @param string $tag
@@ -3426,6 +3506,18 @@ class Freemius extends \Freemius_Abstract
      * @return string
      */
     private function get_ajax_action_tag($tag)
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.6
+     *
+     * @param string $tag
+     * @param string $slug
+     *
+     * @return string
+     */
+    private static function get_ajax_action_tag_static($tag, $slug = '')
     {
     }
     /**
@@ -3468,13 +3560,30 @@ class Freemius extends \Freemius_Abstract
      * @param string   $tag
      * @param callable $function_to_add
      * @param int      $priority
-     * @param int      $accepted_args
      *
      * @uses   add_action()
      *
      * @return bool True if action added, false if no need to add the action since the AJAX call isn't matching.
      */
-    function add_ajax_action($tag, $function_to_add, $priority = \WP_FS__DEFAULT_PRIORITY, $accepted_args = 1)
+    function add_ajax_action($tag, $function_to_add, $priority = \WP_FS__DEFAULT_PRIORITY)
+    {
+    }
+    /**
+     * Add AJAX action.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.6
+     *
+     * @param string   $tag
+     * @param callable $function_to_add
+     * @param int      $priority
+     * @param string   $slug
+     *
+     * @return bool True if action added, false if no need to add the action since the AJAX call isn't matching.
+     * @uses   add_action()
+     *
+     */
+    static function add_ajax_action_static($tag, $function_to_add, $priority = \WP_FS__DEFAULT_PRIORITY, $slug = '')
     {
     }
     /**
@@ -3485,7 +3594,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @param mixed $response
      */
-    function shoot_ajax_response($response)
+    static function shoot_ajax_response($response)
     {
     }
     /**
@@ -3496,7 +3605,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @param mixed $data Data to encode as JSON, then print and exit.
      */
-    function shoot_ajax_success($data = \null)
+    static function shoot_ajax_success($data = \null)
     {
     }
     /**
@@ -3507,7 +3616,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @param mixed $error Optional error message.
      */
-    function shoot_ajax_failure($error = '')
+    static function shoot_ajax_failure($error = '')
     {
     }
     /**
@@ -4019,7 +4128,7 @@ class Freemius extends \Freemius_Abstract
      * @uses   FS_Api
      * @uses   wp_redirect()
      */
-    private function _download_latest_directly($plugin_id = \false)
+    private function download_latest_directly($plugin_id = \false)
     {
     }
     /**
@@ -4032,7 +4141,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return string
      */
-    private function _get_latest_download_api_url($plugin_id = \false)
+    private function get_latest_download_api_url($plugin_id = \false)
     {
     }
     /**
@@ -4059,7 +4168,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return string
      */
-    private function _get_latest_download_link($label, $plugin_id = \false)
+    private function get_latest_download_link($label, $plugin_id = \false)
     {
     }
     /**
@@ -4087,7 +4196,7 @@ class Freemius extends \Freemius_Abstract
      * @param bool|number $plugin_id
      * @param bool        $flush      Since 1.1.7.3
      */
-    private function _check_updates($background = \false, $plugin_id = \false, $flush = \true)
+    private function check_updates($background = \false, $plugin_id = \false, $flush = \true)
     {
     }
     /**
@@ -4100,7 +4209,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @uses   FS_Api
      */
-    private function _sync_addons($flush = \false)
+    private function sync_addons($flush = \false)
     {
     }
     /**
@@ -4114,7 +4223,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return object
      */
-    private function _update_email($new_email)
+    private function update_email($new_email)
     {
     }
     #----------------------------------------------------------------------------------
@@ -5025,6 +5134,22 @@ class FS_Logger
     private $_on = \false;
     private $_echo = \false;
     private $_file_start = 0;
+    /**
+     * @var int PHP Process ID.
+     */
+    private static $_processID;
+    /**
+     * @var string PHP Script user name.
+     */
+    private static $_ownerName;
+    /**
+     * @var bool Is storage logging turned on.
+     */
+    private static $_isStorageLoggingOn;
+    /**
+     * @var int ABSPATH length.
+     */
+    private static $_abspathLength;
     private static $LOGGERS = array();
     private static $LOG = array();
     private static $CNT = 0;
@@ -5042,7 +5167,16 @@ class FS_Logger
     public static function get_logger($id, $on = \false, $echo = \false)
     {
     }
-    private static function _hook_footer()
+    /**
+     * Initialize logging global info.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.6
+     */
+    private static function init()
+    {
+    }
+    private static function hook_footer()
     {
     }
     function is_on()
@@ -5096,18 +5230,133 @@ class FS_Logger
     function departure($message = '', $wrapper = \false)
     {
     }
+    #--------------------------------------------------------------------------------
+    #region Log Formatting
+    #--------------------------------------------------------------------------------
     private static function format($log, $show_type = \true)
     {
     }
     private static function format_html($log)
     {
     }
+    #endregion
     static function dump()
     {
     }
     static function get_log()
     {
     }
+    #--------------------------------------------------------------------------------
+    #region Database Logging
+    #--------------------------------------------------------------------------------
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.6
+     *
+     * @return bool
+     */
+    public static function is_storage_logging_on()
+    {
+    }
+    /**
+     * Turns on/off database persistent debugging to capture
+     * multi-session logs to debug complex flows like
+     * plugin auto-deactivate on premium version activation.
+     *
+     * @todo   Check if Theme Check has issues with DB tables for themes.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.6
+     *
+     * @param bool $is_on
+     *
+     * @return bool
+     */
+    public static function _set_storage_logging($is_on = \true)
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.6
+     *
+     * @param string $type
+     * @param string $message
+     * @param int    $log_order
+     * @param array  $caller
+     *
+     * @return false|int
+     */
+    private function db_log(&$type, &$message, &$log_order, &$caller)
+    {
+    }
+    /**
+     * Persistent DB logger columns.
+     *
+     * @var array
+     */
+    private static $_log_columns = array('id', 'process_id', 'user_name', 'logger', 'log_order', 'type', 'message', 'file', 'line', 'function', 'request_type', 'request_url', 'created');
+    /**
+     * Create DB logs query.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.6
+     *
+     * @param bool $filters
+     * @param int  $limit
+     * @param int  $offset
+     * @param bool $order
+     * @param bool $escape_eol
+     *
+     * @return string
+     */
+    private static function build_db_logs_query($filters = \false, $limit = 200, $offset = 0, $order = \false, $escape_eol = \false)
+    {
+    }
+    /**
+     * Load logs from DB.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.6
+     *
+     * @param bool $filters
+     * @param int  $limit
+     * @param int  $offset
+     * @param bool $order
+     *
+     * @return object[]|null
+     */
+    public static function load_db_logs($filters = \false, $limit = 200, $offset = 0, $order = \false)
+    {
+    }
+    /**
+     * Load logs from DB.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.6
+     *
+     * @param bool   $filters
+     * @param string $filename
+     * @param int    $limit
+     * @param int    $offset
+     * @param bool   $order
+     *
+     * @return false|string File download URL or false on failure.
+     */
+    public static function download_db_logs($filters = \false, $filename = '', $limit = 10000, $offset = 0, $order = \false)
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.6
+     *
+     * @param string $filename
+     *
+     * @return string
+     */
+    public static function get_logs_download_url($filename = '')
+    {
+    }
+    #endregion
 }
 // Uncomment this line for testing.
 //	set_site_transient( 'update_plugins', null );
@@ -5156,7 +5405,7 @@ class FS_Plugin_Updater
      * @since  1.1.6
      *
      * @param string $file
-     * @param array $plugin_data
+     * @param array  $plugin_data
      */
     function edit_and_echo_plugin_update_row($file, $plugin_data)
     {
@@ -5193,9 +5442,9 @@ class FS_Plugin_Updater
      *
      * @uses   FS_Api
      *
-     * @param stdClass $transient_data Update array build by WordPress.
+     * @param object $transient_data Update array build by WordPress.
      *
-     * @return array Modified update array with custom plugin data.
+     * @return object Modified update array with custom plugin data.
      */
     function pre_set_site_transient_update_plugins_filter($transient_data)
     {
@@ -5231,7 +5480,41 @@ class FS_Plugin_Updater
     function plugins_api_filter($data, $action = '', $args = \null)
     {
     }
+    /**
+     * Checks if a given basename has a matching folder name
+     * with the current context plugin.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.6
+     *
+     * @param string $basename Current plugin's basename.
+     *
+     * @return bool
+     */
+    private function is_correct_folder_name($basename = '')
+    {
+    }
+    /**
+     * This is a special after upgrade handler for migrating modules
+     * that didn't use the '-premium' suffix folder structure before
+     * the migration.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.6
+     *
+     * @param bool  $response   Install response.
+     * @param array $hook_extra Extra arguments passed to hooked filters.
+     * @param array $result     Installation result data.
+     *
+     * @return bool
+     */
+    function _maybe_update_folder_name($response, $hook_extra, $result)
+    {
+    }
 }
+/**
+ * Class FS_Security
+ */
 class FS_Security
 {
     /**
@@ -5244,6 +5527,9 @@ class FS_Security
      * @since 1.0.3
      */
     private static $_logger;
+    /**
+     * @return \FS_Security
+     */
     public static function instance()
     {
     }
@@ -5520,6 +5806,9 @@ class FS_Plugin_Info extends \FS_Entity
     {
     }
 }
+/**
+ * Class FS_Plugin_License
+ */
 class FS_Plugin_License extends \FS_Entity
 {
     #region Properties
@@ -5580,6 +5869,11 @@ class FS_Plugin_License extends \FS_Entity
     function __construct($license = \false)
     {
     }
+    /**
+     * Get entity type.
+     *
+     * @return string
+     */
     static function get_type()
     {
     }
@@ -6518,15 +6812,6 @@ class FS_Admin_Menu_Manager
      * @author Vova Feldman (@svovaf)
      * @since  1.1.3
      *
-     * @return string
-     */
-    //		function slug(){
-    //			return $this->_menu_slug;
-    //		}
-    /**
-     * @author Vova Feldman (@svovaf)
-     * @since  1.1.3
-     *
      * @param string $id
      * @param bool   $default
      *
@@ -6547,6 +6832,17 @@ class FS_Admin_Menu_Manager
      * @return string
      */
     function get_slug($page = '')
+    {
+    }
+    /**
+     * Check if module has a menu slug set.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.6
+     *
+     * @return bool
+     */
+    function has_menu_slug()
     {
     }
     /**
@@ -6652,6 +6948,17 @@ class FS_Admin_Menu_Manager
      * @return string[]|false
      */
     private function find_top_level_menu()
+    {
+    }
+    /**
+     * Find plugin's admin dashboard main submenu item.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.2.1.6
+     *
+     * @return array|false
+     */
+    private function find_main_submenu()
     {
     }
     /**
@@ -8194,6 +8501,85 @@ function fs_download_image($from, $to)
 function fs_sort_by_priority($a, $b)
 {
 }
+#--------------------------------------------------------------------------------
+#region Localization
+#--------------------------------------------------------------------------------
+/**
+ * @author Vova Feldman
+ * @since 1.2.1.6
+ *
+ * @param string $key
+ * @param string $slug
+ *
+ * @return string
+ */
+function fs_esc_attr($key, $slug)
+{
+}
+/**
+ * @author Vova Feldman
+ * @since 1.2.1.6
+ *
+ * @param string $key
+ * @param string $slug
+ */
+function fs_esc_attr_echo($key, $slug)
+{
+}
+/**
+ * @author Vova Feldman
+ * @since 1.2.1.6
+ *
+ * @param string $key
+ * @param string $slug
+ *
+ * @return string
+ */
+function fs_esc_js($key, $slug)
+{
+}
+/**
+ * @author Vova Feldman
+ * @since 1.2.1.6
+ *
+ * @param string $key
+ * @param string $slug
+ */
+function fs_esc_js_echo($key, $slug)
+{
+}
+/**
+ * @author Vova Feldman
+ * @since 1.2.1.6
+ *
+ * @param string $key
+ * @param string $slug
+ */
+function fs_json_encode_echo($key, $slug)
+{
+}
+/**
+ * @author Vova Feldman
+ * @since 1.2.1.6
+ *
+ * @param string $key
+ * @param string $slug
+ *
+ * @return string
+ */
+function fs_esc_html($key, $slug)
+{
+}
+/**
+ * @author Vova Feldman
+ * @since 1.2.1.6
+ *
+ * @param string $key
+ * @param string $slug
+ */
+function fs_esc_html_echo($key, $slug)
+{
+}
 /**
  * Redirects to another page, with a workaround for the IIS Set-Cookie bug.
  *
@@ -8329,6 +8715,190 @@ function fs_fallback_to_newest_active_sdk()
  * @uses   apply_filters()
  */
 function fs_apply_filter($slug, $tag, $value)
+{
+}
+/**
+ * Retrieve the translation of $text.
+ *
+ * @since 1.2.1.6
+ *
+ * @param string $text
+ * 
+ * @return string
+ */
+function _fs_text($text)
+{
+}
+/**
+ * Retrieve the translation of $text and escapes it for safe use in an attribute.
+ *
+ * @since 1.2.1.6
+ *
+ * @param string $text
+ * 
+ * @return string
+ */
+function _fs_esc_attr($text)
+{
+}
+/**
+ * Retrieve the translation of $text and escapes it for safe use in HTML output.
+ *
+ * @since 1.2.1.6
+ *
+ * @param string $text
+ * 
+ * @return string
+ */
+function _fs_esc_html($text)
+{
+}
+/**
+ * Display translated text.
+ *
+ * @since 1.2.0
+ *
+ * @param string $text
+ */
+function _fs_echo($text)
+{
+}
+/**
+ * Display translated text that has been escaped for safe use in an attribute.
+ *
+ * @since 1.2.1.6
+ *
+ * @param string $text
+ */
+function _fs_esc_attr_echo($text)
+{
+}
+/**
+ * Display translated text that has been escaped for safe use in HTML output.
+ *
+ * @since 1.2.1.6
+ *
+ * @param string $text
+ */
+function _fs_esc_html_echo($text)
+{
+}
+/**
+ * Retrieve translated string with gettext context.
+ *
+ * Quite a few times, there will be collisions with similar translatable text
+ * found in more than two places, but with different translated context.
+ *
+ * By including the context in the pot file, translators can translate the two
+ * strings differently.
+ *
+ * @since 1.2.1.6
+ *
+ * @param string $text
+ * @param string $context 
+ * 
+ * @return string
+ */
+function _fs_x($text, $context)
+{
+}
+/**
+ * Display translated string with gettext context.
+ *
+ * @since 1.2.1.6
+ *
+ * @param string $text
+ * @param string $context
+ */
+function _fs_ex($text, $context)
+{
+}
+/**
+ * Translate string with gettext context, and escapes it for safe use in an attribute.
+ *
+ * @since 1.2.1.6
+ *
+ * @param string $text
+ * @param string $context
+ *
+ * @return string
+ */
+function _fs_esc_attr_x($text, $context)
+{
+}
+/**
+ * Translate string with gettext context, and escapes it for safe use in HTML output.
+ *
+ * @since 2.9.0
+ *
+ * @param string $text
+ * @param string $context
+ * 
+ * @return string
+ */
+function _fs_esc_html_x($text, $context)
+{
+}
+/**
+ * Translates and retrieves the singular or plural form based on the supplied number.
+ *
+ * @since 1.2.1.6
+ *
+ * @param string $single
+ * @param string $plural
+ * @param int    $number
+ * 
+ * @return string
+ */
+function _fs_n($single, $plural, $number)
+{
+}
+/**
+ * Translates and retrieves the singular or plural form based on the supplied number, with gettext context.
+ *
+ * @since 1.2.1.6
+ *
+ * @param string $single
+ * @param string $plural
+ * @param int    $number
+ * @param string $context
+ * 
+ * @return string
+ */
+function _fs_nx($single, $plural, $number, $context)
+{
+}
+/**
+ * Registers plural strings in POT file, but does not translate them.
+ *
+ * Used when you want to keep structures with translatable plural
+ * strings and use them later when the number is known.
+ *
+ * @since 1.2.1.6
+ *
+ * @param string $singular
+ * @param string $plural
+ * 
+ * @return array
+ */
+function _fs_n_noop($singular, $plural)
+{
+}
+/**
+ * Registers plural strings with gettext context in POT file, but does not translate them.
+ *
+ * Used when you want to keep structures with translatable plural
+ * strings and use them later when the number is known.
+ *
+ * @since 1.2.1.6
+ *
+ * @param string $singular
+ * @param string $plural
+ * @param string $context
+ * 
+ * @return array
+ */
+function _fs_nx_noop($singular, $plural, $context)
 {
 }
 /**

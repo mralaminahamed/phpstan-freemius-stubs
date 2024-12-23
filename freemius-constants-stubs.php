@@ -56,6 +56,9 @@
 \define('WP_FS__ADDRESS', \WP_FS__IS_PRODUCTION_MODE ? \WP_FS__ADDRESS_PRODUCTION : \WP_FS__ADDRESS_LOCALHOST);
 \define('WP_FS__API_ADDRESS_LOCALHOST', 'http://api.freemius:8080');
 \define('WP_FS__API_SANDBOX_ADDRESS_LOCALHOST', 'http://sandbox-api.freemius:8080');
+\define('FS_CHECKOUT__ADDRESS_PRODUCTION', 'https://checkout.freemius.com');
+\define('FS_CHECKOUT__ADDRESS_LOCALHOST', 'http://checkout.freemius:8080');
+\define('FS_CHECKOUT__ADDRESS', \WP_FS__IS_PRODUCTION_MODE ? \FS_CHECKOUT__ADDRESS_PRODUCTION : \FS_CHECKOUT__ADDRESS_LOCALHOST);
 #endregion
 \define('WP_FS___OPTION_PREFIX', 'fs' . (\WP_FS__IS_PRODUCTION_MODE ? '' : '_dbg') . '_');
 \define('WP_FS__ACCOUNTS_OPTION_NAME', \WP_FS___OPTION_PREFIX . 'accounts');
