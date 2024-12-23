@@ -868,6 +868,17 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * Force turning Freemius on.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.8.1
+     *
+     * @return bool TRUE if successfully turned on.
+     */
+    private function turn_on()
+    {
+    }
+    /**
      * Anonymous and unique site identifier (Hash).
      *
      * @author Vova Feldman (@svovaf)
@@ -1590,7 +1601,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @author Vova Feldman (@svovaf)
      * @since  1.1.8
-     *         
+     *
      * @return array|false
      */
     private function get_themes_data_for_api()
@@ -1617,7 +1628,7 @@ class Freemius extends \Freemius_Abstract
      * @author Vova Feldman (@svovaf)
      * @since  1.0.9
      *
-     * @param string[]string $override
+     * @param string[] string $override
      * @param bool     $flush
      *
      * @return false|object|string
@@ -2102,6 +2113,17 @@ class Freemius extends \Freemius_Abstract
      * @return FS_Plugin_Plan
      */
     function _get_plan_by_id($id)
+    {
+    }
+    /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.8.1
+     *
+     * @param string $name
+     *
+     * @return FS_Plugin_Plan|false
+     */
+    private function get_plan_by_name($name)
     {
     }
     /**
@@ -3225,6 +3247,17 @@ class Freemius extends \Freemius_Abstract
     {
     }
     /**
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.8.1
+     *
+     * @param bool|string $plan_name
+     *
+     * @return bool If trial was successfully started.
+     */
+    function start_trial($plan_name = \false)
+    {
+    }
+    /**
      * Cancel site trial.
      *
      * @author Vova Feldman (@svovaf)
@@ -4205,10 +4238,10 @@ class FS_Plugin_Updater
      */
     private $_logger;
     /**
-     * @var bool
-     * @since 1.1.7
+     * @var object
+     * @since 1.1.8.1
      */
-    private $_update_checked = \false;
+    private $_update_details;
     function __construct(\Freemius $freemius)
     {
     }
@@ -4449,7 +4482,7 @@ class FS_Plugin_License extends \FS_Entity
      */
     public $pricing_id;
     /**
-     * @var int
+     * @var int|null
      */
     public $quota;
     /**
@@ -4497,6 +4530,17 @@ class FS_Plugin_License extends \FS_Entity
      * @return int
      */
     function left()
+    {
+    }
+    /**
+     * Check if single site license.
+     *
+     * @author Vova Feldman (@svovaf)
+     * @since  1.1.8.1
+     *
+     * @return bool
+     */
+    function is_single_site()
     {
     }
     /**

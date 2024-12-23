@@ -14,6 +14,7 @@
 \define('FS_SDK__SIMULATE_NO_CURL', \true);
 \define('FS_SDK__SIMULATE_NO_API_CONNECTIVITY_CLOUDFLARE', \true);
 \define('FS_SDK__SIMULATE_NO_API_CONNECTIVITY_SQUID_ACL', \true);
+\define('WP_FS__SIMULATE_FREEMIUS_OFF', \false);
 /**
  * @since  1.1.7.3
  * @author Vova Feldman (@svovaf)
