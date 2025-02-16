@@ -11792,7 +11792,6 @@ class FS_Plugin_License extends \FS_Entity
 /**
  * Class FS_Plugin_Plan
  *
- * @property FS_Pricing[] $pricing
  */
 class FS_Plugin_Plan extends \FS_Entity
 {
@@ -12219,16 +12218,16 @@ class FS_Pricing extends \FS_Entity
     {
     }
 }
-/**
- * @property int $blog_id
- */
-#[\AllowDynamicProperties]
 class FS_Site extends \FS_Scope_Entity
 {
     /**
      * @var number
      */
     public $site_id;
+    /**
+     * @var int
+     */
+    public $blog_id;
     /**
      * @var number
      */
@@ -12550,6 +12549,15 @@ class FS_User extends \FS_Scope_Entity
      * @param object|bool $user
      */
     function __construct($user = \false)
+    {
+    }
+    /**
+     * This method removes the deprecated 'is_beta' property from the serialized data.
+     * Should clean up the serialized data to avoid PHP 8.2 warning on next execution.
+     *
+     * @return void
+     */
+    function __wakeup()
     {
     }
     function get_name()
