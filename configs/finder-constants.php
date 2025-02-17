@@ -3,10 +3,9 @@
 use StubsGenerator\Finder;
 
 return Finder::create()
-    ->in( array(
-        'source/vendor/freemius/wordpress-sdk/',
+    ->in(array(
         'source/vendor/freemius/wordpress-sdk/'
-    ) )
+    ))
     ->append(
         Finder::create()
             ->in(['source/vendor/freemius/wordpress-sdk/'])
@@ -21,5 +20,4 @@ return Finder::create()
             ->depth('< 1')
             ->path('start.php')
     )
-    ->sortByName(true)
-;
+    ->sortByName(true);

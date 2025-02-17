@@ -3,9 +3,9 @@
 use StubsGenerator\Finder;
 
 return Finder::create()
-    ->in( array(
+    ->in(array(
         'source/vendor/freemius/wordpress-sdk/',
-    ) )
+    ))
     ->notPath('customizer')
     ->notPath('debug')
     ->append(

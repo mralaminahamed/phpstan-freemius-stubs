@@ -13,8 +13,8 @@ readonly PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 # Shared file paths
 readonly SOURCE_DIR="${PROJECT_ROOT}/source/vendor/freemius/wordpress-sdk"
-readonly STUBS_FILE="${PROJECT_ROOT}/freemius-stubs.php"
-readonly CONSTANTS_FILE="${PROJECT_ROOT}/freemius-constants-stubs.php"
+readonly STUBS_FILE="${PROJECT_ROOT}/freemius-stubs.stub"
+readonly CONSTANTS_FILE="${PROJECT_ROOT}/freemius-constants-stubs.stub"
 readonly GENERATE_STUBS_BIN="${PROJECT_ROOT}/vendor/bin/generate-stubs"
 readonly VERSIONS_FILE="${PROJECT_ROOT}/freemius_versions.txt"
 readonly PACKAGIST_URL="https://packagist.org/packages/freemius/wordpress-sdk.json"

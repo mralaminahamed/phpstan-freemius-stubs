@@ -48,8 +48,8 @@ Add the stubs to your `phpstan.neon` configuration:
 ```yaml
 parameters:
     bootstrapFiles:
-        - vendor/mralaminahamed/freemius-stubs/freemius-constants-stubs.php
-        - vendor/mralaminahamed/freemius-stubs/freemius-stubs.php
+        - vendor/mralaminahamed/freemius-stubs/freemius-constants-stubs.stub
+        - vendor/mralaminahamed/freemius-stubs/freemius-stubs.stub
 ```
 
 ### IDE Configuration
@@ -65,8 +65,8 @@ Add to your `settings.json`:
 ```json
 {
     "php.stubs": [
-        "vendor/mralaminahamed/freemius-stubs/freemius-stubs.php",
-        "vendor/mralaminahamed/freemius-stubs/freemius-constants-stubs.php"
+        "vendor/mralaminahamed/freemius-stubs/freemius-stubs.stub",
+        "vendor/mralaminahamed/freemius-stubs/freemius-constants-stubs.stub"
     ]
 }
 ```

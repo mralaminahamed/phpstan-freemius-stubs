@@ -5,10 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ad4d1151-a7d6-4fdf-acd4-b3720707e64b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/tests/.gitkeep" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/phpstubs-freemius.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/phpstubs-freemius.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/configs/finder-constants.php" beforeDir="false" afterPath="$PROJECT_DIR$/configs/finder-constants.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/configs/finder.php" beforeDir="false" afterPath="$PROJECT_DIR$/configs/finder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/shared.sh" beforeDir="false" afterPath="$PROJECT_DIR$/lib/shared.sh" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,12 +50,12 @@
     &quot;assignee&quot;: &quot;mralaminahamed&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/mralaminahamed/phpstan-freemius-stubs&quot;,
-    &quot;accountId&quot;: &quot;3ef4a2f6-628c-4ef5-8edc-b5207e84d28c&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/mralaminahamed/phpstan-freemius-stubs",
+    "accountId": "84de5c7d-d007-4b08-904f-c71f68856e64"
   }
-}</component>
+}]]></component>
   <component name="PhpWorkspaceProjectConfiguration" interpreter_name="/usr/bin/php">
     <include_path>
       <path value="$PROJECT_DIR$/vendor/phpstan/phpstan" />
@@ -143,23 +145,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-deb605915726-JavaScript-PS-243.22562.233" />
-        <option value="bundled-php-predefined-a98d8de5180a-7980c7aaca61-com.jetbrains.php.sharedIndexes-PS-243.22562.233" />
-        <option value="php-nikic_php_parser-5543a6ebd44f-b657ee4f" />
-        <option value="php-phar_io_version-5543a6ebd44f-bf2c7010" />
-        <option value="php-phpstan_phpstan-5543a6ebd44f-88ff1117" />
-        <option value="php-phpstan_phpstan-5543a6ebd44f-fea0ed4d" />
-        <option value="php-phpunit_php_code_coverage-5543a6ebd44f-dd8f229f" />
-        <option value="php-phpunit_phpunit-5543a6ebd44f-2d939331" />
-        <option value="php-sebastian_comparator-5543a6ebd44f-2fefc3d7" />
-        <option value="php-squizlabs_php_codesniffer-5543a6ebd44f-edd081df" />
-        <option value="php-symfony_console-5543a6ebd44f-5a7aa3a6" />
-        <option value="php-symfony_console-5543a6ebd44f-5ce23daf" />
-        <option value="php-symfony_filesystem-5543a6ebd44f-89ec7074" />
-        <option value="php-symfony_finder-5543a6ebd44f-128c6d77" />
-        <option value="php-symfony_finder-5543a6ebd44f-7b1a1db5" />
-        <option value="php-symfony_string-5543a6ebd44f-0bf900ec" />
-        <option value="php-symfony_string-5543a6ebd44f-ba92a5af" />
+        <option value="bundled-js-predefined-d6986cc7102b-76f8388c3a79-JavaScript-PS-243.24978.50" />
+        <option value="bundled-php-predefined-a98d8de5180a-fbeb0b58ac0f-com.jetbrains.php.sharedIndexes-PS-243.24978.50" />
       </set>
     </attachedChunks>
   </component>
