@@ -1,8 +1,8 @@
 parameters:
     paths:
-        - freemius-stubs.php
+        - freemius-stubs.stub
     scanFiles:
-        - freemius-constants-stubs.php
+        - freemius-constants-stubs.stub
     bootstrapFiles:
         - configs/bootstrap.php
     level: 5
