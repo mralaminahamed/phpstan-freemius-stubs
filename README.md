@@ -18,7 +18,7 @@ PHP stub declarations for the [Freemius WordPress SDK](https://github.com/freemi
 
 ## 📋 Requirements
 
-- PHP >= 7.1
+- PHP >= 7.4
 - Composer for dependency management
 
 ## 📦 Installation
@@ -36,46 +36,17 @@ composer require --dev mralaminahamed/freemius-stubs:^2.0
 ### Manual Installation
 
 Download the stub files directly:
-- [freemius-stubs.php](https://raw.githubusercontent.com/mralaminahamed/phpstan-freemius-stubs/main/freemius-stubs.php)
-- [freemius-constants-stubs.php](https://raw.githubusercontent.com/mralaminahamed/phpstan-freemius-stubs/main/freemius-constants-stubs.php)
+- [freemius-stubs.stub](https://raw.githubusercontent.com/mralaminahamed/phpstan-freemius-stubs/main/freemius-stubs.stub)
+- [freemius-constants-stubs.stub](https://raw.githubusercontent.com/mralaminahamed/phpstan-freemius-stubs/main/freemius-constants-stubs.stub)
 
-## 🔧 Configuration
+## 🔧 Basic Configuration
 
-### PHPStan Integration
+To use these stubs with PHPStan or your IDE, see our [Usage Guide](./docs/usage.md) for detailed instructions.
 
-Add the stubs to your `phpstan.neon` configuration:
-
-```yaml
-parameters:
-    bootstrapFiles:
-        - vendor/mralaminahamed/freemius-stubs/freemius-constants-stubs.stub
-        - vendor/mralaminahamed/freemius-stubs/freemius-stubs.stub
-```
-
-### IDE Configuration
-
-Most modern IDEs will automatically detect the stubs when installed via Composer. For manual installation, add the stub files to your IDE's include path.
-
-#### PhpStorm
-1. Go to `Settings` → `PHP` → `Include Path`
-2. Add the directory containing the stub files
-
-#### VS Code
-Add to your `settings.json`:
-```json
-{
-    "php.stubs": [
-        "vendor/mralaminahamed/freemius-stubs/freemius-stubs.stub",
-        "vendor/mralaminahamed/freemius-stubs/freemius-constants-stubs.stub"
-    ]
-}
-```
-
-## 🔍 Usage Example
+## 🔍 Quick Usage Example
 
 ```php
 <?php
-
 // Your code will now have full IDE support
 $fs = Freemius::instance();
 
@@ -90,50 +61,42 @@ class MyIntegration implements Freemius_Api_Interface {
 }
 ```
 
+For advanced usage examples, see the [Usage Guide](./docs/usage.md).
+
+## 📁 Package Structure
+
+```
+phpstan-freemius-stubs/
+├── bin/                               # Scripts for generating and releasing stubs
+├── configs/                           # Configuration files for stub generation
+├── docs/                              # Detailed documentation
+│   ├── usage.md                       # Usage guide
+│   └── contributing.md                # Contribution guidelines
+├── freemius-constants-stubs.stub      # Constants stub file
+├── freemius-stubs.stub                # Main stubs file with classes and functions
+├── freemius_versions.txt              # Tracks supported Freemius SDK versions
+├── lib/                               # Helper libraries
+├── phpstan.neon                       # PHPStan configuration
+├── source/                            # Source for generating stubs
+└── tests/                             # Test files
+    ├── bootstrap.php                  # Test bootstrap
+    ├── ConstantsTest.php              # Constants tests
+    └── FreemiusTest.php               # Freemius tests
+```
+
 ## 🛠 Development
 
-### Building Stubs
-
-```bash
-# Clone the repository
-git clone https://github.com/mralaminahamed/phpstan-freemius-stubs.git
-cd phpstan-freemius-stubs
-
-# Install dependencies
-composer install
-
-# Generate stubs
-composer generate
-
-# Release new version
-composer release
-```
-
-### Running Tests
-
-```bash
-# Run all checks
-composer check
-
-# Individual checks
-composer cs      # Coding standards
-composer analyze # Static analysis
-composer test    # Unit tests
-```
+For information on building stubs, running tests, and contributing to the project, please see our [Contributing Guide](./docs/contributing.md).
 
 ## 📚 Documentation
 
+For more detailed information, check out our documentation:
+
+- [Usage Guide](./docs/usage.md)
+- [Contributing Guide](./docs/contributing.md)
 - [Freemius SDK Documentation](https://freemius.com/help/documentation/wordpress-sdk/)
 - [PHPStan Documentation](https://phpstan.org/user-guide/getting-started)
 - [PHP Stubs Generator Documentation](https://github.com/php-stubs/generator)
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
 
 ## 📄 License
 

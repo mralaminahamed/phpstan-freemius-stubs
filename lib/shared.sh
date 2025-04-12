@@ -26,7 +26,9 @@ readonly HEADER=$'/**\n * Generated stub declarations for freemius.\n * @see htt
 log_message() {
     local severity="$1"
     local message="$2"
-    echo "[$(date +'%Y-%m-%d %H:%M:%S')] [${severity^^}] ${message}" >&2
+    # Using tr for uppercase conversion instead of ${severity^^} for compatibility
+    local upper_severity=$(echo "$severity" | tr '[:lower:]' '[:upper:]')
+    echo "[$(date +'%Y-%m-%d %H:%M:%S')] [${upper_severity}] ${message}" >&2
 }
 
 # Function to validate environment
@@ -34,7 +36,7 @@ validate_environment() {
     local missing_requirements=0
 
     # Check for required commands
-    for cmd in git jq wget composer php; do
+    for cmd in git jq curl composer php; do
         if ! command -v "$cmd" >/dev/null 2>&1; then
             log_message "error" "Required command not found: $cmd"
             missing_requirements=1
@@ -67,7 +69,7 @@ fetch_versions() {
     log_message "info" "Fetching package versions..."
     local pkg_json
 
-    if ! pkg_json=$(wget -q -O- "${PACKAGIST_URL}"); then
+    if ! pkg_json=$(curl -s "${PACKAGIST_URL}"); then
         log_message "error" "Failed to fetch package information"
         return 1
     fi

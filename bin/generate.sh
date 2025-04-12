@@ -8,6 +8,23 @@
 # shellcheck source=lib/shared.sh
 source "$(dirname "${BASH_SOURCE[0]}")/../lib/shared.sh"
 
+# Install dependencies in source directory
+install_dependencies() {
+    log_message "info" "Installing dependencies in source directory..."
+    
+    if ! composer --working-dir="${PROJECT_ROOT}/source" install --no-interaction; then
+        log_message "error" "Failed to install dependencies in source directory"
+        return 1
+    fi
+    
+    if [[ ! -d "${SOURCE_DIR}" ]]; then
+        log_message "error" "Source directory still not found after dependency installation"
+        return 1
+    fi
+    
+    return 0
+}
+
 # Generate main stubs
 generate_main_stubs() {
     log_message "info" "Generating main stubs..."
@@ -70,6 +87,12 @@ verify_stubs() {
 # Main execution
 main() {
     log_message "info" "Starting stubs generation..."
+    
+    # Install dependencies first
+    if ! install_dependencies; then
+        log_message "error" "Failed to install dependencies"
+        exit 1
+    fi
 
     if ! validate_environment; then
         log_message "error" "Environment validation failed"
