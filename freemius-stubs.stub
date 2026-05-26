@@ -9688,6 +9688,27 @@ class FS_Garbage_Collector implements \FS_I_Garbage_Collector
     }
 }
 /**
+ * Class FS_Hook_Snapshot
+ *
+ * This class allows you to take a snapshot of the current actions attached to a WordPress hook, remove them, and restore them later.
+ */
+class FS_Hook_Snapshot
+{
+    private $removed_actions = array();
+    /**
+     * Remove all actions from a given hook and store them for later restoration.
+     */
+    public function remove($hook)
+    {
+    }
+    /**
+     * Restore previously removed actions for a given hook.
+     */
+    public function restore($hook)
+    {
+    }
+}
+/**
  * Class FS_Lock
  *
  * @author Vova Feldman (@svovaf)
@@ -11864,6 +11885,12 @@ class FS_Plugin_Plan extends \FS_Entity
      * @var string Support phone.
      */
     public $support_phone;
+    /**
+     * @var string Support skype username.
+     *
+     * @deprecated 2.12.1
+     */
+    public $support_skype = '';
     /**
      * @var bool Is personal success manager supported with the plan.
      */
