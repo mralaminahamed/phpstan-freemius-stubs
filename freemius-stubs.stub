@@ -7377,10 +7377,11 @@ class Freemius extends \Freemius_Abstract
      * @param bool        $flush      Since 1.1.7.3
      * @param int         $expiration Since 1.2.2.7
      * @param bool|string $newer_than Since 2.2.1
+     * @param bool        $fetch_upgrade_notice Since 2.12.1
      *
      * @return object|false New plugin tag info if exist.
      */
-    private function _fetch_newer_version($plugin_id = \false, $flush = \true, $expiration = \WP_FS__TIME_24_HOURS_IN_SEC, $newer_than = \false)
+    private function _fetch_newer_version($plugin_id = \false, $flush = \true, $expiration = \WP_FS__TIME_24_HOURS_IN_SEC, $newer_than = \false, $fetch_upgrade_notice = \true)
     {
     }
     /**
@@ -7389,12 +7390,10 @@ class Freemius extends \Freemius_Abstract
      *
      * @param bool|number $plugin_id
      * @param bool        $flush      Since 1.1.7.3
-     * @param int         $expiration Since 1.2.2.7
-     * @param bool|string $newer_than Since 2.2.1
      *
      * @return bool|FS_Plugin_Tag
      */
-    function get_update($plugin_id = \false, $flush = \true, $expiration = \FS_Plugin_Updater::UPDATES_CHECK_CACHE_EXPIRATION, $newer_than = \false)
+    function get_update($plugin_id = \false, $flush = \true)
     {
     }
     /**
@@ -7688,10 +7687,11 @@ class Freemius extends \Freemius_Abstract
      * @param int         $expiration   Since 1.2.2.7
      * @param bool|string $newer_than   Since 2.2.1
      * @param bool|string $fetch_readme Since 2.2.1
+     * @param bool        $fetch_upgrade_notice Since 2.12.1
      *
      * @return object|false Plugin latest tag info.
      */
-    function _fetch_latest_version($addon_id = \false, $flush = \true, $expiration = \WP_FS__TIME_24_HOURS_IN_SEC, $newer_than = \false, $fetch_readme = \true)
+    function _fetch_latest_version($addon_id = \false, $flush = \true, $expiration = \WP_FS__TIME_24_HOURS_IN_SEC, $newer_than = \false, $fetch_readme = \true, $fetch_upgrade_notice = \false)
     {
     }
     #----------------------------------------------------------------------------------
@@ -7779,10 +7779,8 @@ class Freemius extends \Freemius_Abstract
      *                                was initiated by the admin.
      * @param bool|number $plugin_id
      * @param bool        $flush      Since 1.1.7.3
-     * @param int         $expiration Since 1.2.2.7
-     * @param bool|string $newer_than Since 2.2.1
      */
-    private function check_updates($background = \false, $plugin_id = \false, $flush = \true, $expiration = \FS_Plugin_Updater::UPDATES_CHECK_CACHE_EXPIRATION, $newer_than = \false)
+    private function check_updates($background = \false, $plugin_id = \false, $flush = \true)
     {
     }
     /**
@@ -11867,10 +11865,6 @@ class FS_Plugin_Plan extends \FS_Entity
      */
     public $support_phone;
     /**
-     * @var string Support skype username.
-     */
-    public $support_skype;
-    /**
      * @var bool Is personal success manager supported with the plan.
      */
     public $is_success_manager;
@@ -11964,6 +11958,10 @@ class FS_Plugin_Tag extends \FS_Entity
      * @var string One of the following: `pending`, `beta`, `unreleased`.
      */
     public $release_mode;
+    /**
+     * @var string
+     */
+    public $upgrade_notice;
     function __construct($tag = \false)
     {
     }
