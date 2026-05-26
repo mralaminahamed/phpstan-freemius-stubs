@@ -3038,7 +3038,7 @@ class Freemius extends \Freemius_Abstract
      * @param array             $sites
      * @param int               $blog_id
      */
-    private function maybe_activate_bundle_license(\FS_Plugin_License $license = \null, $sites = array(), $blog_id = 0)
+    private function maybe_activate_bundle_license($license = \null, $sites = array(), $blog_id = 0)
     {
     }
     /**
@@ -4431,7 +4431,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return FS_Plugin_Plan|false
      */
-    function _get_plan_by_id($id)
+    function _get_plan_by_id($id, $allow_sync = \true)
     {
     }
     /**
@@ -4621,7 +4621,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @param \FS_Plugin_License $license
      */
-    private function set_license(\FS_Plugin_License $license = \null)
+    private function set_license($license = \null)
     {
     }
     /**
@@ -4991,6 +4991,7 @@ class Freemius extends \Freemius_Abstract
      * @param null|number $plugin_id
      * @param array       $sites
      * @param int         $blog_id
+     * @param null|number $license_owner_id
      *
      * @return array {
      *      @var bool   $success
@@ -5000,7 +5001,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @uses Freemius::activate_license()
      */
-    function activate_migrated_license($license_key, $is_marketing_allowed = \null, $plugin_id = \null, $sites = array(), $blog_id = \null)
+    function activate_migrated_license($license_key, $is_marketing_allowed = \null, $plugin_id = \null, $sites = array(), $blog_id = \null, $license_owner_id = \null)
     {
     }
     /**
@@ -5034,9 +5035,10 @@ class Freemius extends \Freemius_Abstract
      * @param null|bool   $is_marketing_allowed
      * @param null|int    $blog_id
      * @param null|number $plugin_id
-     * @param null|number $license_owner_id
+     * @param null|number $user_id
      * @param bool|null   $is_extensions_tracking_allowed
      * @param bool|null   $is_diagnostic_tracking_allowed Since 2.5.0.2 to allow license activation with minimal data footprint.
+     * @param null|number $license_owner_id
      *
      *
      * @return array {
@@ -5045,7 +5047,7 @@ class Freemius extends \Freemius_Abstract
      *      @var string $next_page
      * }
      */
-    private function activate_license($license_key, $sites = array(), $is_marketing_allowed = \null, $blog_id = \null, $plugin_id = \null, $license_owner_id = \null, $is_extensions_tracking_allowed = \null, $is_diagnostic_tracking_allowed = \null)
+    private function activate_license($license_key, $sites = array(), $is_marketing_allowed = \null, $blog_id = \null, $plugin_id = \null, $user_id = \null, $is_extensions_tracking_allowed = \null, $is_diagnostic_tracking_allowed = \null, $license_owner_id = \null)
     {
     }
     /**
@@ -5757,7 +5759,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return bool Since 2.3.1 returns if a switch was made.
      */
-    function switch_to_blog($blog_id, \FS_Site $install = \null, $flush = \false)
+    function switch_to_blog($blog_id, $install = \null, $flush = \false)
     {
     }
     /**
@@ -6311,10 +6313,11 @@ class Freemius extends \Freemius_Abstract
      *
      * @param array         $override_with
      * @param bool|int|null $network_level_or_blog_id If true, return params for network level opt-in. If integer, get params for specified blog in the network.
+     * @param bool          $skip_user_info
      *
      * @return array
      */
-    function get_opt_in_params($override_with = array(), $network_level_or_blog_id = \null)
+    function get_opt_in_params($override_with = array(), $network_level_or_blog_id = \null, $skip_user_info = \false)
     {
     }
     /**
@@ -6336,11 +6339,12 @@ class Freemius extends \Freemius_Abstract
      * @param null|bool   $is_marketing_allowed
      * @param array       $sites                If network-level opt-in, an array of containing details of sites.
      * @param bool        $redirect
+     * @param null|number $license_owner_id
      *
      * @return string|object
      * @use    WP_Error
      */
-    function opt_in($email = \false, $first = \false, $last = \false, $license_key = \false, $is_uninstall = \false, $trial_plan_id = \false, $is_disconnected = \false, $is_marketing_allowed = \null, $sites = array(), $redirect = \true)
+    function opt_in($email = \false, $first = \false, $last = \false, $license_key = \false, $is_uninstall = \false, $trial_plan_id = \false, $is_disconnected = \false, $is_marketing_allowed = \null, $sites = array(), $redirect = \true, $license_owner_id = \null)
     {
     }
     /**
@@ -6550,7 +6554,7 @@ class Freemius extends \Freemius_Abstract
      * @param bool|int|null     $network_level_or_blog_id True for network level opt-in and integer for opt-in for specified blog in the network.
      * @param FS_Plugin_License $bundle_license           Since 2.4.0. If provided, this license will be activated for the add-on.
      */
-    private function _activate_addon_account(\Freemius $parent_fs, $network_level_or_blog_id = \null, \FS_Plugin_License $bundle_license = \null)
+    private function _activate_addon_account(\Freemius $parent_fs, $network_level_or_blog_id = \null, $bundle_license = \null)
     {
     }
     /**
@@ -7086,7 +7090,7 @@ class Freemius extends \Freemius_Abstract
      * @param null|int $network_level_or_blog_id Since 2.0.0
      * @param \FS_Site $site                     Since 2.0.0
      */
-    private function _store_site($store = \true, $network_level_or_blog_id = \null, \FS_Site $site = \null, $is_backup = \false)
+    private function _store_site($store = \true, $network_level_or_blog_id = \null, $site = \null, $is_backup = \false)
     {
     }
     /**
@@ -9986,6 +9990,15 @@ class FS_Logger
      * @return string
      */
     public static function get_logs_download_url($filename = '')
+    {
+    }
+    /**
+     * @param string $file_path
+     * @param array  $query_results
+     *
+     * @return bool
+     */
+    private static function write_csv_to_filesystem($file_path, $query_results)
     {
     }
     #endregion
@@ -13993,12 +14006,12 @@ class FS_Clone_Manager
      * @author Vova Feldman (@svovaf)
      * @since 2.5.0
      *
-     * @param Freemius    $instance
-     * @param string|false $license_key
+     * @param Freemius               $instance
+     * @param FS_Plugin_License|null $license
      *
      * @return bool TRUE if successfully connected. FALSE if failed and had to restore install from backup.
      */
-    private function delete_install_and_connect(\Freemius $instance, $license_key = \false)
+    private function delete_install_and_connect(\Freemius $instance, $license = \null)
     {
     }
     /**
