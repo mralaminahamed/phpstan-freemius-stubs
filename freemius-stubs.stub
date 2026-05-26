@@ -6407,6 +6407,31 @@ class Freemius extends \Freemius_Abstract
     /**
      * Install plugin with new user.
      *
+     * You can use this method to sync activation with the Freemius WP SDK where the activation happened outside of the regular opt-in flow, for example if you're using an external licensing server with our api:
+     *
+     * https://docs.freemius.com/api/licenses/activate
+     *
+     * In that case you can call this method like following:
+     *
+     * ```
+     *
+     * my_fs()->install_with_new_user(
+     *     $result['user_id'],
+     *     $result['user_public_key'],
+     *     $result['user_secret_key'],
+     *     $result['is_marketing_allowed'],
+     *     null,
+     *     true,
+     *     $result['install_id'],
+     *     $result['install_public_key'],
+     *     $result['install_secret_key'],
+     *     false
+     * );
+     *
+     * ```
+     *
+     * Here `$result` represents the object returned by the API endpoint.
+     *
      * @author Vova Feldman (@svovaf)
      * @since  1.1.7.4
      *
@@ -6424,7 +6449,7 @@ class Freemius extends \Freemius_Abstract
      *
      * @return string If redirect is `false`, returns the next page the user should be redirected to.
      */
-    private function install_with_new_user($user_id, $user_public_key, $user_secret_key, $is_marketing_allowed, $is_extensions_tracking_allowed, $is_diagnostic_tracking_allowed, $install_id, $install_public_key, $install_secret_key, $redirect = \true, $auto_install = \false)
+    public function install_with_new_user($user_id, $user_public_key, $user_secret_key, $is_marketing_allowed, $is_extensions_tracking_allowed, $is_diagnostic_tracking_allowed, $install_id, $install_public_key, $install_secret_key, $redirect = \true, $auto_install = \false)
     {
     }
     /**
