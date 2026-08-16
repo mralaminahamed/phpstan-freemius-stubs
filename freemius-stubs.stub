@@ -11496,10 +11496,20 @@ class FS_Payment extends \FS_Entity
      * @var int Payment source.
      */
     public $source = 0;
+    /**
+     * Presentment payment information for customer-facing currency display.
+     *
+     * @var object|null
+     */
+    public $presentment;
     #endregion Properties
     const CURRENCY_USD = 'usd';
     const CURRENCY_GBP = 'gbp';
     const CURRENCY_EUR = 'eur';
+    const CURRENCY_ILS = 'ils';
+    const CURRENCY_CAD = 'cad';
+    const CURRENCY_AUD = 'aud';
+    const CURRENCY_PLN = 'pln';
     /**
      * @param object|bool $payment
      */
@@ -11527,6 +11537,30 @@ class FS_Payment extends \FS_Entity
      * @return bool
      */
     function is_migrated()
+    {
+    }
+    /**
+     * @return bool
+     */
+    private function has_presentment()
+    {
+    }
+    /**
+     * @return float
+     */
+    private function get_display_gross()
+    {
+    }
+    /**
+     * @return float
+     */
+    private function get_display_vat()
+    {
+    }
+    /**
+     * @return string
+     */
+    private function get_display_currency()
     {
     }
     /**
