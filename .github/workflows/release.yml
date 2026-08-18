@@ -5,19 +5,34 @@ on:
     paths:
       - ".github/workflows/release.yml"
   schedule:
-    - cron: '0 * * * *'
+    # Once a day. WordPress.org releases do not warrant an hourly poll, and an
+    # hourly schedule floods the notification inbox whenever a run fails.
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
-  relase-new-stubs:
+  release-new-stubs:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          # The release script skips versions that are already tagged, so the
+          # full history and every tag have to be present.
+          fetch-depth: 0
+          token: ${{ secrets.PERSONAL_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
+          # The runner default is 7.4, but --ignore-platform-reqs lets Composer
+          # resolve PHPUnit 11 / Symfony 7, which are PHP 8.2+ code. The
+          # generator then dies parsing its own vendor tree.
+          php-version: '8.3'
           extensions: json zip xdebug
           coverage: none
           tools: composer
@@ -34,35 +49,36 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-suggest --no-progress --no-interaction --ignore-platform-reqs
-      
+        run: composer install --prefer-dist --no-progress --no-interaction --ignore-platform-reqs
+
       - name: Set up Git user
         run: |
           git config user.name 'github-actions'
           git config user.email 'github-actions@github.com'
 
       - name: Release new stubs from latest version
-        run: bash release-latest-versions.sh
+        run: bash bin/release-latest-versions.sh
 
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v6
-        with:
-          token: ${{ secrets.PERSONAL_TOKEN }}
-          commit-message: Generate stubs from latest version
-          committer: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
-          author: ${{ github.actor }} <${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com>
-          signoff: false
-          delete-branch: true
-          title: 'Generate stubs from latest version'
-          body: |
-            This PR updates the codebase with the latest changes from the packagist
-            - Update from packagist
-          labels: |
-            update
-            automated pr
-          assignees: mralaminahamed
-          draft: false
-
-      - name: Check Output
+      - name: Push new stubs and tags
         run: |
-          echo "Pull Request created successfully!"
+          set -euo pipefail
+
+          if [ "$(git rev-list --count origin/main..HEAD)" -eq 0 ]; then
+            echo "No new versions to release."
+            exit 0
+          fi
+
+          git push origin main
+
+          # Push only the tags the release script just created; everything else
+          # is already published.
+          git ls-remote --tags origin \
+            | sed -n 's#.*refs/tags/\([^^]*\)$#\1#p' | sort -u > /tmp/remote-tags
+          git tag | sort -u > /tmp/local-tags
+
+          while IFS= read -r tag; do
+            [ -n "$tag" ] || continue
+            echo "Pushing $tag"
+            git push origin "refs/tags/$tag"
+          done < <(comm -23 /tmp/local-tags /tmp/remote-tags)
+        shell: bash
