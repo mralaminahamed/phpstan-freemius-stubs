@@ -24,7 +24,6 @@ jobs:
           # The release script skips versions that are already tagged, so the
           # full history and every tag have to be present.
           fetch-depth: 0
-          token: ${{ secrets.PERSONAL_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
