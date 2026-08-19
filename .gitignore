@@ -4,3 +4,7 @@
 /.idea/
 /.vscode/
 .DS_Store
+
+# PHPUnit
+.phpunit.result.cache
+coverage/
